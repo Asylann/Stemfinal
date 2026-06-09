@@ -30,6 +30,12 @@ if IS_SQLITE:
     )
 else:
     logger.info("🐘 Используется PostgreSQL")
+    # DB_SSLMODE:
+    #   "require" — для облачных БД (Neon, Supabase, Render)
+    #   "prefer"  — по умолчанию: работает и с SSL и без (Docker local postgres)
+    #   "disable" — принудительно без SSL
+    ssl_mode = os.getenv("DB_SSLMODE", "prefer")
+    logger.info(f"🔒 SSL режим: {ssl_mode}")
     engine = create_engine(
         DATABASE_URL,
         poolclass=QueuePool,
@@ -39,8 +45,7 @@ else:
         pool_recycle=600,
         connect_args={
             "connect_timeout": 10,
-            "sslmode": "require",
-            "sslrootcert": None,
+            "sslmode": ssl_mode,
             "options": "-c timezone=Asia/Almaty"
         },
         echo=False,
