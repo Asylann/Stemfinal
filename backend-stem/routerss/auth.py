@@ -12,7 +12,9 @@ from datetime import datetime, timedelta
 
 router = APIRouter()
 
-SECRET_KEY = os.getenv("SECRET_KEY", "stem-academia-secret-key-2026")
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY environment variable is not set. It is required for secure authentication.")
 ALGORITHM = "HS256"
 EXPIRE_DAYS = 7
 
