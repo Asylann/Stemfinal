@@ -11,11 +11,11 @@ export default function SecondPage() {
     { title: t.furniture_kreslo, img: '/img/pagesecond/738d1eff.png', path: '/secondpage/kreslo' },
     { title: t.furniture_kuhnya, img: '/img/pagesecond/4a950c62bed144.jpg', path: '#' },
     { title: t.furniture_pufy, img: '/img/pagesecond/a41bcac159.png', path: '/secondpage/pufy' },
-    { title: t.furniture_stellazhi,img: '/img/page Second/e0f5951d3c3.png', path: '/ Secondpage/stellazhi' },
+    { title: t.furniture_stellazhi,img: '/img/pagesecond/e0f5951d3c3.png', path: '/ Secondpage/stellazhi' },
     { title: t.furniture_stoly, img: '/img/pagesecond/bb20aa.png', path: '#' },
     { title: t.furniture_stulya, img: '/img/pagesecond/983793aa0.png', path: '/secondpage/stulya' },
     { title: t.furniture_tumby, img: '/img/pagesecond/4d735992.png', path: '/secondpage/tumby' },
-    { title: t.furniture_shkafy, img: '/img/page Second/ce38f5332a.png', path: '/ Secondpage/shkafy' },
+    { title: t.furniture_shkafy, img: '/img/pagesecond/ce38f5332a.png', path: '/ Secondpage/shkafy' },
   ]
 
   return (
