@@ -1,0 +1,69 @@
+version: '3.9'
+
+services:
+
+  # ─── PostgreSQL Database ───────────────────────────────────────────────────
+  db:
+    image: postgres:15-alpine
+    container_name: stem_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-stemuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-stempassword}
+      POSTGRES_DB: ${POSTGRES_DB:-stemdb}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-stemuser} -d ${POSTGRES_DB:-stemdb}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - stem_network
+
+  # ─── FastAPI Backend ───────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend-stem
+      dockerfile: Dockerfile
+    container_name: stem_backend
+    restart: unless-stopped
+    env_file:
+      - ./backend-stem/.env # Telegram, Groq, Bitrix, HF tokens
+    environment:
+      # Override DATABASE_URL to point at the db service (not sqlite)
+      DATABASE_URL: postgresql://${POSTGRES_USER:-stemuser}:${POSTGRES_PASSWORD:-stempassword}@db:5432/${POSTGRES_DB:-stemdb}
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "8000" # Internal only, Nginx proxies to it
+    networks:
+      - stem_network
+
+  # ─── React + Nginx Frontend ────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend-stem
+      dockerfile: Dockerfile
+      args:
+        # Empty = use Nginx reverse proxy (same-origin), no CORS needed
+        VITE_API_URL: ""
+    container_name: stem_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80" # Expose only this to the host
+    depends_on:
+      - backend
+    networks:
+      - stem_network
+
+# ─── Volumes ──────────────────────────────────────────────────────────────────
+volumes:
+  postgres_data:
+    driver: local
+
+# ─── Networks ─────────────────────────────────────────────────────────────────
+networks:
+  stem_network:
+    driver: bridge
