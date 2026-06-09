@@ -125,7 +125,7 @@ app.include_router(products.router,      prefix="/api/products",     tags=["prod
 app.include_router(categories.router,    prefix="/api/categories",   tags=["categories"])
 app.include_router(orders.router,        prefix="/api/orders",       tags=["orders"])
 app.include_router(applications.router,  prefix="/api/applications", tags=["applications"])
-app.include_router(visualize.router,     prefix="/api/ai/visualize", tags=["AI Visualize"])
+app.include_router(visualize.router,     prefix="/api/ai", tags=["AI Visualize"])
 app.include_router(auth.router,          prefix="/auth",             tags=["auth"])
 
 
