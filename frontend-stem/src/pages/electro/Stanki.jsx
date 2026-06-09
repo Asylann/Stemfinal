@@ -1,0 +1,229 @@
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { createApplication } from '../../api/api'
+import { useCart } from '../../context/CartContext'
+import { useFavorites } from '../../context/FavoritesContext'
+import './Stanki.css'
+
+const products = [
+  {
+    id: 1,
+    tag: 'The cool tool',
+    title: 'UNIMAT ML 160200',
+    img: '/img/pagethird/stanki/item1.png',
+    description: [
+      'Unimat — это многофункциональный учебно-лабораторный станок, предназначенный для изучения основ обработки материалов, инженерии и технологий. Станок позволяет учащимся и студентам выполнять практические задания, развивать навыки работы с металлом и пластиком, а также создавать учебные проекты в безопасной учебной среде.',
+    ],
+    article: 'S.Me-ST.S.DP',
+  },
+  {
+    id: 2,
+    tag: 'The cool tool',
+    title: 'UNIMAT 1 BASIC 4B1',
+    img: '/img/pagethird/stanki/item2.png',
+    description: [
+      'Unimat по дереву — это многофункциональный учебно-лабораторный станок, предназначенный для изучения основ обработки древесины, инженерии и технологий. Станок позволяет учащимся и студентам выполнять практические задания, развивать навыки работы с древесными материалами.',
+    ],
+    article: 'S.Me-ST.S.DP',
+  },
+  {
+    id: 3,
+    tag: 'The cool tool',
+    title: 'NAME_TEXT',
+    img: '/img/pagethird/stanki/item3.png',
+    description: [
+      'Учебный станок для освоения базовых технологий обработки материалов и моделирования, оптимизированный для практических занятий.',
+      'Оснащён безопасными механизмами и позволяет изучать точность обработки, сборку прототипов и конструирование изделий.',
+    ],
+    article: 'S.Me-ST.S.DP',
+  },
+]
+
+export default function Stanki() {
+  const { addToCart } = useCart()
+  const { toggleFavorite, isFavorite } = useFavorites()
+  const [showModal, setShowModal] = useState(false)
+  const [formData, setFormData] = useState({ name: '', phone: '', comment: '', productName: '' })
+  const [submitting, setSubmitting] = useState(false)
+  const [submitSuccess, setSubmitSuccess] = useState(false)
+
+
+  const handleOpenModal = (productName) => {
+    setShowModal(true)
+    setSubmitSuccess(false)
+    setFormData({ name: '', phone: '', comment: '', productName })
+  }
+
+  const handleCloseModal = () => setShowModal(false)
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleAddToCart = (product) => {
+    addToCart({
+      id: product.id,
+      title: product.title,
+      article: product.article,
+      img: product.img,
+      name: product.title,
+    })
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setSubmitting(true)
+    try {
+      const applicationData = {
+        name: formData.name,
+        phone: formData.phone,
+        comment: formData.comment,
+        product_name: formData.productName,
+        article: '',
+        product_url: window.location.href
+      }
+      await createApplication(applicationData)
+      setSubmitSuccess(true)
+      setTimeout(() => setShowModal(false), 2000)
+    } catch (err) {
+      console.error('Ошибка отправки заявки:', err)
+      if (err.response?.status === 400) {
+        alert('❌ Проверьте правильность заполнения формы')
+      } else if (err.response?.status === 500) {
+        alert('⚠️ Сервер временно недоступен. Попробуйте позже')
+      } else {
+        alert('❌ Не удалось отправить заявку. Проверьте соединение')
+      }
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <>
+      <div className="stanki-page">
+        <div className="stanki-breadcrumb">
+          <Link to="/">Главная</Link> / <Link to="/electro">Электротехника</Link> / <span>Станки</span>
+        </div>
+
+        <h1 className="stanki-title">Станки <span>{products.length} товара</span></h1>
+
+        {products.map((p) => (
+          <div key={p.id} className="stanki-card">
+            <div className="stanki-card__img-wrap">
+              <img src={p.img} alt={p.title} className="stanki-card__img" loading="lazy" />
+            </div>
+            <div className="stanki-card__info">
+              <span className="stanki-card__tag">{p.tag}</span>
+              <h2 className="stanki-card__title">{p.title}</h2>
+
+              <p className="stanki-card__desc-label">Описание:</p>
+              {p.description.map((d, i) => (
+                <p key={i} className="stanki-card__desc">{d}</p>
+              ))}
+
+              <table className="stanki-card__table">
+                <tbody>
+                  <tr>
+                    <td>Артикул</td>
+                    <td>{p.article}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div className="stanki-card__delivery">
+                <p>🚚 Доставка по Казахстану</p>
+                <p>📍 Самовывоз: г. Астана, ул. Домалак-ана 26</p>
+              </div>
+
+              <div className="stanki-card__actions">
+                <button className="btn-cart" onClick={() => handleAddToCart(p)} type="button">
+                  🛒 В корзину
+                </button>
+                <button className="btn-order" onClick={() => handleOpenModal(p.title)} type="button">
+                  📝 Оставить заявку
+                </button>
+                <button
+                  className={`btn-favorite ${isFavorite(p.id) ? 'active' : ''}`}
+                  onClick={() => toggleFavorite(p)}
+                  type="button"
+                >
+                  {isFavorite(p.id) ? '❤️ В избранном' : '🤍 В избранное'}
+                </button>
+              </div>
+
+              <div className="stanki-card__links">
+                <span>↗ Поделиться</span>
+                <span>⚖ Сравнить</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {showModal && (
+        <div className="modal-overlay" onClick={handleCloseModal}>
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={handleCloseModal} type="button">×</button>
+            <h3 className="modal-title">📝 Оставить заявку</h3>
+            <p className="modal-product-name">Товар: <strong>{formData.productName}</strong></p>
+
+            {submitSuccess ? (
+              <div className="modal-success">
+                <span style={{ fontSize: '40px' }}>✅</span>
+                <h4>Заявка отправлена!</h4>
+                <p>Наш менеджер свяжется с вами в ближайшее время.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="modal-form">
+                <div className="modal-field">
+                  <label htmlFor="name">Ваше имя *</label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="Иван Иванов"
+                    className="modal-input"
+                  />
+                </div>
+                <div className="modal-field">
+                  <label htmlFor="phone">Телефон *</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="+7 (___) ___-__-__"
+                    className="modal-input"
+                  />
+                </div>
+                <div className="modal-field">
+                  <label htmlFor="comment">Комментарий</label>
+                  <textarea
+                    id="comment"
+                    name="comment"
+                    value={formData.comment}
+                    onChange={handleInputChange}
+                    placeholder="Дополнительная информация (необязательно)"
+                    rows="3"
+                    className="modal-input modal-textarea"
+                  />
+                </div>
+                <button type="submit" className="btn-submit" disabled={submitting}>
+                  {submitting ? '⏳ Отправка...' : '📤 Отправить заявку'}
+                </button>
+                <p className="form-note">🔒 Ваши данные защищены. Мы не передаём их третьим лицам.</p>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  )
+}

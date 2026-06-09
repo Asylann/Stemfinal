@@ -1,0 +1,270 @@
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { createApplication } from '../../api/api'
+import { useCart } from '../../context/CartContext'
+import { useFavorites } from '../../context/FavoritesContext'
+import './Peregorodki.css'
+
+
+const products = [
+  {
+    id: 1,
+    title: 'СТЕКЛО',
+    img: ['/img/pagedecor/peregorodki/item1.png'],
+    description: 'Стеклянные перегородки делают пространство визуально лёгким и просторным. Они пропускают свет, не загромождая комнату. Идеально подходят для зонирования офисов, гостиных, кухонь или ванных комнат.',
+    article: 'S.Me-ST.S.DP',
+  },
+  {
+    id: 2,
+    title: 'РЕЙКИ',
+    img: ['/img/pagedecor/peregorodki/item2.png'],
+    description: 'Реечные перегородки из деревянных или пластиковых реек создают ритм и текстуру в интерьере. Отлично смотрятся в стиле лофт, скандинавском или минимализм.',
+    article: 'S.Me-ST.S.DP',
+  },
+  {
+    id: 3,
+    title: 'МЕТАЛЛ',
+    img: ['/img/pagedecor/peregorodki/item31.png', '/img/pagedecor/peregorodki/item32.png'],
+    description: 'Металлические перегородки — для современных интерьеров. Прочные, долговечные, с индустриальным характером. Подходят для офисов, лофтов, студий и технических помещений.',
+    article: 'S.Me-ST.S.DP',
+  },
+]
+
+
+function CardImage({ src, alt }) {
+  const handleError = (e) => {
+    e.target.style.display = 'none'
+    e.target.nextSibling.style.display = 'flex'
+  }
+  return (
+    <>
+      <img src={src} alt={alt} className="perego-img-item" onError={handleError} />
+      <div className="perego-img-soon" style={{ display: 'none' }}>
+        <span className="perego-soon-badge">СКОРО</span>
+        <span className="perego-soon-text">СКОРО</span>
+      </div>
+    </>
+  )
+}
+
+
+export default function Peregorodki() {
+  const { addToCart } = useCart()
+  const { toggleFavorite, isFavorite } = useFavorites()
+  const [showModal, setShowModal] = useState(false)
+  const [formData, setFormData] = useState({ name: '', phone: '', comment: '', productName: '', article: '' })
+  const [submitting, setSubmitting] = useState(false)
+  const [submitSuccess, setSubmitSuccess] = useState(false)
+  const [addedId, setAddedId] = useState(null)
+
+  
+  const handleOpenModal = (product) => {
+    setShowModal(true)
+    setSubmitSuccess(false)
+    setFormData({ name: '', phone: '', comment: '', productName: product.title, article: product.article })
+  }
+
+  const handleCloseModal = () => setShowModal(false)
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleAddToCart = (product) => {
+    addToCart({
+      id: product.id,
+      title: product.title,
+      article: product.article,
+      img: product.img[0],
+      name: product.title,
+    })
+    setAddedId(product.id)
+    setTimeout(() => setAddedId(null), 2000)
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setSubmitting(true)
+    try {
+      await createApplication({
+        name: formData.name,
+        phone: formData.phone,
+        comment: formData.comment,
+        product_name: formData.productName,
+        article: formData.article,
+        product_url: window.location.href,
+      })
+      setSubmitSuccess(true)
+      setTimeout(() => setShowModal(false), 2000)
+    } catch (err) {
+      console.error('Ошибка отправки заявки:', err)
+      if (err.response?.status === 400) {
+        alert('❌ Проверьте правильность заполнения формы')
+      } else if (err.response?.status === 500) {
+        alert('⚠️ Сервер временно недоступен. Попробуйте позже')
+      } else {
+        alert('❌ Не удалось отправить заявку. Проверьте соединение')
+      }
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <>
+      <div className="peregorodki-page">
+        <div className="peregorodki-breadcrumb">
+          <Link to="/" className="breadcrumb-link">Главная</Link>
+          <span> / </span>
+          <Link to="/decor" className="breadcrumb-link">Декор</Link>
+          <span> / </span>
+          <span>Перегородки</span>
+        </div>
+
+        <h1 className="peregorodki-title">
+          Перегородки <span>{products.length} товара</span>
+        </h1>
+
+        <div className="peregorodki-list">
+          {products.map((p) => (
+            <div key={p.id} className="peregorodki-card">
+
+              <div className="peregorodki-card__gallery">
+                {p.img.length > 1 ? (
+                  <div className="perego-multi-img">
+                    {p.img.map((src, i) => (
+                      <CardImage key={i} src={src} alt={p.title} />
+                    ))}
+                  </div>
+                ) : (
+                  <CardImage src={p.img[0]} alt={p.title} />
+                )}
+              </div>
+
+              <div className="peregorodki-card__info">
+                <h2>{p.title}</h2>
+                <p className="peregorodki-card__desc-label">Описание:</p>
+                <p className="peregorodki-card__desc">{p.description}</p>
+
+                <table className="peregorodki-card__table">
+                  <tbody>
+                    <tr>
+                      <td>Артикул</td>
+                      <td>{p.article}</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div className="peregorodki-card__delivery">
+                  <span>🚚 Доставка по Казахстану</span>
+                  <span>📍 Самовывоз: г. Астана, ул. Домалак-ана 26</span>
+                </div>
+
+                {/* Кнопки В корзину + В избранное */}
+                <div className="peregorodki-card__actions">
+                  <button
+                    className={`perego-btn-cart ${addedId === p.id ? 'added' : ''}`}
+                    onClick={() => handleAddToCart(p)}
+                    disabled={addedId === p.id}
+                    type="button"
+                  >
+                    {addedId === p.id ? '✓ Добавлено!' : '🛒 В корзину'}
+                  </button>
+                  <button
+                    className={`perego-btn-fav ${isFavorite(p.id) ? 'active' : ''}`}
+                    onClick={() => toggleFavorite(p)}
+                    type="button"
+                  >
+                    {isFavorite(p.id) ? '❤️ В избранном' : '🤍 В избранное'}
+                  </button>
+                </div>
+
+                {/*  Заявка через модалку, не тг */}
+                <button
+                  className="btn-order-full"
+                  onClick={() => handleOpenModal(p)}
+                  type="button"
+                >
+                  📝 Оставить заявку
+                </button>
+
+                <div className="peregorodki-card__share">
+                  <button type="button">↗ Поделиться</button>
+                  <button type="button">⚖ Сравнить</button>
+                </div>
+              </div>
+
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/*  Модальное окно заявки */}
+      {showModal && (
+        <div className="modal-overlay" onClick={handleCloseModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={handleCloseModal} type="button">×</button>
+
+            <h2 className="modal-title">📝 Оставить заявку</h2>
+            <p className="modal-subtitle">
+              Товар: <strong>{formData.productName}</strong>
+            </p>
+
+            {submitSuccess ? (
+              <div className="success-message">
+                <div className="success-icon">✅</div>
+                <h3>Заявка отправлена!</h3>
+                <p>Наш менеджер свяжется с вами в ближайшее время.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="application-form">
+                <div className="form-group">
+                  <label htmlFor="name">Ваше имя *</label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="Иван Иванов"
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="phone">Телефон *</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="+7 (___) ___-__-__"
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="comment">Комментарий</label>
+                  <textarea
+                    id="comment"
+                    name="comment"
+                    value={formData.comment}
+                    onChange={handleInputChange}
+                    placeholder="Дополнительная информация (необязательно)"
+                    rows="3"
+                  />
+                </div>
+                <button type="submit" className="btn-submit" disabled={submitting}>
+                  {submitting ? '⏳ Отправка...' : '📤 Отправить заявку'}
+                </button>
+                <p className="form-note">
+                  🔒 Ваши данные защищены. Мы не передаём их третьим лицам.
+                </p>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  )
+}

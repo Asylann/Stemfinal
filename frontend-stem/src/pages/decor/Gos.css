@@ -1,0 +1,99 @@
+.gos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 30px 40px;
+}
+
+.gos-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gos-card__name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111;
+}
+
+.gos-card__img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.gos-card__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+}
+
+.gos-card__col {
+  font-size: 13px;
+  color: #333;
+}
+
+.gos-card__col strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #111;
+}
+
+.gos-card__col p {
+  line-height: 1.5;
+  color: #555;
+}
+
+.gos-card__col ol {
+  margin: 0 0 0 16px;
+  padding: 0;
+}
+
+.gos-card__col li {
+  margin-bottom: 3px;
+}
+
+.gos-card__colors {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.gos-color-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.gos-color-circle {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.gos-card__size {
+  white-space: pre-line;
+  line-height: 1.7;
+  color: #555;
+}
+
+.gos-card__article {
+  font-size: 12px;
+  color: #888;
+  border-top: 1px solid #eee;
+  padding-top: 8px;
+}

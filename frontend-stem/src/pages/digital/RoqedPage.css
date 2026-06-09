@@ -1,0 +1,206 @@
+.roqed-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+.roqed-breadcrumb {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 24px;
+}
+
+.roqed-breadcrumb a {
+  color: #888;
+  text-decoration: none;
+}
+
+.roqed-breadcrumb a:hover {
+  color: #333;
+}
+
+.roqed-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* ЛЕВАЯ КАРТОЧКА */
+.roqed-card {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 28px;
+}
+
+.roqed-card h1 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.roqed-desc {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.roqed-licenses h2 {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.roqed-licenses-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.roqed-license-col {
+  background: #f9f9f9;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.roqed-license-col h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.roqed-license-col ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.roqed-license-col li {
+  font-size: 13px;
+  color: #333;
+  padding-left: 24px;
+  position: relative;
+  line-height: 1.4;
+}
+
+.roqed-license-col li.yes::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 3px;
+  width: 16px;
+  height: 16px;
+  background: #2db35d;
+  border-radius: 50%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
+  background-size: 10px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.roqed-license-col li.no::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 3px;
+  width: 16px;
+  height: 16px;
+  background: #e0e0e0;
+  border-radius: 50%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='3'%3E%3Cpath d='M18 6L6 18M6 6l12 12'/%3E%3C/svg%3E");
+  background-size: 9px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.roqed-article {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e5e5;
+  font-size: 12px;
+  color: #999;
+}
+
+
+.roqed-tech-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.roqed-tech-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.roqed-tech-card {
+  border-radius: 14px;
+  padding: 24px;
+  color: #fff;
+}
+
+.roqed-tech-windows {
+  background: #1565c0;
+}
+
+.roqed-tech-android {
+  background: #2e7d32;
+}
+
+.roqed-tech-icon {
+  margin-bottom: 12px;
+  opacity: 0.9;
+}
+
+.roqed-tech-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.roqed-tech-label {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.75;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 14px;
+}
+
+.roqed-tech-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.roqed-tech-card li {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+
+@media (max-width: 768px) {
+  .roqed-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .roqed-tech-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .roqed-licenses-grid {
+    grid-template-columns: 1fr;
+  }
+}

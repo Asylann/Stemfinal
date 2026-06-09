@@ -1,0 +1,123 @@
+.rasteniya-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 16px 32px;
+  height: calc(100vh - 100px);
+}
+
+.rasteniya-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.rasteniya-card__title {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 900;
+  font-size: 1.1rem;
+  color: #111;
+  padding: 14px 16px 8px;
+  flex-shrink: 0;
+  line-height: 1.3;
+}
+
+.rasteniya-card__img-wrap {
+  height: 320px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: transparent;
+  padding: 10px;
+}
+
+.rasteniya-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.rasteniya-card__body {
+  padding: 10px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.rasteniya-card__section {
+  margin-bottom: 4px;
+}
+
+.rasteniya-card__label {
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: #111;
+  margin-bottom: 4px;
+}
+
+
+.rasteniya-card__colors {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.rasteniya-card__color-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: #333;
+}
+
+.rasteniya-card__color-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+}
+
+
+.rasteniya-card__materials {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rasteniya-card__material-item {
+  font-size: 0.78rem;
+  color: #333;
+}
+
+.rasteniya-card__desc-label {
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: #111;
+  margin-top: 4px;
+}
+
+.rasteniya-card__desc {
+  font-size: 0.75rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+.rasteniya-card__divider {
+  border-top: 1px solid #e0e0e0;
+  margin-top: 8px;
+}
+
+.rasteniya-card__article {
+  font-size: 0.7rem;
+  color: #999;
+  margin-top: 6px;
+}

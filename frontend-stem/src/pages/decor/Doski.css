@@ -1,0 +1,74 @@
+.doski-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 16px 32px;
+  height: calc(100vh - 100px);
+}
+
+.doski-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.doski-card__title {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 900;
+  font-size: 1.1rem;
+  color: #111;
+  padding: 14px 16px 8px;
+  flex-shrink: 0;
+  line-height: 1.3;
+}
+
+.doski-card__img-wrap {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: transparent;
+  padding: 10px;
+  min-height: 0;
+}
+
+.doski-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.doski-card__body {
+  padding: 10px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.doski-card__desc-label {
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: #111;
+}
+
+.doski-card__desc {
+  font-size: 0.75rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+.doski-card__divider {
+  border-top: 1px solid #e0e0e0;
+  margin-top: 8px;
+}
+
+.doski-card__article {
+  font-size: 0.7rem;
+  color: #999;
+  margin-top: 6px;
+}

@@ -1,0 +1,253 @@
+
+.fav-page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  background-color: #f9f9f9; 
+  min-height: 100vh;
+}
+
+.fav-breadcrumb {
+  margin-bottom: 24px;
+  color: #888;
+  font-size: 14px;
+}
+
+.fav-breadcrumb a {
+  color: #2f6f55;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.fav-breadcrumb a:hover {
+  color: #1e4a38;
+}
+
+.fav-title {
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 32px;
+  color: #111;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fav-title span {
+  font-size: 16px;
+  color: #888;
+  font-weight: 500;
+}
+
+
+.fav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+
+.fav-card {
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(0,0,0,0.03);
+}
+
+
+.fav-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+
+.fav-card__image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 260px; 
+  background-color: #f4f4f4; 
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fav-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; 
+  padding: 20px; 
+  transition: transform 0.5s ease;
+}
+
+
+.fav-card:hover .fav-card__img {
+  transform: scale(1.08);
+}
+
+
+.fav-card__remove {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  color: #666;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+}
+
+.fav-card__remove:hover {
+  background: #ff4d4d;
+  color: white;
+  transform: rotate(90deg);
+}
+
+
+.fav-card__info {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; 
+}
+
+.fav-card__name {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 6px;
+  color: #222;
+  line-height: 1.3;
+}
+
+.fav-card__article {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 12px;
+}
+
+.fav-card__price {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2f6f55; 
+  margin: 0 0 20px;
+}
+
+.fav-card__price--ask {
+  color: #999;
+  font-style: italic;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+
+.fav-card__actions {
+  padding: 0 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto; 
+}
+
+.fav-btn-cart {
+  width: 100%;
+  padding: 12px;
+  background: #2f6f55;
+  color: white;
+  border: 2px solid #2f6f55;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.fav-btn-cart:hover {
+  background: #255a45;
+  border-color: #255a45;
+  box-shadow: 0 4px 12px rgba(47, 111, 85, 0.3);
+}
+
+.fav-btn-cart--added {
+  background: #10b981;
+  border-color: #10b981;
+  cursor: default;
+}
+
+.fav-btn-order {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  color: #2f6f55;
+  border: 2px solid #2f6f55;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.fav-btn-order:hover {
+  background: rgba(47, 111, 85, 0.05);
+  transform: translateY(-2px);
+}
+
+
+.fav-empty {
+  text-align: center;
+  padding: 100px 20px;
+  color: #666;
+}
+.fav-empty h2 { margin-bottom: 10px; color: #333; }
+.fav-login-btn {
+  margin-top: 20px;
+  padding: 12px 24px;
+  background: #2f6f55;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+
+@media (max-width: 768px) {
+  .fav-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  
+  .fav-card__image-wrapper {
+    height: 200px;
+  }
+  
+  .fav-card__remove {
+    opacity: 1; 
+  }
+}

@@ -1,0 +1,141 @@
+.computers-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 12px 32px;
+  height: calc(100vh - 100px);
+  overflow: hidden;
+}
+
+.computer-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  overflow: hidden;
+}
+
+
+.computer-card__top {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.computer-card__top-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.computer-card__type {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 900;
+  font-size: 1.2rem;
+  color: #111;
+  line-height: 1.1;
+}
+
+.computer-card__brand {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: #111;
+}
+
+.computer-card__desc {
+  font-size: 0.67rem;
+  color: #444;
+  line-height: 1.5;
+}
+
+.computer-card__included {
+  font-size: 0.67rem;
+  color: #333;
+  line-height: 1.5;
+}
+
+.computer-card__included strong {
+  font-weight: 700;
+  color: #111;
+}
+
+
+.computer-card__img-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.computer-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  max-height: 220px;
+}
+
+.computer-card__specs-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.computer-card__specs-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #111;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.computer-card__specs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.comp-spec {
+  background: #f5f5f3;
+  border-radius: 8px;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 3px;
+}
+
+.comp-spec__icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.comp-spec__label {
+  font-size: 0.55rem;
+  color: #777;
+  line-height: 1.2;
+}
+
+.comp-spec__value {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 900;
+  font-size: 0.62rem;
+  color: #111;
+  line-height: 1.2;
+}
+
+.computer-card__article {
+  font-size: 0.65rem;
+  color: #999;
+  padding-top: 6px;
+  border-top: 1px solid #e0e0e0;
+  margin-top: auto;
+}

@@ -1,0 +1,137 @@
+
+.digital-page {
+  background: #f5f5f5;
+  min-height: 100vh;
+  padding: 0 40px 60px;
+}
+
+.digital-breadcrumb {
+  padding: 14px 0;
+  font-size: 13px;
+  color: #888;
+}
+
+.digital-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.digital-header__title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.digital-header__count {
+  font-size: 13px;
+  color: #888;
+}
+
+
+.digital-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.digital-row {
+  display: grid;
+  gap: 20px;
+}
+
+.digital-row--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+
+.digital-card {
+  border-radius: 16px;
+  overflow: hidden;
+  text-decoration: none;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
+  padding: 24px;
+  gap: 12px;
+}
+
+.digital-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.13);
+}
+
+.digital-card__title {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  color: #111;
+  letter-spacing: 0.5px;
+}
+
+
+.digital-card--img {
+  height: 320px;
+}
+
+.digital-card--img .digital-card__img-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.digital-card--img .digital-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+
+.digital-card--text {
+  flex-direction: row;
+  align-items: center;
+  height: 200px;
+}
+
+.digital-card__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.digital-card__desc {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.6;
+}
+
+.digital-card--text .digital-card__img-wrap {
+  width: 40%;
+  height: 100%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.digital-card--text .digital-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+@media (max-width: 768px) {
+  .digital-page { padding: 0 16px 40px; }
+  .digital-row--2 { grid-template-columns: 1fr; }
+  .digital-card--img { height: 220px; }
+  .digital-card--text { flex-direction: column; height: auto; }
+  .digital-card--text .digital-card__img-wrap { width: 100%; height: 160px; }
+}
