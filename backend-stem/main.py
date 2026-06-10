@@ -34,8 +34,8 @@ app.add_middleware(
         "https://frontend-stem.yvayvayayv7.workers.dev",
     ],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"],
 )
 
 BITRIX_WEBHOOK_URL = os.getenv("BITRIX_WEBHOOK_URL")
@@ -58,6 +58,52 @@ class ChatMessage(BaseModel):
         return v
 
 
+SYSTEM_PROMPT = """
+Ты — виртуальный помощник компании STEM Academia (Казахстан).
+Твоя задача: помогать клиентам подбирать мебель и оборудование, отвечать на вопросы о доставке и оплате.
+
+ИНФОРМАЦИЯ О КОМПАНИИ:
+- Мы продаем: мебель для школ/офисов, парты, стулья, шкафы, интерактивные панели, 3D декор, лабораторное оборудование.
+- Доставка: По всему Казахстану.
+- Самовывоз: г. Астана, ул. Домалак-ана 26.
+- Телефон/WhatsApp: +7 700 039 58 77.
+- Сайт: stem-academia.kz
+
+ПРАВИЛА ОБЩЕНИЯ:
+- Отвечай кратко, вежливо и по делу (максимум 3-4 предложения).
+- Если не знаешь точного ответа — предложи написать менеджеру в WhatsApp.
+- Не выдумывай цены и наличие, если их нет в вопросе.
+- Поддерживай русский и казахский языки (отвечай на том же, на котором спросили).
+"""
+
+
+def build_chat_messages(body: dict) -> list[dict[str, str]]:
+    messages: list[dict[str, str]] = [{"role": "system", "content": SYSTEM_PROMPT}]
+
+    history = body.get("messages")
+    if isinstance(history, list):
+        for item in history[-12:]:
+            if not isinstance(item, dict):
+                continue
+
+            role = item.get("role")
+            content = item.get("content")
+
+            if role not in {"user", "assistant"}:
+                continue
+            if not isinstance(content, str) or not content.strip():
+                continue
+
+            messages.append({"role": role, "content": content.strip()[:4000]})
+
+    user_message = body.get("message") or body.get("text")
+    if isinstance(user_message, str) and user_message.strip():
+        if not messages or messages[-1].get("role") != "user" or messages[-1].get("content") != user_message.strip():
+            messages.append({"role": "user", "content": user_message.strip()[:4000]})
+
+    return messages
+
+
 @app.post("/api/ai/chat")
 async def ai_chat(request: Request):
     try:
@@ -71,27 +117,11 @@ async def ai_chat(request: Request):
         raise HTTPException(status_code=422, detail="Поле 'message' обязательно")
 
     if not GROQ_API_KEY:
-        return {"reply": "⚠️ Ошибка: GROQ_API_KEY не настроен"}
-
-    SYSTEM_PROMPT = """
-    Ты — виртуальный помощник компании STEM Academia (Казахстан).
-    Твоя задача: помогать клиентам подбирать мебель и оборудование, отвечать на вопросы о доставке и оплате.
-
-    ИНФОРМАЦИЯ О КОМПАНИИ:
-    - Мы продаем: мебель для школ/офисов, парты, стулья, шкафы, интерактивные панели, 3D декор, лабораторное оборудование.
-    - Доставка: По всему Казахстану.
-    - Самовывоз: г. Астана, ул. Домалак-ана 26.
-    - Телефон/WhatsApp: +7 700 039 58 77.
-    - Сайт: stem-academia.kz
-
-    ПРАВИЛА ОБЩЕНИЯ:
-    - Отвечай кратко, вежливо и по делу (максимум 3-4 предложения).
-    - Если не знаешь точного ответа — предложи написать менеджеру в WhatsApp.
-    - Не выдумывай цены и наличие, если их нет в вопросе.
-    - Поддерживай русский и казахский языки (отвечай на том же, на котором спросили).
-    """
+        return {"reply": "⚠️ Ошибка: сервис ИИ не настроен"}
 
     try:
+        chat_messages = build_chat_messages(body)
+
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 "https://api.groq.com/openai/v1/chat/completions",
@@ -101,10 +131,7 @@ async def ai_chat(request: Request):
                 },
                 json={
                     "model": "llama-3.1-8b-instant",
-                    "messages": [
-                        {"role": "system", "content": SYSTEM_PROMPT},
-                        {"role": "user", "content": user_message}
-                    ],
+                    "messages": chat_messages,
                     "temperature": 0.5,
                     "max_tokens": 300
                 },
@@ -125,7 +152,7 @@ app.include_router(products.router,      prefix="/api/products",     tags=["prod
 app.include_router(categories.router,    prefix="/api/categories",   tags=["categories"])
 app.include_router(orders.router,        prefix="/api/orders",       tags=["orders"])
 app.include_router(applications.router,  prefix="/api/applications", tags=["applications"])
-app.include_router(visualize.router,     prefix="/api/ai/visualize", tags=["AI Visualize"])
+app.include_router(visualize.router,     prefix="/api/ai", tags=["AI Visualize"])
 app.include_router(auth.router,          prefix="/auth",             tags=["auth"])
 
 
