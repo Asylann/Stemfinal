@@ -79,6 +79,13 @@ export default function Footer() {
             <a href={telegramLink} target="_blank" rel="noreferrer" className="footer-messenger-btn footer-messenger-btn--tg">
               Telegram
             </a>
+            <button
+              type="button"
+              className="footer-messenger-btn footer-messenger-btn--grok footer-messenger-btn--grok-trigger"
+              onClick={() => window.dispatchEvent(new Event('open-grok-chat'))}
+            >
+              Чат с ИИ
+            </button>
           </div>
         </div>
       </div>

@@ -1,16 +1,108 @@
-import React from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './FloatingButtons.css'
+import { chatWithGrok } from '../api/api'
 
 export default function FloatingButtons() {
-  const phoneNumber = '77000395877'
-  const message = 'Здравствуйте! Интересует ваш товар'
-  const telegramUsername = 'sulllelilukfjfjf'
+  const inputRef = useRef(null)
+  const messagesEndRef = useRef(null)
+  const [chatInput, setChatInput] = useState('')
+  const [chatOpen, setChatOpen] = useState(true)
+  const [chatLoading, setChatLoading] = useState(false)
+  const [chatError, setChatError] = useState('')
+  const [chatMessages, setChatMessages] = useState([
+    {
+      role: 'assistant',
+      content: 'Здравствуйте. Я ИИ-помощник STEM Academia. Задайте вопрос о товарах, доставке, оплате или подборе решения.'
+    }
+  ])
 
   const whatsappLink = ``
   const telegramLink = ``
 
+  useEffect(() => {
+    function handleOpenChat() {
+      setChatOpen(true)
+    }
+
+    window.addEventListener('open-grok-chat', handleOpenChat)
+    return () => window.removeEventListener('open-grok-chat', handleOpenChat)
+  }, [])
+
+  useEffect(() => {
+    if (chatOpen) {
+      inputRef.current?.focus()
+    }
+  }, [chatOpen])
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [chatMessages, chatOpen])
+
+  function openChat() {
+    setChatOpen(true)
+    setChatError('')
+  }
+
+  function closeChat() {
+    setChatOpen(false)
+  }
+
+  async function handleSendMessage(event) {
+    event.preventDefault()
+
+    const text = chatInput.trim()
+    if (!text || chatLoading) return
+
+    setChatInput('')
+    setChatError('')
+
+    const nextMessages = [...chatMessages, { role: 'user', content: text }]
+    setChatMessages(nextMessages)
+    setChatLoading(true)
+
+    try {
+      const response = await chatWithGrok(text, nextMessages)
+      const reply = response?.reply?.trim()
+
+      setChatMessages(current => [
+        ...current,
+        {
+          role: 'assistant',
+          content: reply || 'Не удалось получить ответ. Попробуйте ещё раз.'
+        }
+      ])
+    } catch {
+      setChatError('Не удалось подключиться к ИИ. Попробуйте ещё раз.')
+      setChatMessages(current => [
+        ...current,
+        {
+          role: 'assistant',
+          content: 'Не удалось подключиться к ИИ. Попробуйте ещё раз.'
+        }
+      ])
+    } finally {
+      setChatLoading(false)
+    }
+  }
+
   return (
     <div className="floating-buttons-container">
+      <a
+        href="#grok-chat"
+        className="float-btn grok"
+        title="Открыть чат с ИИ"
+        aria-label="Открыть чат с ИИ"
+        onClick={(event) => {
+          event.preventDefault()
+          openChat()
+        }}
+      >
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 2.5a9.5 9.5 0 1 0 6.4 16.5l2.3.9-.9-2.3A9.5 9.5 0 0 0 12 2.5Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+          <path d="M8.2 10.2h7.6M8.2 13.8h4.6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+          <path d="M16.6 8.2l.4-1 .4 1 1 .4-1 .4-.4 1-.4-1-1-.4 1-.4Z" fill="currentColor"/>
+        </svg>
+      </a>
       
       {/*  Кнопка Telegram */}
       <a
@@ -42,6 +134,52 @@ export default function FloatingButtons() {
 
       {/* Instagram */}
       
+
+      {chatOpen && (
+        <div className="grok-chat-overlay" role="dialog" aria-modal="true" aria-labelledby="grok-chat-title">
+          <div className="grok-chat-panel">
+            <div className="grok-chat-header">
+              <div>
+                <p className="grok-chat-kicker">STEM Academia</p>
+                <h3 id="grok-chat-title">Чат с ИИ</h3>
+              </div>
+              <button type="button" className="grok-chat-close" onClick={closeChat} aria-label="Закрыть чат">
+                ✕
+              </button>
+            </div>
+
+            <div className="grok-chat-body">
+              {chatMessages.map((item, index) => (
+                <div key={`${item.role}-${index}`} className={`grok-chat-bubble grok-chat-bubble--${item.role}`}>
+                  {item.content}
+                </div>
+              ))}
+              {chatLoading && (
+                <div className="grok-chat-bubble grok-chat-bubble--assistant grok-chat-bubble--loading">
+                  ИИ печатает...
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+
+            <form className="grok-chat-composer" onSubmit={handleSendMessage}>
+              <textarea
+                ref={inputRef}
+                value={chatInput}
+                onChange={(event) => setChatInput(event.target.value)}
+                placeholder="Спросите про товар, доставку, цены или подбор решения"
+                rows="3"
+              />
+              <div className="grok-chat-actions">
+                <span className="grok-chat-status">{chatError || 'Ответы формируются через ИИ'}</span>
+                <button type="submit" disabled={chatLoading || !chatInput.trim()}>
+                  {chatLoading ? 'Отправка...' : 'Отправить'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
   )

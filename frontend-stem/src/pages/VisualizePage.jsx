@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import './VisualizePage.css'
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://backend-stem.onrender.com'
+const API_BASE = import.meta.env.VITE_API_URL || ""
 
 const PRODUCT_OPTIONS = [
   { id: 1, label: '🛋 Диван мягкий' },
@@ -77,7 +77,7 @@ export default function VisualizePage() {
     try {
       const imageBase64 = await toBase64(file)
 
-      const res = await fetch(`${API_BASE}/api/ai/visualize`, {
+      const res = await fetch(`${API_BASE}/api/ai/visualize/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
