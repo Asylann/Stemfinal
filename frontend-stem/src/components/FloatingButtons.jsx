@@ -3,6 +3,9 @@ import './FloatingButtons.css'
 import { chatWithGrok } from '../api/api'
 
 export default function FloatingButtons() {
+  const phoneNumber = '77770016786'
+  const message = 'Здравствуйте! Интересует ваш товар'
+  const telegramUsername = 'stemacademia'
   const inputRef = useRef(null)
   const messagesEndRef = useRef(null)
   const [chatInput, setChatInput] = useState('')
@@ -16,8 +19,8 @@ export default function FloatingButtons() {
     }
   ])
 
-  const whatsappLink = ``
-  const telegramLink = ``
+  const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
+  const telegramLink = `https://t.me/${telegramUsername}`
 
   useEffect(() => {
     function handleOpenChat() {

@@ -4,16 +4,8 @@ import { useLang } from '../i18n/LanguageContext'
 import { useFavorites } from '../context/FavoritesContext'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
-import { createApplication } from '../api/api'
+import { apiClient } from '../api/api'
 import './ProductList.css'
-
-// Use the shared BASE_URL from api.js so the same env-var logic applies everywhere.
-// In Docker: '' (relative) → Nginx proxies to backend. In local dev: http://localhost:8000
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL_BACKEND ??
-  import.meta.env.VITE_API_URL ??
-  ''
-
 
 function ApplicationModal({ product, onClose }) {
   const [form, setForm] = useState({
@@ -115,20 +107,15 @@ function ApplicationModal({ product, onClose }) {
       : form.comment.trim()
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/applications/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: cleanName,
-          phone: cleanPhone,
-          username: form.username.trim(),
-          comment: finalComment,
-          product_name: product.title,
-          article: product.article,
-          product_url: window.location.href,
-        }),
+      await apiClient.post('/api/applications/', {
+        name: cleanName,
+        phone: cleanPhone,
+        username: form.username.trim(),
+        comment: finalComment,
+        product_name: product.title,
+        article: product.article,
+        product_url: window.location.href,
       })
-      if (!response.ok) throw new Error('Ошибка отправки')
       setSent(true)
     } catch {
       setSent(false)

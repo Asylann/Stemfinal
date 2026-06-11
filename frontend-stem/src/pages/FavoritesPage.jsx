@@ -21,7 +21,7 @@ const FavCard = memo(function FavCard({ item }) {
     : (item.imgs?.[0] || item.image || item.img || '/placeholder-product.svg')
 
   const telegramMsg = `Здравствуйте! Интересует товар: ${name}`
-  const telegramLink = ``
+  const telegramLink = `https://t.me/stemacademia?text=${encodeURIComponent(telegramMsg)}`
 
   const handleAddToCart = () => {
     addToCart({
