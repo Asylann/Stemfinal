@@ -1,7 +1,8 @@
-import ProductList from '../../components/ProductList'
+﻿import ProductList from '../../components/ProductList'
+import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import './Category.css'
 
-const products = [{
+const STATIC_PRODUCTS = [{
   id: 1,
   title: `ВСТРОЕННЫЙ ШКАФ 1`,
   img: `/img/pagesecond/shkafy/vstroenye/shkaf1/shkaf1.png`,
@@ -49,9 +50,11 @@ const products = [{
 }]
 
 export default function Vstroenye() {
+  const { products, loading } = useCategoryProducts('vstroenye', STATIC_PRODUCTS)
   return (
     <ProductList
       products={products}
+      loading={loading}
       title="Встроенные шкафы"
       backPath="/secondpage/shkafy"
       backLabel="Шкафы"

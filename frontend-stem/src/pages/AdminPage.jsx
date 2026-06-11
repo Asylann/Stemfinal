@@ -10,6 +10,7 @@ import {
   adminDeleteApplication,
   adminGetUsers,
   adminGetCategories,
+  adminUploadImage,
 } from '../api/adminApi'
 import './AdminPage.css'
 
@@ -42,6 +43,8 @@ function ProductModal({ product, categories, onClose, onSaved }) {
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [uploading, setUploading] = useState(false)
+  const [imgPreview, setImgPreview] = useState(product?.img || '')
 
   const set = (field) => (e) =>
     setForm((prev) => ({
@@ -49,10 +52,38 @@ function ProductModal({ product, categories, onClose, onSaved }) {
       [field]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
     }))
 
+  // Handle file picker → upload → store returned URL
+  async function handleImageFile(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Immediate local preview
+    const localUrl = URL.createObjectURL(file)
+    setImgPreview(localUrl)
+
+    setUploading(true)
+    setError('')
+    try {
+      const result = await adminUploadImage(file)
+      const uploadedUrl = result.url
+      setForm((prev) => ({ ...prev, img: uploadedUrl }))
+      setImgPreview(uploadedUrl)
+    } catch (err) {
+      setError('Ошибка загрузки фото: ' + err.message)
+      setImgPreview(form.img || '')
+    } finally {
+      setUploading(false)
+    }
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     if (!form.title.trim()) {
       setError('Название товара обязательно')
+      return
+    }
+    if (uploading) {
+      setError('Подождите, фото ещё загружается...')
       return
     }
     setSaving(true)
@@ -113,9 +144,35 @@ function ProductModal({ product, categories, onClose, onSaved }) {
             </div>
           </div>
 
+          {/* Image upload */}
           <div className="admin-form__field">
-            <label>URL изображения</label>
-            <input value={form.img} onChange={set('img')} placeholder="/img/..." />
+            <label>Фото товара</label>
+            <div className="admin-img-upload">
+              {imgPreview && (
+                <img
+                  src={imgPreview}
+                  alt="preview"
+                  className="admin-img-upload__preview"
+                  onError={(e) => { e.target.style.display = 'none' }}
+                />
+              )}
+              <label className="admin-img-upload__btn" htmlFor="product-img-file">
+                {uploading ? '⏳ Загрузка...' : imgPreview ? '🔄 Заменить фото' : '📷 Загрузить фото'}
+              </label>
+              <input
+                id="product-img-file"
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                style={{ display: 'none' }}
+                onChange={handleImageFile}
+                disabled={uploading}
+              />
+              {form.img && (
+                <span className="admin-img-upload__url" title={form.img}>
+                  {form.img.length > 40 ? '...' + form.img.slice(-35) : form.img}
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="admin-form__row">
@@ -161,7 +218,7 @@ function ProductModal({ product, categories, onClose, onSaved }) {
             <button type="button" className="admin-btn admin-btn--secondary" onClick={onClose}>
               Отмена
             </button>
-            <button type="submit" className="admin-btn admin-btn--primary" disabled={saving}>
+            <button type="submit" className="admin-btn admin-btn--primary" disabled={saving || uploading}>
               {saving ? 'Сохранение...' : isEdit ? 'Сохранить' : 'Добавить'}
             </button>
           </div>

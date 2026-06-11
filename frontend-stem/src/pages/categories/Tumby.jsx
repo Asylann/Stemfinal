@@ -1,7 +1,8 @@
-import ProductList from '../../components/ProductList'
+﻿import ProductList from '../../components/ProductList'
+import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import './Category.css'
 
-const products = [
+const STATIC_PRODUCTS = [
   {
     id: 1,
     title: 'ТУМБА 1',
@@ -36,9 +37,11 @@ const products = [
 ]
 
 export default function Tumby() {
+  const { products, loading } = useCategoryProducts('tumby', STATIC_PRODUCTS)
   return (
     <ProductList
       products={products}
+      loading={loading}
       title="Тумбы"
       backPath="/secondpage"
       backLabel="Мебель"

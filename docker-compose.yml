@@ -38,6 +38,8 @@ services:
         condition: service_healthy
     expose:
       - "8000" # Internal only, Nginx proxies to it
+    volumes:
+      - uploads_data:/app/uploads   # Persist uploaded product images
     networks:
       - stem_network
 
@@ -61,6 +63,8 @@ services:
 # ─── Volumes ──────────────────────────────────────────────────────────────────
 volumes:
   postgres_data:
+    driver: local
+  uploads_data:
     driver: local
 
 # ─── Networks ─────────────────────────────────────────────────────────────────

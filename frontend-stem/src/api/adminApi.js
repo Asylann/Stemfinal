@@ -151,3 +151,48 @@ export function adminDeleteApplication(id) {
 export function adminGetUsers() {
   return adminFetch('/admin/users').then(d => toArray(d, 'users'))
 }
+
+// ── Image Upload ───────────────────────────────────────────────────────────────
+
+/**
+ * Upload a product image file (multipart/form-data).
+ * Returns { url: '/uploads/<uuid>.ext' }
+ */
+export async function adminUploadImage(file) {
+  const url = `${BASE_URL}/api/uploads/image`
+  const token = getToken()
+
+  const formData = new FormData()
+  formData.append('file', file)
+
+  let res
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData,
+      // Do NOT set Content-Type — the browser sets it with the boundary
+    })
+  } catch {
+    throw new Error('Сервер недоступен. Проверьте соединение.')
+  }
+
+  const text = await res.text()
+
+  if (text.trimStart().startsWith('<!')) {
+    throw new Error('Эндпоинт загрузки недоступен (получен HTML). Проверьте nginx.conf.')
+  }
+
+  let data
+  try {
+    data = JSON.parse(text)
+  } catch {
+    throw new Error(`Неожиданный ответ сервера: ${text.slice(0, 120)}`)
+  }
+
+  if (!res.ok) {
+    throw new Error(data?.detail || `Ошибка загрузки ${res.status}`)
+  }
+
+  return data // { url: '/uploads/<uuid>.ext' }
+}

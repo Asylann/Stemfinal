@@ -4,10 +4,15 @@ import { useLang } from '../i18n/LanguageContext'
 import { useFavorites } from '../context/FavoritesContext'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
+import { createApplication } from '../api/api'
 import './ProductList.css'
 
-
-const API_BASE_URL = import.meta.env.VITE_API_URL_BACKEND || 'http://localhost:8000'
+// Use the shared BASE_URL from api.js so the same env-var logic applies everywhere.
+// In Docker: '' (relative) → Nginx proxies to backend. In local dev: http://localhost:8000
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL_BACKEND ??
+  import.meta.env.VITE_API_URL ??
+  ''
 
 
 function ApplicationModal({ product, onClose }) {

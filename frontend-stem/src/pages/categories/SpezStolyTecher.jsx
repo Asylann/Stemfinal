@@ -1,6 +1,7 @@
-import ProductList from '../../components/ProductList'
+﻿import ProductList from '../../components/ProductList'
+import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 
-const products = [
+const STATIC_PRODUCTS = [
   {
     id: 'speztecher-1',
     title: 'СПЕЦ СТОЛ ДЛЯ ПРЕПОДАВАТЕЛЯ 1',
@@ -28,12 +29,14 @@ const products = [
 ]
 
 export default function SpezStolyTecher() {
+  const { products, loading } = useCategoryProducts('spez-stoly', STATIC_PRODUCTS)
   return (
     <ProductList
       products={products}
-      title="Мебель | Столы | Спец столы для преподавателя"
-      backPath="/secondpage/stoly"
-      backLabel="Столы"
+      loading={loading}
+      title="Спец. столы"
+      backPath="/secondpage"
+      backLabel="Мебель"
     />
   )
 }
