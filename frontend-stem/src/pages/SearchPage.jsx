@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { useInView } from 'react-intersection-observer'
 import { getProducts } from '../api/api'
