@@ -20,10 +20,15 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Add is_admin boolean column to users table. Defaults to false for all existing rows."""
-    op.add_column(
-        'users',
-        sa.Column('is_admin', sa.Boolean(), nullable=False, server_default=sa.text('false'))
-    )
+    from sqlalchemy.engine.reflection import Inspector
+    bind = op.get_context().bind
+    inspector = Inspector.from_engine(bind)
+    columns = [c['name'] for c in inspector.get_columns('users')]
+    if 'is_admin' not in columns:
+        op.add_column(
+            'users',
+            sa.Column('is_admin', sa.Boolean(), nullable=False, server_default=sa.text('false'))
+        )
 
 
 def downgrade() -> None:
