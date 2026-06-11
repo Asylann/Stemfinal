@@ -2,13 +2,9 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useLang } from '../i18n/LanguageContext'
 import { useCart } from '../context/CartContext'
-import { createApplication } from '../api/api'
+import { useFavorites } from '../context/FavoritesContext'
+import { createApplication, apiClient } from '../api/api'
 import './ProductDetail.css'
-
-const API_BASE_URL = 
-  import.meta.env.VITE_API_URL_BACKEND || 
-  import.meta.env.VITE_API_URL || 
-  'http://localhost:8000'
 
 
 function formatPrice(price) {
@@ -39,6 +35,7 @@ export default function ProductDetail() {
   const { id } = useParams()
   const { t } = useLang()
   const { addToCart } = useCart()
+  const { toggleFavorite, isFavorite } = useFavorites()
   
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -54,16 +51,14 @@ export default function ProductDetail() {
       try {
         setLoading(true)
         setError(null)
-        const url = `${API_BASE_URL}/api/products/${id}`
-        const response = await fetch(url)
-        if (!response.ok) {
-          if (response.status === 404) throw new Error('Товар не найден')
-          throw new Error(`Ошибка сервера: ${response.status}`)
-        }
-        const data = await response.json()
-        setProduct(data)
+        const response = await apiClient.get(`/api/products/${id}`)
+        setProduct(response.data)
       } catch (err) {
-        setError(err.message)
+        if (err.response?.status === 404) {
+          setError('Товар не найден')
+        } else {
+          setError(err.message || 'Ошибка загрузки товара')
+        }
       } finally {
         setLoading(false)
       }
@@ -197,7 +192,6 @@ export default function ProductDetail() {
                 src={product.img}
                 alt={product.title}
                 className="main-image"
-                onError={(e) => { e.target.src = '/img/placeholder.png' }}
               />
             </div>
           </div>
@@ -237,6 +231,13 @@ export default function ProductDetail() {
             <div className="product-actions">
               <button className="btn-add-to-cart" onClick={handleAddToCart}>
                 🛒 В корзину
+              </button>
+              <button
+                className={`btn-favorite ${isFavorite(product.id) ? 'active' : ''}`}
+                onClick={() => toggleFavorite(product)}
+                type="button"
+              >
+                ❤ {isFavorite(product.id) ? 'В избранном' : 'В избранное'}
               </button>
             </div>
 

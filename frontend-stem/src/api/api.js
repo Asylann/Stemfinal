@@ -1,20 +1,50 @@
-function pickBaseUrl() {
-  const candidates = [
-    import.meta.env.VITE_API_URL_BACKEND,
-    import.meta.env.VITE_API_URL,
-  ]
+import axios from 'axios'
 
-  for (const value of candidates) {
-    if (value !== undefined) {
-      return value
+// Docker/Nginx: VITE_API_URL="" → BASE_URL="" → relative paths → Nginx proxies /api/ to backend
+// Local dev:    VITE_API_URL="http://localhost:8000" in .env.local
+// Production:   VITE_API_URL="https://yourdomain.com"
+//
+// IMPORTANT: fallback must be '' (empty), NOT 'http://localhost:8000'
+// In Docker the browser cannot reach port 8000 (it's internal only).
+// Relative paths like /api/products go through Nginx which proxies to backend.
+const BASE_URL =
+  import.meta.env.VITE_API_URL_BACKEND ??
+  import.meta.env.VITE_API_URL ??
+  ''
+
+// Создание экземпляра axios с базовым URL
+export const apiClient = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+// JWT Interceptor для автоматического добавления токена
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('stem_access_token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
     }
+    return config
+  },
+  (error) => Promise.reject(error)
+)
+
+// Interceptor для обработки 401 ошибок
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Очистить токен при 401 Unauthorized
+      localStorage.removeItem('stem_access_token')
+      // Диспатчить событие для глобального логаута
+      window.dispatchEvent(new CustomEvent('unauthorized'))
+    }
+    return Promise.reject(error)
   }
-
-  return 'http://localhost:8000'
-}
-
-const BASE_URL = pickBaseUrl()
-
+)
 
 export function getImageUrl(img) {
   if (!img || img === 'null' || img === 'undefined') return '/img/placeholder.png'
@@ -30,52 +60,52 @@ export async function getProducts(params = {}) {
   const filteredParams = Object.fromEntries(
     Object.entries(params).filter(([, v]) => v !== null && v !== undefined && v !== '')
   )
-  const query = new URLSearchParams(filteredParams).toString()
-  const url = `${BASE_URL}/api/products${query ? '?' + query : ''}`
-
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Ошибка загрузки товаров: ${res.status}`)
-  return res.json()
+  try {
+    const response = await apiClient.get('/api/products', { params: filteredParams })
+    return response.data
+  } catch (error) {
+    throw new Error(`Ошибка загрузки товаров: ${error.response?.status || error.message}`)
+  }
 }
 
 export async function getProductById(id) {
-  const res = await fetch(`${BASE_URL}/api/products/${id}`)
-  if (!res.ok) throw new Error(`Товар не найден: ${id}`)
-  return res.json()
+  try {
+    const response = await apiClient.get(`/api/products/${id}`)
+    return response.data
+  } catch (error) {
+    throw new Error(`Товар не найден: ${id}`)
+  }
 }
 
 export async function getCategories() {
-  const res = await fetch(`${BASE_URL}/api/categories`)
-  if (!res.ok) throw new Error(`Ошибка загрузки категорий: ${res.status}`)
-  return res.json()
+  try {
+    const response = await apiClient.get('/api/categories')
+    return response.data
+  } catch (error) {
+    throw new Error(`Ошибка загрузки категорий: ${error.response?.status || error.message}`)
+  }
 }
 
 
 
 export async function createOrder(data) {
-  const res = await fetch(`${BASE_URL}/api/orders`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  })
-  if (!res.ok) {
-    const error = await res.text()
-    throw new Error(error || `Ошибка отправки заказа: ${res.status}`)
+  try {
+    const response = await apiClient.post('/api/orders', data)
+    return response.data
+  } catch (error) {
+    const errorMessage = error.response?.data?.detail || error.response?.statusText || error.message
+    throw new Error(errorMessage || `Ошибка отправки заказа: ${error.response?.status}`)
   }
-  return res.json()
 }
 
 export async function createApplication(data) {
-  const res = await fetch(`${BASE_URL}/api/applications`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  })
-  if (!res.ok) {
-    const error = await res.text()
-    throw new Error(error || `Ошибка отправки заявки: ${res.status}`)
+  try {
+    const response = await apiClient.post('/api/applications', data)
+    return response.data
+  } catch (error) {
+    const errorMessage = error.response?.data?.detail || error.response?.statusText || error.message
+    throw new Error(errorMessage || `Ошибка отправки заявки: ${error.response?.status}`)
   }
-  return res.json()
 }
 
 export async function chatWithGrok(message, messages = []) {
@@ -99,40 +129,37 @@ export async function chatWithGrok(message, messages = []) {
 
 
 export async function login(email, password) {
-  const res = await fetch(`${BASE_URL}/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
-  })
-  if (!res.ok) {
-    const text = await res.text()
-    throw new Error(text || 'Неверный email или пароль')
+  try {
+    const response = await apiClient.post('/auth/login', { email, password })
+    return response.data
+  } catch (error) {
+    const errorMessage = error.response?.data?.detail || error.response?.statusText
+    throw new Error(errorMessage || 'Неверный email или пароль')
   }
-  return res.json()
 }
 
 export async function register(email, password, name, phone = '') {
-  const res = await fetch(`${BASE_URL}/auth/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, email, password, phone })
-  })
-  if (!res.ok) {
-    const text = await res.text()
-    throw new Error(text || 'Ошибка регистрации')
+  try {
+    const response = await apiClient.post('/auth/register', { name, email, password, phone })
+    return response.data
+  } catch (error) {
+    const errorMessage = error.response?.data?.detail || error.response?.statusText
+    throw new Error(errorMessage || 'Ошибка регистрации')
   }
-  return res.json()
 }
 
 export async function getCurrentUser(token) {
-  const res = await fetch(`${BASE_URL}/auth/me`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    }
-  })
-  if (!res.ok) throw new Error('Failed to fetch user')
-  return res.json()
+  try {
+    // Создать временный клиент с токеном для этого запроса
+    const response = await apiClient.get('/auth/me', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    return response.data
+  } catch (error) {
+    throw new Error('Failed to fetch user')
+  }
 }
 
 export function logout() {

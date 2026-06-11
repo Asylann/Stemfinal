@@ -96,6 +96,7 @@ export default function Footer() {
         <div className="footer-bottom__links">
           <a href="#">{t.footer_privacy}</a>
           <a href="#">{t.footer_terms}</a>
+          <Link to="/admin/login" className="footer-admin-link" tabIndex={-1} aria-label="Администратор">●</Link>
         </div>
       </div>
     </footer>

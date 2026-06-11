@@ -1,7 +1,8 @@
-import ProductList from '../../components/ProductList'
+﻿import ProductList from '../../components/ProductList'
+import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import './Category.css'
 
-const products = [
+const STATIC_PRODUCTS = [
   {
     id: 1,
     title: 'МЯГКИЙ СТУЛ 1',
@@ -50,9 +51,11 @@ const products = [
 ]
 
 export default function Myagkie() {
+  const { products, loading } = useCategoryProducts('myagkie', STATIC_PRODUCTS)
   return (
     <ProductList
       products={products}
+      loading={loading}
       title="Мягкие стулья"
       backPath="/secondpage/stulya"
       backLabel="Стулья"

@@ -1,15 +1,20 @@
 import os
 import json
 import httpx
+from pathlib import Path
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, validator
 from dotenv import load_dotenv
 
 load_dotenv()
 
-from routerss import categories, orders, products, applications, visualize, auth
+from routerss import categories, orders, products, applications, visualize, auth, admin, uploads
 from database import init_db
+
+UPLOADS_DIR = Path("/app/uploads")
+UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
 app = FastAPI(title="STEM Academia API", redirect_slashes=False)
 app.router.redirect_slashes = False
@@ -34,8 +39,8 @@ app.add_middleware(
         "https://frontend-stem.yvayvayayv7.workers.dev",
     ],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"],
 )
 
 BITRIX_WEBHOOK_URL = os.getenv("BITRIX_WEBHOOK_URL")
@@ -153,7 +158,13 @@ app.include_router(categories.router,    prefix="/api/categories",   tags=["cate
 app.include_router(orders.router,        prefix="/api/orders",       tags=["orders"])
 app.include_router(applications.router,  prefix="/api/applications", tags=["applications"])
 app.include_router(visualize.router,     prefix="/api/ai", tags=["AI Visualize"])
+app.include_router(uploads.router,       prefix="/api/uploads",      tags=["uploads"])
 app.include_router(auth.router,          prefix="/auth",             tags=["auth"])
+app.include_router(admin.router,         prefix="/admin",            tags=["admin"])
+
+# Serve uploaded product images as static files
+# /uploads/<filename> → /app/uploads/<filename>
+app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 
 
 @app.get("/")

@@ -1,7 +1,8 @@
-import ProductList from '../../components/ProductList'
+﻿import ProductList from '../../components/ProductList'
+import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import './Category.css'
 
-const products = [
+const STATIC_PRODUCTS = [
   {
     id: 1,
     title: 'ПУФ 1',
@@ -127,9 +128,11 @@ const products = [
 ]
 
 export default function Pufy() {
+  const { products, loading } = useCategoryProducts('pufy', STATIC_PRODUCTS)
   return (
     <ProductList
       products={products}
+      loading={loading}
       title="Пуфы"
       backPath="/secondpage"
       backLabel="Мебель"

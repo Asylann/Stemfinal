@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 
 
 import Navbar from './components/Navbar'
@@ -26,6 +26,9 @@ import BlogPage from './pages/BlogPage'
 import HowToOrderPage from './pages/HowToOrderPage'
 
 import VisualizePage from './pages/VisualizePage'
+import AdminPage from './pages/AdminPage'
+import AdminLoginPage from './pages/AdminLoginPage'
+import AdminGuard from './components/AdminGuard'
 
 
 import RoqedPage from './pages/digital/RoqedPage'
@@ -72,12 +75,19 @@ import Bytovaya from './pages/electro/Bytovaya'
 import Printers3D from './pages/electro/Printers3D'
 
 export default function App() {
+  const location = useLocation()
+  const isAdminRoute = location.pathname.startsWith('/admin')
+
   return (
     <>
-      <Navbar />
-      <CartDrawer />
+      {!isAdminRoute && <Navbar />}
+      {!isAdminRoute && <CartDrawer />}
 
       <Routes>
+        {/* Admin panel — own layout, no Navbar/Footer */}
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />
+
         {/* Главные страницы */}
         <Route path="/" element={<FirstPage />} />
         <Route path="/secondpage" element={<SecondPage />} />
@@ -102,6 +112,7 @@ export default function App() {
 
         {/* Страница товара */}
         <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/products/:id" element={<ProductDetail />} />
 
         {/* Категории мебели */}
         <Route path="/secondpage/divany" element={<Divany />} />
@@ -144,8 +155,8 @@ export default function App() {
         <Route path="/electro/printers3d" element={<Printers3D />} />
       </Routes>
 
-      <Footer />
-      <FloatingButtons />
+      {!isAdminRoute && <Footer />}
+      {!isAdminRoute && <FloatingButtons />}
     </>
   )
 }
