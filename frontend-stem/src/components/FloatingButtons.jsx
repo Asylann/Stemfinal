@@ -2,12 +2,12 @@ import React from 'react'
 import './FloatingButtons.css'
 
 export default function FloatingButtons() {
-  const phoneNumber = '77000395877'
+  const phoneNumber = '77770016786'
   const message = 'Здравствуйте! Интересует ваш товар'
-  const telegramUsername = 'sulllelilukfjfjf'
+  const telegramUsername = 'stemacademia'
 
-  const whatsappLink = ``
-  const telegramLink = ``
+  const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
+  const telegramLink = `https://t.me/${telegramUsername}`
 
   return (
     <div className="floating-buttons-container">
