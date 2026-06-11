@@ -10,14 +10,34 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
   const { setUserEmail } = useUserEmail()
 
+  // Обработка автоматического логаута при 401
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      setUser(null)
+      setUserEmail(null)
+      localStorage.removeItem('stem_access_token')
+      setShowModal(true)
+    }
+
+    window.addEventListener('unauthorized', handleUnauthorized)
+    return () => window.removeEventListener('unauthorized', handleUnauthorized)
+  }, [setUserEmail])
+
+  // Проверка авторизации при загрузке
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const token = localStorage.getItem('stem_access_token')
         if (token) {
-          const userData = await getCurrentUser(token)
-          setUser(userData)
-          setUserEmail(userData.email)
+          try {
+            const userData = await getCurrentUser(token)
+            setUser(userData)
+            setUserEmail(userData.email)
+          } catch (err) {
+            // Если получить пользователя не удалось, очистить токен
+            localStorage.removeItem('stem_access_token')
+            setUser(null)
+          }
         }
       } catch (err) {
         console.error('Auth check error:', err)
@@ -53,6 +73,7 @@ export function AuthProvider({ children }) {
     apiLogout()
     setUser(null)
     setUserEmail(null)
+    setShowModal(false)
   }
 
   const openModal = () => setShowModal(true)
