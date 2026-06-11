@@ -152,6 +152,7 @@
   font-size: 12px;
   font-weight: 600;
   text-decoration: none;
+  border: none;
   transition: opacity 0.2s;
 }
 .footer-messenger-btn:hover { opacity: 0.85; }
@@ -163,6 +164,16 @@
 .footer-messenger-btn--tg {
   background: #229ED9;
   color: #fff;
+}
+
+.footer-messenger-btn--grok {
+  background: linear-gradient(135deg, #0f172a 0%, #1f2937 55%, #6366f1 100%);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footer-messenger-btn--grok-trigger {
+  cursor: pointer;
 }
 
 @media (max-width: 1024px) {

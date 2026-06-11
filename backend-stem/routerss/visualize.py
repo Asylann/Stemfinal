@@ -12,7 +12,7 @@ HF_TOKEN = os.getenv("HF_TOKEN")
 HF_MODEL_URL = "https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-2-1"
 
 
-@router.post("/")
+@router.post("/visualize")
 async def visualize_interior(request: Request):
     if not HF_TOKEN:
         raise HTTPException(status_code=500, detail="HF_TOKEN не настроен в .env")

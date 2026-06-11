@@ -1,5 +1,8 @@
 import axios from 'axios'
 
+// Docker/Nginx:  VITE_API_URL=""  → BASE_URL=""  → relative paths → Nginx proxies /api/ to backend
+// Local dev:     VITE_API_URL not set → undefined ?? fallback → 'http://localhost:8000'
+// Production:    VITE_API_URL="https://yourdomain.com" → direct URL
 const BASE_URL =
   import.meta.env.VITE_API_URL_BACKEND ??
   import.meta.env.VITE_API_URL ??
@@ -99,6 +102,24 @@ export async function createApplication(data) {
     const errorMessage = error.response?.data?.detail || error.response?.statusText || error.message
     throw new Error(errorMessage || `Ошибка отправки заявки: ${error.response?.status}`)
   }
+}
+
+export async function chatWithGrok(message, messages = []) {
+  const res = await fetch(`${BASE_URL}/api/ai/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      message,
+      messages,
+    })
+  })
+
+  if (!res.ok) {
+    const error = await res.text()
+    throw new Error(error || `Ошибка Grok AI: ${res.status}`)
+  }
+
+  return res.json()
 }
 
 
