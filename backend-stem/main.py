@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from routerss import categories, orders, products, applications, visualize, auth
+from routerss import categories, orders, products, applications, visualize, auth, admin
 from database import init_db
 
 app = FastAPI(title="STEM Academia API", redirect_slashes=False)
@@ -154,6 +154,7 @@ app.include_router(orders.router,        prefix="/api/orders",       tags=["orde
 app.include_router(applications.router,  prefix="/api/applications", tags=["applications"])
 app.include_router(visualize.router,     prefix="/api/ai", tags=["AI Visualize"])
 app.include_router(auth.router,          prefix="/auth",             tags=["auth"])
+app.include_router(admin.router,         prefix="/admin",            tags=["admin"])
 
 
 @app.get("/")
