@@ -1,6 +1,7 @@
-import ProductList from '../../components/ProductList'
+﻿import ProductList from '../../components/ProductList'
+import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 
-const products = [
+const STATIC_PRODUCTS = [
   {
     id: 'party-1',
     title: 'ПАРТА 1',
@@ -58,12 +59,14 @@ const products = [
 ]
 
 export default function Party() {
+  const { products, loading } = useCategoryProducts('party', STATIC_PRODUCTS)
   return (
     <ProductList
       products={products}
-      title="Мебель | Столы | Парты одноместные"
-      backPath="/secondpage/stoly"
-      backLabel="Столы"
+      loading={loading}
+      title="Party стулья"
+      backPath="/secondpage/stulya"
+      backLabel="Стулья"
     />
   )
 }

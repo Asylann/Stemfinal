@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Query, HTTPException, Depends
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
 from database import get_db
 from models import Product
@@ -31,7 +31,6 @@ def _product_out(p: Product) -> dict:
             "path": cat.path,
         } if cat else None,
     }
-
 
 @router.get("")
 @router.get("/")

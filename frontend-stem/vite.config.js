@@ -21,6 +21,11 @@ export default defineConfig({
       '/auth': {
         target: 'http://stem_backend:8000',
         changeOrigin: true
+      },
+      // Admin API — must be proxied, not served by the SPA
+      '/admin': {
+        target: 'http://stem_backend:8000',
+        changeOrigin: true
       }
     }
   }

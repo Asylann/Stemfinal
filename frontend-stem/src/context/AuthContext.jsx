@@ -89,6 +89,7 @@ export function AuthProvider({ children }) {
       openModal,
       closeModal,
       isAuthenticated: !!user,
+      isAdmin: user?.is_admin === true,
       loading,
     }}>
       {children}

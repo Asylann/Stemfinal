@@ -1,10 +1,9 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from models import Category
 
 router = APIRouter()
-
 
 def _cat_out(c: Category) -> dict:
     return {
@@ -17,7 +16,6 @@ def _cat_out(c: Category) -> dict:
         "parent_slug": c.parent_slug,
     }
 
-
 @router.get("")
 @router.get("/")
 def get_categories(db: Session = Depends(get_db)):
@@ -28,5 +26,5 @@ def get_categories(db: Session = Depends(get_db)):
 def get_category(slug: str, db: Session = Depends(get_db)):
     c = db.query(Category).filter(Category.slug == slug).first()
     if not c:
-        return None
+        raise HTTPException(status_code=404, detail=f"Категория '{slug}' не найдена")
     return _cat_out(c)

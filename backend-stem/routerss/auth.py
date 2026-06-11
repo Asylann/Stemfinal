@@ -26,17 +26,20 @@ class RegisterData(BaseModel):
     name: str
     email: str
     password: str
-    phone: Optional[str] = None  
+    phone: Optional[str] = None
+
 
 class LoginData(BaseModel):
     email: str
     password: str
 
+
 class UserOut(BaseModel):
     id: int
     name: str
     email: str
-    phone: Optional[str] = None  
+    phone: Optional[str] = None
+    is_admin: bool = False
 
     class Config:
         from_attributes = True
@@ -46,12 +49,34 @@ def make_token(user_id: int) -> str:
     expire = datetime.utcnow() + timedelta(days=EXPIRE_DAYS)
     return jwt.encode({"sub": str(user_id), "exp": expire}, SECRET_KEY, algorithm=ALGORITHM)
 
+
 def get_user_id(token: str = Depends(oauth2)) -> int:
+    """Extract user ID from JWT — used by legacy routes."""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return int(payload["sub"])
     except JWTError:
         raise HTTPException(status_code=401, detail="Невалидный токен")
+
+
+def get_current_user(token: str = Depends(oauth2), db: Session = Depends(get_db)) -> User:
+    """Return the full User ORM object from the JWT. Raises 401 on invalid token."""
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = int(payload["sub"])
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Невалидный токен")
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=401, detail="Пользователь не найден")
+    return user
+
+
+def get_current_admin(current_user: User = Depends(get_current_user)) -> User:
+    """Ensure the current user is an administrator. Raises 403 otherwise."""
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Доступ запрещён: требуются права администратора")
+    return current_user
 
 
 @router.post("/register")
@@ -62,7 +87,7 @@ def register(data: RegisterData, db: Session = Depends(get_db)):
         name=data.name,
         email=data.email,
         password=pwd.hash(data.password),
-        phone=data.phone  
+        phone=data.phone
     )
     db.add(user)
     db.commit()
@@ -70,8 +95,15 @@ def register(data: RegisterData, db: Session = Depends(get_db)):
     return {
         "access_token": make_token(user.id),
         "token_type": "bearer",
-        "user": {"id": user.id, "name": user.name, "email": user.email, "phone": user.phone}
+        "user": {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "phone": user.phone,
+            "is_admin": user.is_admin,
+        }
     }
+
 
 @router.post("/login")
 def login(data: LoginData, db: Session = Depends(get_db)):
@@ -81,12 +113,16 @@ def login(data: LoginData, db: Session = Depends(get_db)):
     return {
         "access_token": make_token(user.id),
         "token_type": "bearer",
-        "user": {"id": user.id, "name": user.name, "email": user.email, "phone": user.phone}
+        "user": {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "phone": user.phone,
+            "is_admin": user.is_admin,
+        }
     }
 
+
 @router.get("/me", response_model=UserOut)
-def me(user_id: int = Depends(get_user_id), db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="Пользователь не найден")
-    return user
+def me(current_user: User = Depends(get_current_user)):
+    return current_user

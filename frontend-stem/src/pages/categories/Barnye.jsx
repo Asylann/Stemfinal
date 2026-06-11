@@ -1,7 +1,8 @@
-import ProductList from '../../components/ProductList'
+﻿import ProductList from '../../components/ProductList'
+import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import './Category.css'
 
-const products = [
+const STATIC_PRODUCTS = [
   {
     id: 1,
     title: 'БАРНЫЙ СТУЛ 1',
@@ -36,9 +37,11 @@ const products = [
 ]
 
 export default function Barnye() {
+  const { products, loading } = useCategoryProducts('barnye', STATIC_PRODUCTS)
   return (
     <ProductList
       products={products}
+      loading={loading}
       title="Барные стулья"
       backPath="/secondpage/stulya"
       backLabel="Стулья"

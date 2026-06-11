@@ -7,7 +7,6 @@ import { useAuth } from '../context/AuthContext'
 import { apiClient } from '../api/api'
 import './ProductList.css'
 
-
 function ApplicationModal({ product, onClose }) {
   const [form, setForm] = useState({
     name: '',

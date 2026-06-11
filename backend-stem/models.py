@@ -80,3 +80,4 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)
     phone = Column(String, nullable=True)
+    is_admin = Column(Boolean, default=False, nullable=False, server_default="false")

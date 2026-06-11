@@ -214,3 +214,21 @@
   .footer-messengers { flex-direction: column; }
   .footer-messenger-btn { text-align: center; padding: 8px 14px; }
 }
+
+/* ── Discreet admin entry point ─────────────────────────────────────────────── */
+/* A tiny bullet in the footer bottom bar — invisible to regular users.          */
+.footer-admin-link {
+  color: transparent !important;
+  font-size: 8px;
+  text-decoration: none;
+  line-height: 1;
+  padding: 4px;
+  cursor: default;
+  user-select: none;
+  transition: color 0.3s;
+  border-radius: 50%;
+}
+.footer-admin-link:hover {
+  color: rgba(255, 255, 255, 0.15) !important;
+  cursor: pointer;
+}

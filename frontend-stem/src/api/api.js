@@ -1,12 +1,16 @@
 import axios from 'axios'
 
-// Docker/Nginx:  VITE_API_URL=""  → BASE_URL=""  → relative paths → Nginx proxies /api/ to backend
-// Local dev:     VITE_API_URL not set → undefined ?? fallback → 'http://localhost:8000'
-// Production:    VITE_API_URL="https://yourdomain.com" → direct URL
+// Docker/Nginx: VITE_API_URL="" → BASE_URL="" → relative paths → Nginx proxies /api/ to backend
+// Local dev:    VITE_API_URL="http://localhost:8000" in .env.local
+// Production:   VITE_API_URL="https://yourdomain.com"
+//
+// IMPORTANT: fallback must be '' (empty), NOT 'http://localhost:8000'
+// In Docker the browser cannot reach port 8000 (it's internal only).
+// Relative paths like /api/products go through Nginx which proxies to backend.
 const BASE_URL =
   import.meta.env.VITE_API_URL_BACKEND ??
   import.meta.env.VITE_API_URL ??
-  'http://localhost:8000'
+  ''
 
 // Создание экземпляра axios с базовым URL
 export const apiClient = axios.create({

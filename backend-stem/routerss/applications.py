@@ -6,8 +6,12 @@ from typing import Optional, List, Dict, Tuple
 
 import httpx
 from dotenv import load_dotenv
-from fastapi import APIRouter, BackgroundTasks, HTTPException
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Depends
 from pydantic import BaseModel, field_validator, model_validator
+from sqlalchemy.orm import Session
+
+from database import get_db
+from models import Application
 
 load_dotenv()
 
@@ -177,7 +181,11 @@ async def send_to_bitrix(data: Dict) -> None:
 
 @router.post("")
 @router.post("/")
-async def create_application(data: ApplicationCreate, background_tasks: BackgroundTasks):
+async def create_application(
+    data: ApplicationCreate, 
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
     app_id = str(uuid.uuid4())[:8].upper()
     normalized_phone = normalize_phone(data.phone)
 
@@ -207,12 +215,28 @@ async def create_application(data: ApplicationCreate, background_tasks: Backgrou
         "items_count": items_count,
     }
 
+    # Save to Database
+    new_application = Application(
+        name=app_data["name"],
+        phone=app_data["phone"],
+        username=app_data["username"],
+        comment=app_data["comment"],
+        product_name=app_data["product_name"],
+        article=app_data["article"],
+        product_url=app_data["product_url"],
+        status="new"
+    )
+    db.add(new_application)
+    db.commit()
+    db.refresh(new_application)
+
     background_tasks.add_task(send_to_bitrix, app_data)
     background_tasks.add_task(send_to_telegram, app_data, app_id)
 
     return {
         "status": "ok",
         "id": app_id,
+        "db_id": new_application.id,
         "normalized_phone": normalized_phone,
         "items_count": items_count,
     }

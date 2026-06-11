@@ -1,7 +1,8 @@
-import ProductList from '../../components/ProductList'
+﻿import ProductList from '../../components/ProductList'
+import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import './Category.css'
 
-const products = [
+const STATIC_PRODUCTS = [
   {
     id: 1,
     title: 'СТЕЛЛАЖ 1',
@@ -38,9 +39,11 @@ const products = [
 ]
 
 export default function Stellazhi() {
+  const { products, loading } = useCategoryProducts('stellazhi', STATIC_PRODUCTS)
   return (
     <ProductList
       products={products}
+      loading={loading}
       title="Стеллажи"
       backPath="/secondpage"
       backLabel="Мебель"
