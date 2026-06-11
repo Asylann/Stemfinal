@@ -102,6 +102,7 @@ export default function App() {
 
         {/* Страница товара */}
         <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/products/:id" element={<ProductDetail />} />
 
         {/* Категории мебели */}
         <Route path="/secondpage/divany" element={<Divany />} />
