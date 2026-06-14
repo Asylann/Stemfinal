@@ -1,3 +1,4 @@
+import json
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
 from database import get_db
@@ -6,12 +7,24 @@ from models import Product
 router = APIRouter()
 
 
+def _parse_colors(colors_json):
+    if not colors_json:
+        return []
+    try:
+        data = json.loads(colors_json)
+        return data if isinstance(data, list) else []
+    except (json.JSONDecodeError, TypeError):
+        return []
+
+
 def _product_out(p: Product) -> dict:
     cat = p.category
+    colors = _parse_colors(p.colors_json)
     return {
         "id": p.id,
         "title": p.title,
         "img": p.img,
+        "imgs": [c["img"] for c in colors if c.get("img")] or ([p.img] if p.img else []),
         "description": p.description_ru,
         "description_ru": p.description_ru,
         "description_kz": p.description_kz,
@@ -23,6 +36,7 @@ def _product_out(p: Product) -> dict:
         "in_stock": p.in_stock,
         "price": None,
         "old_price": None,
+        "colors": colors,
         "category_slug": p.category_slug,
         "category": {
             "slug": cat.slug,

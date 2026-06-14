@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useLang } from '../i18n/LanguageContext'
+import { sendContactMessage } from '../api/api'
 import './Contacts.css'
 
 export default function Contacts() {
@@ -8,19 +9,29 @@ export default function Contacts() {
   const [form, setForm] = useState({ name: '', phone: '', message: '' })
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     if (!form.name.trim() || !form.phone.trim()) return
     setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
+    setError(null)
+    try {
+      await sendContactMessage({
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        message: form.message.trim() || null,
+      })
       setSent(true)
-    }, 900)
+    } catch (err) {
+      setError(err.message || 'Произошла ошибка при отправке')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -152,6 +163,11 @@ export default function Contacts() {
               <button type="submit" className="contacts-form__btn" disabled={loading}>
                 {loading ? t.sending : t.contacts_form_btn}
               </button>
+              {error && (
+                <p style={{ color: '#c0392b', fontSize: '13px', marginTop: '8px', textAlign: 'center' }}>
+                  {error}
+                </p>
+              )}
               <p className="contacts-form__note">{t.data_protected}</p>
             </form>
           )}

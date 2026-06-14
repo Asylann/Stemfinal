@@ -3,43 +3,11 @@ import { Link } from 'react-router-dom'
 import { createApplication } from '../../api/api'
 import { useCart } from '../../context/CartContext'
 import { useFavorites } from '../../context/FavoritesContext'
+import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import './Stanki.css'
 
-const products = [
-  {
-    id: 1,
-    tag: 'The cool tool',
-    title: 'UNIMAT ML 160200',
-    img: '/img/pagethird/stanki/item1.png',
-    description: [
-      'Unimat — это многофункциональный учебно-лабораторный станок, предназначенный для изучения основ обработки материалов, инженерии и технологий. Станок позволяет учащимся и студентам выполнять практические задания, развивать навыки работы с металлом и пластиком, а также создавать учебные проекты в безопасной учебной среде.',
-    ],
-    article: 'S.Me-ST.S.DP',
-  },
-  {
-    id: 2,
-    tag: 'The cool tool',
-    title: 'UNIMAT 1 BASIC 4B1',
-    img: '/img/pagethird/stanki/item2.png',
-    description: [
-      'Unimat по дереву — это многофункциональный учебно-лабораторный станок, предназначенный для изучения основ обработки древесины, инженерии и технологий. Станок позволяет учащимся и студентам выполнять практические задания, развивать навыки работы с древесными материалами.',
-    ],
-    article: 'S.Me-ST.S.DP',
-  },
-  {
-    id: 3,
-    tag: 'The cool tool',
-    title: 'NAME_TEXT',
-    img: '/img/pagethird/stanki/item3.png',
-    description: [
-      'Учебный станок для освоения базовых технологий обработки материалов и моделирования, оптимизированный для практических занятий.',
-      'Оснащён безопасными механизмами и позволяет изучать точность обработки, сборку прототипов и конструирование изделий.',
-    ],
-    article: 'S.Me-ST.S.DP',
-  },
-]
-
 export default function Stanki() {
+  const { products, loading } = useCategoryProducts('stanki')
   const { addToCart } = useCart()
   const { toggleFavorite, isFavorite } = useFavorites()
   const [showModal, setShowModal] = useState(false)
