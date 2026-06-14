@@ -10,6 +10,9 @@ import {
   adminDeleteApplication,
   adminGetUsers,
   adminGetCategories,
+  adminCreateCategory,
+  adminUpdateCategory,
+  adminDeleteCategory,
   adminUploadImage,
 } from '../api/adminApi'
 import './AdminPage.css'
@@ -39,6 +42,7 @@ function ProductModal({ product, categories, onClose, onSaved }) {
     size: product?.size ?? '',
     article: product?.article ?? '',
     in_stock: product?.in_stock ?? true,
+    price: product?.price ?? '',
     category_slug: product?.category_slug ?? '',
   })
   const [saving, setSaving] = useState(false)
@@ -46,11 +50,17 @@ function ProductModal({ product, categories, onClose, onSaved }) {
   const [uploading, setUploading] = useState(false)
   const [imgPreview, setImgPreview] = useState(product?.img || '')
 
-  const set = (field) => (e) =>
-    setForm((prev) => ({
-      ...prev,
-      [field]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
-    }))
+  const set = (field) => (e) => {
+    if (field === 'price') {
+      const val = e.target.value
+      setForm((prev) => ({ ...prev, price: val === '' ? '' : Number(val) }))
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        [field]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
+      }))
+    }
+  }
 
   // Handle file picker → upload → store returned URL
   async function handleImageFile(e) {
@@ -98,6 +108,7 @@ function ProductModal({ product, categories, onClose, onSaved }) {
         material_kz: form.material_kz || null,
         size: form.size || null,
         article: form.article || null,
+        price: form.price !== '' && form.price !== null ? Number(form.price) : null,
         category_slug: form.category_slug || null,
       }
       if (isEdit) {
@@ -131,6 +142,20 @@ function ProductModal({ product, categories, onClose, onSaved }) {
               <label>Артикул</label>
               <input value={form.article} onChange={set('article')} />
             </div>
+            <div className="admin-form__field">
+              <label>Цена (₸)</label>
+              <input
+                type="number"
+                min="0"
+                step="1000"
+                value={form.price}
+                onChange={set('price')}
+                placeholder="Например: 150000"
+              />
+            </div>
+          </div>
+
+          <div className="admin-form__row">
             <div className="admin-form__field">
               <label>Категория</label>
               <select value={form.category_slug} onChange={set('category_slug')}>
@@ -309,6 +334,7 @@ function ProductsTab() {
                 <th>Фото</th>
                 <th>Название</th>
                 <th>Артикул</th>
+                <th>Цена</th>
                 <th>Категория</th>
                 <th>Наличие</th>
                 <th>Действия</th>
@@ -332,6 +358,9 @@ function ProductsTab() {
                   </td>
                   <td style={{ maxWidth: 220, fontWeight: 500 }}>{p.title}</td>
                   <td style={{ color: '#888', fontSize: 12 }}>{p.article || '—'}</td>
+                  <td style={{ fontWeight: 600, color: '#2f6f55', whiteSpace: 'nowrap' }}>
+                    {p.price ? `${Number(p.price).toLocaleString('ru-KZ')} ₸` : '—'}
+                  </td>
                   <td style={{ fontSize: 12 }}>{p.category_slug || '—'}</td>
                   <td>
                     <span className={`badge ${p.in_stock ? 'badge--green' : 'badge--red'}`}>
@@ -486,6 +515,230 @@ function ApplicationsTab() {
   )
 }
 
+// ─── Category Form Modal ─────────────────────────────────────────────────────
+
+function CategoryModal({ category, onClose, onSaved }) {
+  const isEdit = !!category
+  const [form, setForm] = useState({
+    slug: category?.slug ?? '',
+    title_ru: category?.title_ru ?? '',
+    title_kz: category?.title_kz ?? '',
+    img: category?.img ?? '',
+    path: category?.path ?? '',
+    parent_slug: category?.parent_slug ?? '',
+  })
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  const set = (field) => (e) => {
+    setForm((prev) => ({ ...prev, [field]: e.target.value }))
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    if (!form.slug.trim()) {
+      setError('Slug (URL-идентификатор) обязателен')
+      return
+    }
+    if (!form.title_ru.trim()) {
+      setError('Название (RU) обязательно')
+      return
+    }
+    setSaving(true)
+    setError('')
+    try {
+      const payload = {
+        ...form,
+        slug: form.slug.trim().toLowerCase().replace(/\s+/g, '-'),
+        title_kz: form.title_kz || null,
+        img: form.img || null,
+        path: form.path || null,
+        parent_slug: form.parent_slug || null,
+      }
+      if (isEdit) {
+        await adminUpdateCategory(category.id, payload)
+      } else {
+        await adminCreateCategory(payload)
+      }
+      onSaved()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // Auto-generate slug from title_ru when creating
+  function handleTitleChange(e) {
+    const title = e.target.value
+    setForm((prev) => ({
+      ...prev,
+      title_ru: title,
+      slug: isEdit ? prev.slug : title.toLowerCase().replace(/[^a-zа-я0-9\s-]/gi, '').replace(/\s+/g, '-').replace(/-+/g, '-'),
+    }))
+  }
+
+  return (
+    <div className="admin-modal-overlay" onClick={onClose}>
+      <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+        <h3 className="admin-modal__title">
+          {isEdit ? `Редактировать: ${category.title_ru}` : 'Добавить категорию'}
+        </h3>
+        <ErrorBox message={error} />
+        <form className="admin-form" onSubmit={handleSubmit}>
+          <div className="admin-form__field">
+            <label>Название (RU) *</label>
+            <input value={form.title_ru} onChange={handleTitleChange} required />
+          </div>
+          <div className="admin-form__field">
+            <label>Название (KZ)</label>
+            <input value={form.title_kz} onChange={set('title_kz')} />
+          </div>
+          <div className="admin-form__field">
+            <label>Slug (URL) *</label>
+            <input value={form.slug} onChange={set('slug')} required placeholder="naprimer: divany" />
+            <small style={{ color: '#888', fontSize: 11 }}>Используется в URL: /category/<b>{form.slug || '...'}</b></small>
+          </div>
+          <div className="admin-form__field">
+            <label>Родительская категория (slug)</label>
+            <input value={form.parent_slug} onChange={set('parent_slug')} placeholder="Оставьте пустым если нет" />
+          </div>
+          <div className="admin-form__field">
+            <label>Путь (path)</label>
+            <input value={form.path} onChange={set('path')} placeholder="/secondpage" />
+          </div>
+          <div className="admin-form__field">
+            <label>Изображение (URL)</label>
+            <input value={form.img} onChange={set('img')} placeholder="/img/..." />
+          </div>
+          <div className="admin-form__actions">
+            <button type="button" className="admin-btn admin-btn--secondary" onClick={onClose}>
+              Отмена
+            </button>
+            <button type="submit" className="admin-btn admin-btn--primary" disabled={saving}>
+              {saving ? 'Сохранение...' : isEdit ? 'Сохранить' : 'Добавить'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+// ─── Categories Tab ──────────────────────────────────────────────────────────
+
+function CategoriesTab() {
+  const [categories, setCategories] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [modal, setModal] = useState(null)
+  const [confirmDelete, setConfirmDelete] = useState(null)
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const cats = await adminGetCategories()
+      setCategories(cats)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  async function handleDelete(id) {
+    try {
+      await adminDeleteCategory(id)
+      setConfirmDelete(null)
+      load()
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  return (
+    <>
+      <div className="admin-section-header">
+        <h2 className="admin-section-title">Категории ({categories.length})</h2>
+        <button className="admin-btn admin-btn--primary" onClick={() => setModal('create')}>
+          + Добавить категорию
+        </button>
+      </div>
+
+      <ErrorBox message={error} />
+
+      {loading ? (
+        <Spinner />
+      ) : categories.length === 0 ? (
+        <div className="admin-empty">Категорий пока нет. Добавьте первую!</div>
+      ) : (
+        <div className="admin-table-wrap">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Slug (URL)</th>
+                <th>Название (RU)</th>
+                <th>Название (KZ)</th>
+                <th>Родитель</th>
+                <th>Путь</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody>
+              {categories.map((c) => (
+                <tr key={c.id}>
+                  <td>{c.id}</td>
+                  <td style={{ fontFamily: 'monospace', fontSize: 12, color: '#2f6f55' }}>{c.slug}</td>
+                  <td style={{ fontWeight: 500 }}>{c.title_ru}</td>
+                  <td style={{ fontSize: 13 }}>{c.title_kz || '—'}</td>
+                  <td style={{ fontSize: 12, color: '#888' }}>{c.parent_slug || '—'}</td>
+                  <td style={{ fontSize: 12, color: '#888' }}>{c.path || '—'}</td>
+                  <td>
+                    <div className="admin-table__actions">
+                      <button
+                        className="admin-btn admin-btn--secondary admin-btn--sm"
+                        onClick={() => setModal(c)}
+                      >
+                        ✏️ Изменить
+                      </button>
+                      <button
+                        className="admin-btn admin-btn--danger admin-btn--sm"
+                        onClick={() => setConfirmDelete({ id: c.id, title: c.title_ru })}
+                      >
+                        🗑️ Удалить
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {modal && (
+        <CategoryModal
+          category={modal === 'create' ? null : modal}
+          onClose={() => setModal(null)}
+          onSaved={() => { setModal(null); load() }}
+        />
+      )}
+
+      {confirmDelete && (
+        <ConfirmModal
+          message={`Вы уверены, что хотите удалить категорию "${confirmDelete.title}"? Это действие нельзя отменить.`}
+          onConfirm={() => handleDelete(confirmDelete.id)}
+          onCancel={() => setConfirmDelete(null)}
+        />
+      )}
+    </>
+  )
+}
+
 // ─── Users Tab ────────────────────────────────────────────────────────────────
 
 function UsersTab() {
@@ -550,6 +803,7 @@ function UsersTab() {
 
 const TABS = [
   { id: 'products',     label: '📦 Товары' },
+  { id: 'categories',   label: '📁 Категории' },
   { id: 'applications', label: '📋 Заявки' },
   { id: 'users',        label: '👤 Пользователи' },
 ]
@@ -624,6 +878,7 @@ export default function AdminPage() {
       {/* ── Content ── */}
       <div className="admin-content">
         {activeTab === 'products'     && <ProductsTab />}
+        {activeTab === 'categories'   && <CategoriesTab />}
         {activeTab === 'applications' && <ApplicationsTab />}
         {activeTab === 'users'        && <UsersTab />}
       </div>
