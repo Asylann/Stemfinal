@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, Text, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, Boolean, Float, ForeignKey
 from sqlalchemy.orm import relationship
 from database import Base
 
@@ -32,6 +32,7 @@ class Product(Base):
     size = Column(String, nullable=True)
     article = Column(String, nullable=True)
     in_stock = Column(Boolean, default=True)
+    price = Column(Float, nullable=True)
     category_slug = Column(String, ForeignKey("categories.slug"))
     colors_json = Column(Text, nullable=True)
 

@@ -42,6 +42,7 @@ class ProductCreate(BaseModel):
     size: Optional[str] = None
     article: Optional[str] = None
     in_stock: bool = True
+    price: Optional[float] = None
     category_slug: Optional[str] = None
 
 
@@ -55,6 +56,7 @@ class ProductUpdate(BaseModel):
     size: Optional[str] = None
     article: Optional[str] = None
     in_stock: Optional[bool] = None
+    price: Optional[float] = None
     category_slug: Optional[str] = None
 
 
@@ -90,6 +92,7 @@ def _product_out(p: Product) -> dict:
         "size": p.size,
         "article": p.article,
         "in_stock": p.in_stock,
+        "price": p.price,
         "category_slug": p.category_slug,
     }
 

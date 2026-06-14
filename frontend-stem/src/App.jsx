@@ -53,6 +53,7 @@ import Party from './pages/categories/Party'
 import Reception from './pages/categories/Reception'
 import SpezStolyTecher from './pages/categories/SpezStolyTecher'
 import Kuhnya from './pages/categories/Kuhnya'
+import DynamicCategory from './pages/categories/DynamicCategory'
 
 
 import Ulab from './pages/equipment/Ulab'
@@ -134,6 +135,10 @@ export default function App() {
         <Route path="/secondpage/stoly/reception" element={<Reception />} />
         <Route path="/secondpage/stoly/spets-teacher" element={<SpezStolyTecher />} />
         <Route path="/secondpage/kuhnya" element={<Kuhnya />} />
+
+        {/* Dynamic category route — for admin-created categories */}
+        <Route path="/category/:slug" element={<DynamicCategory />} />
+        <Route path="/secondpage/:slug" element={<DynamicCategory />} />
 
         {/* Оборудование */}
         <Route path="/equipment/ulab" element={<Ulab />} />
