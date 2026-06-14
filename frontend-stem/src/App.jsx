@@ -23,6 +23,7 @@ import AboutPage from './pages/AboutPage'
 import CooperationPage from './pages/CooperationPage'
 import InstructionsPage from './pages/InstructionsPage'
 import BlogPage from './pages/BlogPage'
+import BlogPostDetail from './pages/BlogPostDetail'
 import HowToOrderPage from './pages/HowToOrderPage'
 
 import VisualizePage from './pages/VisualizePage'
@@ -108,6 +109,7 @@ export default function App() {
         <Route path="/cooperation" element={<CooperationPage />} />
         <Route path="/instructions" element={<InstructionsPage />} />
         <Route path="/blog" element={<BlogPage />} />
+        <Route path="/blog/:id" element={<BlogPostDetail />} />
         <Route path="/how-to-order" element={<HowToOrderPage />} />
 
         {/* Страница товара */}

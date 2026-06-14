@@ -3,32 +3,8 @@ import { Link } from 'react-router-dom'
 import { createApplication } from '../../api/api'
 import { useCart } from '../../context/CartContext'
 import { useFavorites } from '../../context/FavoritesContext'
+import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import './Peregorodki.css'
-
-
-const products = [
-  {
-    id: 1,
-    title: 'СТЕКЛО',
-    img: ['/img/pagedecor/peregorodki/item1.png'],
-    description: 'Стеклянные перегородки делают пространство визуально лёгким и просторным. Они пропускают свет, не загромождая комнату. Идеально подходят для зонирования офисов, гостиных, кухонь или ванных комнат.',
-    article: 'S.Me-ST.S.DP',
-  },
-  {
-    id: 2,
-    title: 'РЕЙКИ',
-    img: ['/img/pagedecor/peregorodki/item2.png'],
-    description: 'Реечные перегородки из деревянных или пластиковых реек создают ритм и текстуру в интерьере. Отлично смотрятся в стиле лофт, скандинавском или минимализм.',
-    article: 'S.Me-ST.S.DP',
-  },
-  {
-    id: 3,
-    title: 'МЕТАЛЛ',
-    img: ['/img/pagedecor/peregorodki/item31.png', '/img/pagedecor/peregorodki/item32.png'],
-    description: 'Металлические перегородки — для современных интерьеров. Прочные, долговечные, с индустриальным характером. Подходят для офисов, лофтов, студий и технических помещений.',
-    article: 'S.Me-ST.S.DP',
-  },
-]
 
 
 function CardImage({ src, alt }) {
@@ -49,6 +25,7 @@ function CardImage({ src, alt }) {
 
 
 export default function Peregorodki() {
+  const { products, loading } = useCategoryProducts('peregorodki')
   const { addToCart } = useCart()
   const { toggleFavorite, isFavorite } = useFavorites()
   const [showModal, setShowModal] = useState(false)
@@ -76,7 +53,7 @@ export default function Peregorodki() {
       id: product.id,
       title: product.title,
       article: product.article,
-      img: product.img[0],
+      img: Array.isArray(product.img) ? product.img[0] : product.img,
       name: product.title,
     })
     setAddedId(product.id)
@@ -131,15 +108,19 @@ export default function Peregorodki() {
             <div key={p.id} className="peregorodki-card">
 
               <div className="peregorodki-card__gallery">
-                {p.img.length > 1 ? (
-                  <div className="perego-multi-img">
-                    {p.img.map((src, i) => (
-                      <CardImage key={i} src={src} alt={p.title} />
-                    ))}
-                  </div>
-                ) : (
-                  <CardImage src={p.img[0]} alt={p.title} />
-                )}
+                {(() => {
+                  const imgs = Array.isArray(p.img) ? p.img : (p.img ? [p.img] : [])
+                  if (imgs.length > 1) {
+                    return (
+                      <div className="perego-multi-img">
+                        {imgs.map((src, i) => (
+                          <CardImage key={i} src={src} alt={p.title} />
+                        ))}
+                      </div>
+                    )
+                  }
+                  return <CardImage src={imgs[0] || ''} alt={p.title} />
+                })()}
               </div>
 
               <div className="peregorodki-card__info">
