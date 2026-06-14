@@ -179,6 +179,110 @@ async def send_to_bitrix(data: Dict) -> None:
         print(f"❌ Ошибка Bitrix: {e}")
 
 
+class ContactForm(BaseModel):
+    name: str
+    phone: str
+    message: Optional[str] = None
+
+    @field_validator("name")
+    @classmethod
+    def validate_contact_name(cls, v: str) -> str:
+        cleaned = v.strip()
+        if len(cleaned) < 2 or len(cleaned) > 50:
+            raise ValueError("Имя должно быть от 2 до 50 символов")
+        return cleaned
+
+    @field_validator("phone")
+    @classmethod
+    def validate_contact_phone(cls, v: str) -> str:
+        digits = "".join(ch for ch in v if ch.isdigit())
+        if len(digits) < 10 or len(digits) > 15:
+            raise ValueError("Некорректный номер телефона")
+        return v
+
+
+async def send_contact_to_telegram(data: Dict) -> None:
+    """Send a contact-form message to Telegram."""
+    if not BOT_TOKEN or not GROUP_CHAT_ID:
+        print("⚠️ Telegram не настроен — контактное сообщение не отправлено")
+        return
+
+    text = (
+        "📬 <b>Сообщение с формы обратной связи</b>\n\n"
+        f"🕒 <b>Время:</b> {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
+        f"👤 <b>Имя:</b> {data.get('name')}\n"
+        f"📞 <b>Телефон:</b> {data.get('phone')}\n"
+        f"💬 <b>Сообщение:</b> {data.get('message') or '—'}"
+    )
+
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            response = await client.post(
+                f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+                json={
+                    "chat_id": GROUP_CHAT_ID,
+                    "text": text,
+                    "parse_mode": "HTML",
+                    "disable_web_page_preview": True,
+                },
+            )
+            if response.status_code == 200:
+                print("📩 Telegram: Контактное сообщение отправлено")
+            else:
+                print(f"❌ Telegram ошибка: {response.text}")
+    except Exception as e:
+        print(f"❌ Ошибка Telegram: {e}")
+
+
+@router.post("/contact")
+async def contact_form(
+    data: ContactForm,
+    db: Session = Depends(get_db),
+):
+    print(f"📨 Contact form received: name={data.name}, phone={data.phone}")
+
+    # 1) Send to Telegram FIRST (synchronously, not background)
+    telegram_ok = False
+    try:
+        await send_contact_to_telegram({
+            "name": data.name.strip(),
+            "phone": data.phone.strip(),
+            "message": data.message.strip() if data.message else None,
+        })
+        telegram_ok = True
+    except Exception as e:
+        print(f"❌ Ошибка отправки Telegram из контактной формы: {e}")
+
+    # 2) Save to DB (best-effort)
+    app_id = None
+    try:
+        normalized_phone = normalize_phone(data.phone)
+        new_app = Application(
+            name=data.name.strip(),
+            phone=normalized_phone,
+            comment=data.message.strip() if data.message else None,
+            product_name="Контактная форма",
+            status="new",
+        )
+        db.add(new_app)
+        db.commit()
+        db.refresh(new_app)
+        app_id = new_app.id
+        print(f"✅ Контактная заявка #{app_id} сохранена в БД")
+    except HTTPException:
+        db.rollback()
+        raise
+    except Exception as e:
+        db.rollback()
+        print(f"❌ Ошибка сохранения контактной заявки: {type(e).__name__}: {e}")
+        app_id = None
+
+    if not telegram_ok:
+        raise HTTPException(status_code=500, detail="Не удалось отправить сообщение в Telegram")
+
+    return {"status": "ok", "id": app_id}
+
+
 @router.post("")
 @router.post("/")
 async def create_application(

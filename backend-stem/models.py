@@ -33,6 +33,7 @@ class Product(Base):
     article = Column(String, nullable=True)
     in_stock = Column(Boolean, default=True)
     category_slug = Column(String, ForeignKey("categories.slug"))
+    colors_json = Column(Text, nullable=True)
 
     category = relationship("Category", back_populates="products")
 
@@ -80,4 +81,4 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)
     phone = Column(String, nullable=True)
-    is_admin = Column(Boolean, default=False, nullable=False, server_default="false")
+    is_admin = Column(Boolean, default=False, nullable=False, server_default="false")

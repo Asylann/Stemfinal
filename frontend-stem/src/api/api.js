@@ -165,3 +165,21 @@ export async function getCurrentUser(token) {
 export function logout() {
   localStorage.removeItem('stem_access_token')
 }
+
+export async function sendContactMessage(data) {
+  try {
+    const response = await apiClient.post('/api/applications/contact', data)
+    return response.data
+  } catch (error) {
+    console.error('sendContactMessage error:', error.response?.status, error.response?.data)
+    const detail = error.response?.data?.detail
+    let errorMessage
+    if (Array.isArray(detail)) {
+      // Pydantic validation errors
+      errorMessage = detail.map(e => e.msg || e.message).join('; ')
+    } else {
+      errorMessage = detail || error.response?.statusText || error.message
+    }
+    throw new Error(errorMessage || `Ошибка отправки сообщения: ${error.response?.status}`)
+  }
+}
