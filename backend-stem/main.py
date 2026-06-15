@@ -11,7 +11,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from routerss import categories, orders, products, applications, visualize, auth, admin, uploads, blog
-from database import init_db
+from database import init_db, SessionLocal
+from models import Product, Category
 
 UPLOADS_DIR = Path("/app/uploads")
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
@@ -19,9 +20,51 @@ UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 app = FastAPI(title="STEM Academia API", redirect_slashes=False)
 app.router.redirect_slashes = False
 
+# ── Product catalog cache for the AI chatbot ──────────────────────────────────
+PRODUCT_CATALOG_TEXT = ""  # populated on startup
+
+
+def _build_product_catalog() -> str:
+    """Load all products from DB and build a compact text catalog for the AI prompt."""
+    db = SessionLocal()
+    try:
+        all_products = db.query(Product).all()
+        all_categories = db.query(Category).all()
+
+        cat_map = {c.slug: c.title_ru for c in all_categories}
+
+        # Group products by category
+        grouped: dict[str, list[str]] = {}
+        for p in all_products:
+            cat_name = cat_map.get(p.category_slug, p.category_slug or "Без категории")
+            entry = p.title
+            if p.article:
+                entry += f" (арт. {p.article})"
+            if p.size:
+                entry += f", {p.size}"
+            grouped.setdefault(cat_name, []).append(entry)
+
+        lines = ["КАТАЛОГ ТОВАРОВ (актуальный список из базы данных):"]
+        for cat_name, items in grouped.items():
+            lines.append(f"\n📁 {cat_name} ({len(items)} товаров):")
+            for item in items:
+                lines.append(f"  • {item}")
+
+        lines.append(f"\nВсего товаров в каталоге: {len(all_products)}")
+        return "\n".join(lines)
+    except Exception as e:
+        print(f"⚠️ Не удалось загрузить каталог для AI: {e}")
+        return "Каталог товаров временно недоступен."
+    finally:
+        db.close()
+
+
 @app.on_event("startup")
 async def startup_event():
     init_db()
+    global PRODUCT_CATALOG_TEXT
+    PRODUCT_CATALOG_TEXT = _build_product_catalog()
+    print(f"🤖 AI product catalog loaded: {len(PRODUCT_CATALOG_TEXT)} chars")
 
 app.add_middleware(
     CORSMiddleware,
@@ -63,7 +106,7 @@ class ChatMessage(BaseModel):
         return v
 
 
-SYSTEM_PROMPT = """
+SYSTEM_PROMPT_BASE = """
 Ты — виртуальный помощник компании STEM Academia (Казахстан).
 Твоя задача: помогать клиентам подбирать мебель и оборудование, отвечать на вопросы о доставке и оплате.
 
@@ -76,14 +119,21 @@ SYSTEM_PROMPT = """
 
 ПРАВИЛА ОБЩЕНИЯ:
 - Отвечай кратко, вежливо и по делу (максимум 3-4 предложения).
-- Если не знаешь точного ответа — предложи написать менеджеру в WhatsApp.
-- Не выдумывай цены и наличие, если их нет в вопросе.
+- Если клиент спрашивает о конкретном товаре — ищи его в каталоге ниже и отвечай на основе каталога.
+- Если товара нет в каталоге — скажи что такого товара пока нет и предложи связаться с менеджером.
+- Не выдумывай цены — они не указаны в каталоге. Предлагай связаться с менеджером для уточнения цены.
 - Поддерживай русский и казахский языки (отвечай на том же, на котором спросили).
+- Когда recommending товары, mention их названия точно как в каталоге.
 """
 
 
+def get_system_prompt() -> str:
+    """Build the full system prompt with the current product catalog."""
+    return SYSTEM_PROMPT_BASE + "\n\n" + PRODUCT_CATALOG_TEXT
+
+
 def build_chat_messages(body: dict) -> list[dict[str, str]]:
-    messages: list[dict[str, str]] = [{"role": "system", "content": SYSTEM_PROMPT}]
+    messages: list[dict[str, str]] = [{"role": "system", "content": get_system_prompt()}]
 
     history = body.get("messages")
     if isinstance(history, list):
