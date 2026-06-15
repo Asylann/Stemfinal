@@ -142,7 +142,7 @@ async def send_to_bitrix(data: Dict) -> None:
         print("⚠️ Bitrix не настроен")
         return
 
-    url = f"{BITRIX_WEBHOOK_URL.rstrip('/')}/crm.lead.add"
+    url = f"{BITRIX_WEBHOOK_URL.rstrip('/')}/crm.deal.add"
     short_name, product_detailed = format_products(data.get("products_list"))
 
     comments = (
@@ -159,6 +159,7 @@ async def send_to_bitrix(data: Dict) -> None:
             "COMMENTS": comments,
             "SOURCE_ID": "WEB",
             "SOURCE_DESCRIPTION": "Сайт STEM Academia",
+            "STATUS_ID": "NEW",
             "OPENED": "Y",
         }
     }
@@ -166,10 +167,15 @@ async def send_to_bitrix(data: Dict) -> None:
     try:
         async with httpx.AsyncClient(timeout=15) as client:
             response = await client.post(url, json=payload)
+            print("=" * 50)
+            print("BITRIX URL:", url)
+            print("BITRIX STATUS:", response.status_code)
+            print("BITRIX RESPONSE:", response.text)
+            print("=" * 50)
             if response.status_code == 200:
                 result = response.json()
                 if result.get("result"):
-                    print(f"✅ Битрикс24: Лид #{result['result']} создан")
+                    print(f"✅ Битрикс24: сделка #{result['result']} создан")
                 else:
                     print(f"❌ Битрикс24 ошибка: {result}")
             else:

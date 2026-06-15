@@ -39,7 +39,9 @@ services:
     expose:
       - "8000" # Internal only, Nginx proxies to it
     volumes:
-      - uploads_data:/app/uploads   # Persist uploaded product images
+      - uploads_data:/app/uploads
+      - ./backend-stem:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     networks:
       - stem_network
 
