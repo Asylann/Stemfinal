@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from routerss import categories, orders, products, applications, visualize, auth, admin, uploads
+from routerss import categories, orders, products, applications, visualize, auth, admin, uploads, blog
 from database import init_db
 
 UPLOADS_DIR = Path("/app/uploads")
@@ -159,6 +159,7 @@ app.include_router(orders.router,        prefix="/api/orders",       tags=["orde
 app.include_router(applications.router,  prefix="/api/applications", tags=["applications"])
 app.include_router(visualize.router,     prefix="/api/ai", tags=["AI Visualize"])
 app.include_router(uploads.router,       prefix="/api/uploads",      tags=["uploads"])
+app.include_router(blog.router,          prefix="/api/blog",         tags=["blog"])
 app.include_router(auth.router,          prefix="/auth",             tags=["auth"])
 app.include_router(admin.router,         prefix="/admin",            tags=["admin"])
 

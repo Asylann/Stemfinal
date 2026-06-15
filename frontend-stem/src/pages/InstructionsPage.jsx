@@ -87,12 +87,12 @@ export default function InstructionsPage() {
           <h2>Все материалы</h2>
           <div className="instructions-grid">
             {INSTRUCTIONS.map((instr, i) => (
-              <Link key={i} to={instr.path} className="instruction-card">
+              <div key={i} className="instruction-card">
                 <div className="instruction-card__icon">{instr.icon}</div>
                 <div className="instruction-card__title">{instr.title}</div>
                 <p className="instruction-card__desc">{instr.desc}</p>
                 <span className="instruction-tag">{instr.tag}</span>
-              </Link>
+              </div>
             ))}
           </div>
         </section>

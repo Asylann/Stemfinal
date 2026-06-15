@@ -16,6 +16,8 @@ is_admin, run the management command inside the container:
     "
 """
 
+import json
+import re
 import os
 from typing import Optional
 
@@ -24,7 +26,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from database import get_db
-from models import Application, Category, Product, User
+from models import Application, BlogPost, Category, Product, User
 from routerss.auth import get_current_admin
 
 router = APIRouter()
@@ -284,3 +286,127 @@ def admin_get_users(
     _admin: User = Depends(get_current_admin),
 ):
     return [_user_out(u) for u in db.query(User).all()]
+
+
+# ─── Blog Posts ───────────────────────────────────────────────────────────────
+
+class BlogPostCreate(BaseModel):
+    title: str
+    slug: Optional[str] = None
+    excerpt: Optional[str] = None
+    content: Optional[str] = None       # JSON array of paragraphs
+    img: Optional[str] = None
+    category: Optional[str] = None
+    published: bool = True
+
+
+class BlogPostUpdate(BaseModel):
+    title: Optional[str] = None
+    slug: Optional[str] = None
+    excerpt: Optional[str] = None
+    content: Optional[str] = None
+    img: Optional[str] = None
+    category: Optional[str] = None
+    published: Optional[bool] = None
+
+
+def _blog_post_out(p: BlogPost) -> dict:
+    content = p.content or ""
+    paragraphs = []
+    try:
+        parsed = json.loads(content)
+        if isinstance(parsed, list):
+            paragraphs = parsed
+        else:
+            paragraphs = [content]
+    except (json.JSONDecodeError, TypeError):
+        paragraphs = [content] if content else []
+
+    return {
+        "id": p.id,
+        "title": p.title,
+        "slug": p.slug,
+        "excerpt": p.excerpt,
+        "content": paragraphs,
+        "img": p.img,
+        "category": p.category,
+        "published": p.published,
+        "created_at": p.created_at,
+    }
+
+
+def _auto_slug(title: str) -> str:
+    s = title.lower().strip()
+    s = re.sub(r'[^a-zа-я0-9\s-]', '', s)
+    s = re.sub(r'\s+', '-', s)
+    s = re.sub(r'-+', '-', s)
+    return s[:120]
+
+
+@router.get("/blog")
+def admin_get_blog_posts(
+    db: Session = Depends(get_db),
+    _admin: User = Depends(get_current_admin),
+):
+    """List all blog posts (including unpublished)."""
+    posts = db.query(BlogPost).order_by(BlogPost.created_at.desc()).all()
+    return [_blog_post_out(p) for p in posts]
+
+
+@router.post("/blog", status_code=201)
+def admin_create_blog_post(
+    data: BlogPostCreate,
+    db: Session = Depends(get_db),
+    _admin: User = Depends(get_current_admin),
+):
+    slug = data.slug or _auto_slug(data.title)
+    existing = db.query(BlogPost).filter(BlogPost.slug == slug).first()
+    if existing:
+        slug = f"{slug}-{existing.id + 1}"
+
+    post = BlogPost(
+        title=data.title,
+        slug=slug,
+        excerpt=data.excerpt,
+        content=data.content,
+        img=data.img,
+        category=data.category,
+        published=data.published,
+    )
+    db.add(post)
+    db.commit()
+    db.refresh(post)
+    return _blog_post_out(post)
+
+
+@router.put("/blog/{post_id}")
+def admin_update_blog_post(
+    post_id: int,
+    data: BlogPostUpdate,
+    db: Session = Depends(get_db),
+    _admin: User = Depends(get_current_admin),
+):
+    post = db.query(BlogPost).filter(BlogPost.id == post_id).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Статья не найдена")
+
+    for field, value in data.model_dump(exclude_unset=True).items():
+        setattr(post, field, value)
+
+    db.commit()
+    db.refresh(post)
+    return _blog_post_out(post)
+
+
+@router.delete("/blog/{post_id}", status_code=204)
+def admin_delete_blog_post(
+    post_id: int,
+    db: Session = Depends(get_db),
+    _admin: User = Depends(get_current_admin),
+):
+    post = db.query(BlogPost).filter(BlogPost.id == post_id).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Статья не найдена")
+    db.delete(post)
+    db.commit()
+    return None

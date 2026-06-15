@@ -11,7 +11,6 @@ export default function CartDrawer() {
     removeFromCart,
     increaseQty,
     decreaseQty,
-    totalPrice,
     clearCart
   } = useCart()
 
@@ -25,24 +24,6 @@ export default function CartDrawer() {
   const [submitSuccess, setSubmitSuccess] = useState(false)
 
   const handleClose = () => setIsOpen(false)
-
-  const normalizeNumber = (value) => {
-    if (typeof value === 'number' && Number.isFinite(value)) return value
-    if (typeof value === 'string') {
-      const cleaned = value.replace(/[^\d.-]/g, '')
-      const parsed = Number(cleaned)
-      return Number.isFinite(parsed) ? parsed : 0
-    }
-    return 0
-  }
-
-  const safeTotalPrice = Number.isFinite(Number(totalPrice))
-    ? Number(totalPrice)
-    : cartItems.reduce((sum, item) => {
-        const price = normalizeNumber(item.price)
-        const qty = normalizeNumber(item.quantity) || 1
-        return sum + price * qty
-      }, 0)
 
   if (!isOpen) return null
 
@@ -67,8 +48,7 @@ export default function CartDrawer() {
       const products = cartItems.map((item) => ({
         name: item.name || item.title || 'Товар',
         article: item.article || null,
-        price: normalizeNumber(item.price),
-        quantity: normalizeNumber(item.quantity) || 1,
+        quantity: item.quantity || 1,
         url: item.url || window.location.href
       }))
 
@@ -141,9 +121,7 @@ export default function CartDrawer() {
           <>
             <div className="cart-drawer__items">
               {cartItems.map((item) => {
-                const itemPrice = normalizeNumber(item.price)
-                const itemQty = normalizeNumber(item.quantity) || 1
-                const itemTotal = itemPrice * itemQty
+                const itemQty = item.quantity || 1
 
                 return (
                   <div key={item.id} className="cart-item">
@@ -157,9 +135,6 @@ export default function CartDrawer() {
                       <p className="cart-item__name">{item.name || item.title || 'Товар'}</p>
                       <p className="cart-item__article">
                         Арт: {item.article || '—'}
-                      </p>
-                      <p className="cart-item__price">
-                        {itemTotal.toLocaleString('ru-KZ')} ₸
                       </p>
 
                       <div className="cart-item__qty">
@@ -186,11 +161,6 @@ export default function CartDrawer() {
             </div>
 
             <div className="cart-drawer__footer">
-              <div className="cart-drawer__total">
-                <span>Итого:</span>
-                <strong>{safeTotalPrice.toLocaleString('ru-KZ')} ₸</strong>
-              </div>
-
               <button
                 className="cart-drawer__checkout"
                 onClick={handleOpenModal}
@@ -227,7 +197,7 @@ export default function CartDrawer() {
                 </strong>
               </p>
               <p>
-                Итого: <strong>{safeTotalPrice.toLocaleString('ru-KZ')} ₸</strong>
+                Количество: <strong>{cartItems.length}</strong>
               </p>
             </div>
 

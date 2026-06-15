@@ -183,3 +183,23 @@ export async function sendContactMessage(data) {
     throw new Error(errorMessage || `Ошибка отправки сообщения: ${error.response?.status}`)
   }
 }
+
+// ── Blog ───────────────────────────────────────────────────────────────────
+
+export async function getBlogPosts() {
+  try {
+    const response = await apiClient.get('/api/blog')
+    return response.data
+  } catch (error) {
+    throw new Error(`Ошибка загрузки блога: ${error.response?.status || error.message}`)
+  }
+}
+
+export async function getBlogPost(identifier) {
+  try {
+    const response = await apiClient.get(`/api/blog/${identifier}`)
+    return response.data
+  } catch (error) {
+    throw new Error(`Статья не найдена: ${identifier}`)
+  }
+}

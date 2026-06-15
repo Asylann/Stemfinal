@@ -66,12 +66,28 @@ export default function Navbar() {
   const [catalogOpen, setCatalogOpen] = useState(false)
   const [callbackOpen, setCallbackOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [cityOpen, setCityOpen] = useState(false)
+  const [selectedCity, setSelectedCity] = useState(
+    () => localStorage.getItem('stem_city') || 'astana'
+  )
   const { lang, setLang, t } = useLang()
   const navigate = useNavigate()
   const catalogRef = useRef(null)
+  const cityRef = useRef(null)
 
   const { isOpen, setIsOpen, totalCount } = useCart()
   const { favorites } = useFavorites()
+
+  const cities = [
+    { key: 'astana', label: t.city_astana },
+    { key: 'almaty', label: t.city_almaty },
+  ]
+
+  function handleCityChange(key) {
+    setSelectedCity(key)
+    localStorage.setItem('stem_city', key)
+    setCityOpen(false)
+  }
 
   const catalogCategories = [
     { label: t.nav_design,    path: '/' },
@@ -96,6 +112,9 @@ export default function Navbar() {
       if (catalogRef.current && !catalogRef.current.contains(e.target)) {
         setCatalogOpen(false)
       }
+      if (cityRef.current && !cityRef.current.contains(e.target)) {
+        setCityOpen(false)
+      }
     }
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
@@ -115,7 +134,29 @@ export default function Navbar() {
       <header className="navbar-wrapper">
         {/* TOP BAR */}
         <div className="navbar-topbar">
-          <span className="topbar-city">📍 {t.city}</span>
+          <div className="topbar-city-wrap" ref={cityRef}>
+            <button
+              className="topbar-city"
+              onClick={() => setCityOpen(!cityOpen)}
+              type="button"
+            >
+              📍 {selectedCity === 'almaty' ? t.city_almaty : t.city_astana} <span className="city-arrow">{cityOpen ? '▲' : '▼'}</span>
+            </button>
+            {cityOpen && (
+              <div className="city-dropdown">
+                {cities.map(c => (
+                  <button
+                    key={c.key}
+                    className={`city-dropdown-item ${selectedCity === c.key ? 'active' : ''}`}
+                    onClick={() => handleCityChange(c.key)}
+                    type="button"
+                  >
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <div className="topbar-right">
             <span className="topbar-phone">📞 {t.phone}</span>
             <button
