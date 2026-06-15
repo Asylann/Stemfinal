@@ -34,8 +34,6 @@ def _product_out(p: Product) -> dict:
         "size": p.size,
         "article": p.article,
         "in_stock": p.in_stock,
-        "price": p.price,
-        "old_price": None,
         "colors": colors,
         "category_slug": p.category_slug,
         "category": {

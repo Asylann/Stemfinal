@@ -7,17 +7,6 @@ import { createApplication, apiClient } from '../api/api'
 import './ProductDetail.css'
 
 
-function formatPrice(price) {
-  if (price === null || price === undefined || price === '') {
-    return '0 ₸'
-  }
-  const num = Number(price)
-  if (isNaN(num)) {
-    return '0 ₸'
-  }
-  return num.toLocaleString('ru-KZ') + ' ₸'
-}
-
 
 function validatePhone(phone) {
   const digits = phone.replace(/\D/g, '')
@@ -206,20 +195,6 @@ export default function ProductDetail() {
             {product.article && (
               <div className="product-article">
                 <span>Артикул:</span> <strong>{product.article}</strong>
-              </div>
-            )}
-
-            {/*  Безопасное отображение цены */}
-            {(product.price !== null && product.price !== undefined) && (
-              <div className="product-price">
-                <span className="price-current">
-                  {formatPrice(product.price)}
-                </span>
-                {product.old_price && (
-                  <span className="price-old">
-                    {formatPrice(product.old_price)}
-                  </span>
-                )}
               </div>
             )}
 

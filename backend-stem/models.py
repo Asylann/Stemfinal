@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, Text, Boolean, Float, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from database import Base
 
@@ -32,7 +32,6 @@ class Product(Base):
     size = Column(String, nullable=True)
     article = Column(String, nullable=True)
     in_stock = Column(Boolean, default=True)
-    price = Column(Float, nullable=True)
     category_slug = Column(String, ForeignKey("categories.slug"))
     colors_json = Column(Text, nullable=True)
 
@@ -83,3 +82,17 @@ class User(Base):
     password = Column(String, nullable=False)
     phone = Column(String, nullable=True)
     is_admin = Column(Boolean, default=False, nullable=False, server_default="false")
+
+
+class BlogPost(Base):
+    __tablename__ = "blog_posts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    slug = Column(String, unique=True, index=True, nullable=False)
+    excerpt = Column(Text, nullable=True)
+    content = Column(Text, nullable=True)        # JSON-encoded list of paragraphs
+    img = Column(String, nullable=True)
+    category = Column(String, nullable=True)      # e.g. "Мебель", "Оборудование"
+    published = Column(Boolean, default=True)
+    created_at = Column(String, default=lambda: datetime.now().strftime("%Y-%m-%d %H:%M:%S"))

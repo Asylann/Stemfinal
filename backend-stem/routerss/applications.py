@@ -25,7 +25,6 @@ BITRIX_WEBHOOK_URL = os.getenv("BITRIX_WEBHOOK_URL")
 class CartItem(BaseModel):
     name: str
     article: Optional[str] = None
-    price: Optional[float] = None
     quantity: Optional[int] = 1
     url: Optional[str] = None
 
