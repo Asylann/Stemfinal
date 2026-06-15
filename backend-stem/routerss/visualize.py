@@ -14,11 +14,16 @@ HF_TOKEN = os.getenv("HF_TOKEN")
 def build_prompt(products_list):
     items_text = ", ".join(products_list)
     return (
-       f"Professional STEM classroom interior, photorealistic 4K render. "
+       f"Professional STEM classroom interior, photorealistic 4K architectural render. "
         f"The room contains ONLY these items: {items_text}. "
-        f"Each item is large, detailed and clearly visible in the foreground. "
-        f"Modern school, clean white walls, bright LED lighting, wooden floor. "
-        f"Architectural visualization, interior design magazine quality."
+        f"Large modern classroom with fresh renovation, premium educational interior design. "
+        f"Interactive STEM learning environment with visible equipment and organized workspace. "
+        f"Bright LED ceiling panel lighting, additional accent lighting, realistic illumination. "
+        f"Modern suspended ceiling, decorative wall panels, acoustic elements, clean white and light wood finishes. "
+        f"High-quality wooden flooring, large windows with natural daylight. "
+        f"Every object is large, detailed, fully visible and occupies significant space in the scene. "
+        f"No empty areas, no unused floor space, richly furnished classroom. "
+        f"Professional school interior, architectural visualization, interior design magazine quality, ultra realistic."
     )
 
 @router.post("/visualize")
