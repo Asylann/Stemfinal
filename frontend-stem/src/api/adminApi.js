@@ -196,3 +196,27 @@ export async function adminUploadImage(file) {
 
   return data // { url: '/uploads/<uuid>.ext' }
 }
+
+// ── Blog Posts ─────────────────────────────────────────────────────────────
+
+export function adminGetBlogPosts() {
+  return adminFetch('/admin/blog').then(d => toArray(d, 'blog posts'))
+}
+
+export function adminCreateBlogPost(data) {
+  return adminFetch('/admin/blog', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export function adminUpdateBlogPost(id, data) {
+  return adminFetch(`/admin/blog/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}
+
+export function adminDeleteBlogPost(id) {
+  return adminFetch(`/admin/blog/${id}`, { method: 'DELETE' })
+}

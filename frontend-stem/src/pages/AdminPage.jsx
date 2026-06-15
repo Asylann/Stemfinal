@@ -14,6 +14,10 @@ import {
   adminUpdateCategory,
   adminDeleteCategory,
   adminUploadImage,
+  adminGetBlogPosts,
+  adminCreateBlogPost,
+  adminUpdateBlogPost,
+  adminDeleteBlogPost,
 } from '../api/adminApi'
 import './AdminPage.css'
 
@@ -42,7 +46,6 @@ function ProductModal({ product, categories, onClose, onSaved }) {
     size: product?.size ?? '',
     article: product?.article ?? '',
     in_stock: product?.in_stock ?? true,
-    price: product?.price ?? '',
     category_slug: product?.category_slug ?? '',
   })
   const [saving, setSaving] = useState(false)
@@ -51,15 +54,10 @@ function ProductModal({ product, categories, onClose, onSaved }) {
   const [imgPreview, setImgPreview] = useState(product?.img || '')
 
   const set = (field) => (e) => {
-    if (field === 'price') {
-      const val = e.target.value
-      setForm((prev) => ({ ...prev, price: val === '' ? '' : Number(val) }))
-    } else {
-      setForm((prev) => ({
-        ...prev,
-        [field]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
-      }))
-    }
+    setForm((prev) => ({
+      ...prev,
+      [field]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
+    }))
   }
 
   // Handle file picker → upload → store returned URL
@@ -108,7 +106,6 @@ function ProductModal({ product, categories, onClose, onSaved }) {
         material_kz: form.material_kz || null,
         size: form.size || null,
         article: form.article || null,
-        price: form.price !== '' && form.price !== null ? Number(form.price) : null,
         category_slug: form.category_slug || null,
       }
       if (isEdit) {
@@ -142,20 +139,6 @@ function ProductModal({ product, categories, onClose, onSaved }) {
               <label>Артикул</label>
               <input value={form.article} onChange={set('article')} />
             </div>
-            <div className="admin-form__field">
-              <label>Цена (₸)</label>
-              <input
-                type="number"
-                min="0"
-                step="1000"
-                value={form.price}
-                onChange={set('price')}
-                placeholder="Например: 150000"
-              />
-            </div>
-          </div>
-
-          <div className="admin-form__row">
             <div className="admin-form__field">
               <label>Категория</label>
               <select value={form.category_slug} onChange={set('category_slug')}>
@@ -334,7 +317,6 @@ function ProductsTab() {
                 <th>Фото</th>
                 <th>Название</th>
                 <th>Артикул</th>
-                <th>Цена</th>
                 <th>Категория</th>
                 <th>Наличие</th>
                 <th>Действия</th>
@@ -358,9 +340,6 @@ function ProductsTab() {
                   </td>
                   <td style={{ maxWidth: 220, fontWeight: 500 }}>{p.title}</td>
                   <td style={{ color: '#888', fontSize: 12 }}>{p.article || '—'}</td>
-                  <td style={{ fontWeight: 600, color: '#2f6f55', whiteSpace: 'nowrap' }}>
-                    {p.price ? `${Number(p.price).toLocaleString('ru-KZ')} ₸` : '—'}
-                  </td>
                   <td style={{ fontSize: 12 }}>{p.category_slug || '—'}</td>
                   <td>
                     <span className={`badge ${p.in_stock ? 'badge--green' : 'badge--red'}`}>
@@ -739,6 +718,344 @@ function CategoriesTab() {
   )
 }
 
+// ─── Blog Post Form Modal ─────────────────────────────────────────────────
+
+function BlogPostModal({ post, onClose, onSaved }) {
+  const isEdit = !!post
+  const [form, setForm] = useState({
+    title: post?.title ?? '',
+    slug: post?.slug ?? '',
+    excerpt: post?.excerpt ?? '',
+    content: post?.content?.join('\n\n') ?? '',
+    img: post?.img ?? '',
+    category: post?.category ?? '',
+    published: post?.published ?? true,
+  })
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [uploading, setUploading] = useState(false)
+  const [imgPreview, setImgPreview] = useState(post?.img || '')
+
+  const set = (field) => (e) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
+    }))
+  }
+
+  async function handleImageFile(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const localUrl = URL.createObjectURL(file)
+    setImgPreview(localUrl)
+    setUploading(true)
+    setError('')
+    try {
+      const result = await adminUploadImage(file)
+      setForm((prev) => ({ ...prev, img: result.url }))
+      setImgPreview(result.url)
+    } catch (err) {
+      setError('Ошибка загрузки фото: ' + err.message)
+      setImgPreview(form.img || '')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    if (!form.title.trim()) {
+      setError('Название статьи обязательно')
+      return
+    }
+    if (uploading) {
+      setError('Подождите, фото ещё загружается...')
+      return
+    }
+    setSaving(true)
+    setError('')
+    try {
+      // Convert content text to JSON array of paragraphs
+      const paragraphs = form.content
+        .split(/\n\n+/)
+        .map(p => p.trim())
+        .filter(Boolean)
+      const payload = {
+        title: form.title,
+        slug: form.slug || undefined,
+        excerpt: form.excerpt || undefined,
+        content: JSON.stringify(paragraphs),
+        img: form.img || undefined,
+        category: form.category || undefined,
+        published: form.published,
+      }
+      if (isEdit) {
+        await adminUpdateBlogPost(post.id, payload)
+      } else {
+        await adminCreateBlogPost(payload)
+      }
+      onSaved()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="admin-modal-overlay" onClick={onClose}>
+      <div className="admin-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 720 }}>
+        <h3 className="admin-modal__title">
+          {isEdit ? `Редактировать: ${post.title}` : 'Новая статья'}
+        </h3>
+        <ErrorBox message={error} />
+        <form className="admin-form" onSubmit={handleSubmit}>
+          <div className="admin-form__field">
+            <label>Заголовок *</label>
+            <input value={form.title} onChange={set('title')} required />
+          </div>
+
+          <div className="admin-form__field">
+            <label>Slug (URL)</label>
+            <input
+              value={form.slug}
+              onChange={set('slug')}
+              placeholder={isEdit ? form.slug : 'Автоматически из заголовка'}
+            />
+            <small style={{ color: '#888', fontSize: 11 }}>
+              URL: /blog/<b>{form.slug || '...'}</b>
+            </small>
+          </div>
+
+          <div className="admin-form__field">
+            <label>Краткое описание (excerpt)</label>
+            <textarea
+              rows={2}
+              value={form.excerpt}
+              onChange={set('excerpt')}
+              placeholder="Краткое описание для карточки блога"
+            />
+          </div>
+
+          {/* Image upload */}
+          <div className="admin-form__field">
+            <label>Обложка статьи</label>
+            <div className="admin-img-upload">
+              {imgPreview && (
+                <img
+                  src={imgPreview}
+                  alt="preview"
+                  className="admin-img-upload__preview"
+                  onError={(e) => { e.target.style.display = 'none' }}
+                />
+              )}
+              <label className="admin-img-upload__btn" htmlFor="blog-img-file">
+                {uploading ? '⏳ Загрузка...' : imgPreview ? '🔄 Заменить фото' : '📷 Загрузить фото'}
+              </label>
+              <input
+                id="blog-img-file"
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                style={{ display: 'none' }}
+                onChange={handleImageFile}
+                disabled={uploading}
+              />
+            </div>
+          </div>
+
+          <div className="admin-form__field">
+            <label>Категория</label>
+            <input
+              value={form.category}
+              onChange={set('category')}
+              placeholder="Оборудование, Мебель, Новости..."
+            />
+          </div>
+
+          <div className="admin-form__field">
+            <label>Текст статьи</label>
+            <p style={{ color: '#888', fontSize: 11, margin: '0 0 4px' }}>
+              Разделяйте абзацы пустой строкой. Каждый абзац будет отдельным блоком.
+            </p>
+            <textarea
+              rows={12}
+              value={form.content}
+              onChange={set('content')}
+              placeholder="Первый абзац...
+
+Второй абзац...
+
+Третий абзац..."
+            />
+          </div>
+
+          <div className="admin-form__check-row">
+            <input
+              type="checkbox"
+              id="blog_published"
+              checked={form.published}
+              onChange={set('published')}
+            />
+            <label htmlFor="blog_published" style={{ textTransform: 'none', fontSize: '14px', cursor: 'pointer' }}>
+              Опубликовано
+            </label>
+          </div>
+
+          <div className="admin-form__actions">
+            <button type="button" className="admin-btn admin-btn--secondary" onClick={onClose}>
+              Отмена
+            </button>
+            <button type="submit" className="admin-btn admin-btn--primary" disabled={saving || uploading}>
+              {saving ? 'Сохранение...' : isEdit ? 'Сохранить' : 'Опубликовать'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+// ─── Blog Tab ───────────────────────────────────────────────────────────────
+
+function BlogTab() {
+  const [posts, setPosts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [modal, setModal] = useState(null)
+  const [confirmDelete, setConfirmDelete] = useState(null)
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const data = await adminGetBlogPosts()
+      setPosts(data)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  async function handleDelete(id) {
+    try {
+      await adminDeleteBlogPost(id)
+      setConfirmDelete(null)
+      load()
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  return (
+    <>
+      <div className="admin-section-header">
+        <h2 className="admin-section-title">Блог ({posts.length})</h2>
+        <button className="admin-btn admin-btn--primary" onClick={() => setModal('create')}>
+          + Новая статья
+        </button>
+      </div>
+
+      <ErrorBox message={error} />
+
+      {loading ? (
+        <Spinner />
+      ) : posts.length === 0 ? (
+        <div className="admin-empty">Статей пока нет. Напишите первую!</div>
+      ) : (
+        <div className="admin-table-wrap">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Обложка</th>
+                <th>Заголовок</th>
+                <th>Категория</th>
+                <th>Дата</th>
+                <th>Статус</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody>
+              {posts.map((p) => (
+                <tr key={p.id}>
+                  <td>{p.id}</td>
+                  <td>
+                    {p.img ? (
+                      <img
+                        src={p.img}
+                        alt={p.title}
+                        className="admin-table__img"
+                        style={{ width: 80, height: 50, objectFit: 'cover', borderRadius: 6 }}
+                        onError={(e) => { e.target.style.display = 'none' }}
+                      />
+                    ) : (
+                      <span style={{ color: '#ccc', fontSize: 11 }}>—</span>
+                    )}
+                  </td>
+                  <td style={{ maxWidth: 260, fontWeight: 500 }}>
+                    {p.title}
+                    {p.excerpt && (
+                      <div style={{ fontSize: 11, color: '#888', marginTop: 2, lineHeight: 1.3 }}>
+                        {p.excerpt.length > 80 ? p.excerpt.slice(0, 80) + '...' : p.excerpt}
+                      </div>
+                    )}
+                  </td>
+                  <td style={{ fontSize: 12 }}>{p.category || '—'}</td>
+                  <td style={{ fontSize: 12, color: '#888', whiteSpace: 'nowrap' }}>
+                    {p.created_at
+                      ? new Date(p.created_at).toLocaleDateString('ru-RU')
+                      : '—'}
+                  </td>
+                  <td>
+                    <span className={`badge ${p.published ? 'badge--green' : 'badge--red'}`}>
+                      {p.published ? 'Опубл.' : 'Черновик'}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="admin-table__actions">
+                      <button
+                        className="admin-btn admin-btn--secondary admin-btn--sm"
+                        onClick={() => setModal(p)}
+                      >
+                        ✏️ Изменить
+                      </button>
+                      <button
+                        className="admin-btn admin-btn--danger admin-btn--sm"
+                        onClick={() => setConfirmDelete({ id: p.id, title: p.title })}
+                      >
+                        🗑️ Удалить
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {modal && (
+        <BlogPostModal
+          post={modal === 'create' ? null : modal}
+          onClose={() => setModal(null)}
+          onSaved={() => { setModal(null); load() }}
+        />
+      )}
+
+      {confirmDelete && (
+        <ConfirmModal
+          message={`Вы уверены, что хотите удалить статью «${confirmDelete.title}»? Это действие нельзя отменить.`}
+          onConfirm={() => handleDelete(confirmDelete.id)}
+          onCancel={() => setConfirmDelete(null)}
+        />
+      )}
+    </>
+  )
+}
+
 // ─── Users Tab ────────────────────────────────────────────────────────────────
 
 function UsersTab() {
@@ -804,6 +1121,7 @@ function UsersTab() {
 const TABS = [
   { id: 'products',     label: '📦 Товары' },
   { id: 'categories',   label: '📁 Категории' },
+  { id: 'blog',         label: '📝 Блог' },
   { id: 'applications', label: '📋 Заявки' },
   { id: 'users',        label: '👤 Пользователи' },
 ]
@@ -879,6 +1197,7 @@ export default function AdminPage() {
       <div className="admin-content">
         {activeTab === 'products'     && <ProductsTab />}
         {activeTab === 'categories'   && <CategoriesTab />}
+        {activeTab === 'blog'         && <BlogTab />}
         {activeTab === 'applications' && <ApplicationsTab />}
         {activeTab === 'users'        && <UsersTab />}
       </div>

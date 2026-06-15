@@ -13,7 +13,6 @@ const FavCard = memo(function FavCard({ item }) {
 
   const id = item.id || item.article || item.sku || Math.random()
   const name = item.name || item.title || item.product_name || 'Без названия'
-  const price = item.price ?? item.cost ?? null
   const article = item.article || item.sku || ''
 
   const imageSrc = imgError
@@ -28,7 +27,6 @@ const FavCard = memo(function FavCard({ item }) {
       id,
       name,
       image: imageSrc,
-      price: price || 0,
       article,
     })
     setAdded(true)
@@ -70,16 +68,6 @@ const FavCard = memo(function FavCard({ item }) {
       <div className="fav-card__info">
         <h3 className="fav-card__name">{name}</h3>
         {article && <p className="fav-card__article">Арт. {article}</p>}
-
-        {price ? (
-          <p className="fav-card__price">
-            {Number(price).toLocaleString('ru-RU')} ₸
-          </p>
-        ) : (
-          <p className="fav-card__price fav-card__price--ask">
-            Цена по запросу
-          </p>
-        )}
 
         <div className="fav-card__actions">
           <button

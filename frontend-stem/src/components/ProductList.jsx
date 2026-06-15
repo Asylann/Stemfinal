@@ -279,16 +279,6 @@ function ProductCard({ product }) {
         </div>
         <div className="divan-card__info">
           <h2 className="divan-card__title">{product.title}</h2>
-          {product.price != null && product.price > 0 && (
-            <p className="divan-card__price" style={{
-              fontSize: '20px',
-              fontWeight: '700',
-              color: '#2f6f55',
-              margin: '8px 0 4px',
-            }}>
-              {Number(product.price).toLocaleString('ru-KZ')} ₸
-            </p>
-          )}
           <p className="divan-card__desc">{product.description_ru || product.description}</p>
 
           {colors.length > 0 && (
