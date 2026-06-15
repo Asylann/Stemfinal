@@ -6,8 +6,8 @@ export default function EquipmentPage() {
   const { t } = useLang()
 
   const categories = [
-    { title: 'ARDUINO',         img: '/img/equipment/arduino.png',   path: '#' },
-    { title: 'LEGO SPIKE',      img: '/img/equipment/legospike.png', path: '#' },
+    { title: 'ARDUINO',         img: '/img/equipment/arduino.png',   path: '/equipment/arduino' },
+    { title: 'LEGO SPIKE',      img: '/img/equipment/legospike.png', path: '/equipment/legospike' },
     { title: 'LABDISC',         img: '/img/equipment/labdisc.png',   path: '/equipment/labdisc' },
     { title: 'ULAB',            img: '/img/equipment/ulab.png',      path: '/equipment/ulab' },
     { title: t.equipment_soon,  img: null,                           path: '#' },

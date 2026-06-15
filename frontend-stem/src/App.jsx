@@ -34,6 +34,8 @@ import AdminGuard from './components/AdminGuard'
 
 import RoqedPage from './pages/digital/RoqedPage'
 import StemPlatformPage from './pages/digital/StemPlatformPage'
+import InfoStendPage from './pages/digital/InfoStendPage'
+import SteamBookPage from './pages/digital/SteamBookPage'
 
 
 import Divany from './pages/categories/Divany'
@@ -58,6 +60,8 @@ import DynamicCategory from './pages/categories/DynamicCategory'
 
 import Ulab from './pages/equipment/Ulab'
 import Labdisc from './pages/equipment/Labdisc'
+import Arduino from './pages/equipment/Arduino'
+import LegoSpike from './pages/equipment/LegoSpike'
 
 
 import Gos from './pages/decor/Gos'
@@ -103,6 +107,8 @@ export default function App() {
         <Route path="/digital" element={<DigitalPage />} />
         <Route path="/digital/stemplatform" element={<StemPlatformPage />} />
         <Route path="/digital/roqed" element={<RoqedPage />} />
+        <Route path="/digital/infostend" element={<InfoStendPage />} />
+        <Route path="/digital/steambook" element={<SteamBookPage />} />
         <Route path="/visualize" element={<VisualizePage />} />
 
         {/* Новые разделы по ТЗ */}
@@ -143,6 +149,8 @@ export default function App() {
         {/* Оборудование */}
         <Route path="/equipment/ulab" element={<Ulab />} />
         <Route path="/equipment/labdisc" element={<Labdisc />} />
+        <Route path="/equipment/arduino" element={<Arduino />} />
+        <Route path="/equipment/legospike" element={<LegoSpike />} />
 
         {/* Декор */}
         <Route path="/decor/gos" element={<Gos />} />

@@ -50,10 +50,10 @@ const menuItems = [
   {
     label: 'цифровые продукты',
     links: [
-      { text: 'Roqed Science', path: '#' },
-      { text: 'STEM Platform', path: '#' },
-      { text: 'пособия',       path: '#' },
-      { text: 'инфо. стенды',  path: '#' },
+      { text: 'Roqed Science', path: '/digital/roqed' },
+      { text: 'STEM Platform', path: '/digital/stemplatform' },
+      { text: 'пособия',       path: '/digital/steambook' },
+      { text: 'инфо. стенды',  path: '/digital/infostend' },
     ]
   },
   {
@@ -61,8 +61,8 @@ const menuItems = [
     links: [
       { text: 'ULabs',      path: '/equipment/ulab' },
       { text: 'LabDisc',    path: '/equipment/labdisc' },
-      { text: 'Lego Spike', path: '#' },
-      { text: 'Arduino',    path: '#' },
+      { text: 'Lego Spike', path: '/equipment/legospike' },
+      { text: 'Arduino',    path: '/equipment/arduino' },
     ]
   },
   {
