@@ -55,6 +55,19 @@ export default function FirstPage() {
       <HeroSlider />
       <CategoryGrid />
 
+      {/* AI Визуализация — CTA секция */}
+      <section className="visualize-cta-section">
+        <div className="visualize-cta-container">
+          <div className="visualize-cta-text">
+            <h2 className="visualize-cta-title">{t.visualize_cta_title || 'Визуализируйте мебель в вашем помещении с AI'}</h2>
+            <p className="visualize-cta-desc">{t.visualize_cta_desc || 'Загрузите фото вашего помещения и разместите мебель из нашего каталога с помощью AI'}</p>
+          </div>
+          <Link to="/visualize" className="visualize-cta-btn">
+            {t.visualize_cta_btn || 'Попробовать визуализацию'} →
+          </Link>
+        </div>
+      </section>
+
       {/* Breadcrumb */}
       <div className="breadcrumb">{t.design_breadcrumb}</div>
 

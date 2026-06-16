@@ -16,8 +16,7 @@ export default function Footer() {
         {/* КОЛОНКА 1 — Бренд */}
         <div className="footer-col footer-col--brand">
           <div className="footer-logo">
-            <span className="footer-logo-stem">STEM</span>
-            <span className="footer-logo-academia">Academia</span>
+            <img src="/img/pagefirst/Vector (89).png" alt="STEM Academia" className="footer-logo-img" />
           </div>
           <p className="footer-tagline">{t.footer_tagline}</p>
 

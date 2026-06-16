@@ -180,8 +180,7 @@ export default function Navbar() {
         {/* MAIN NAV */}
         <div className="navbar-main">
           <Link to="/" className="navbar-logo">
-            <span className="logo-stem">STEM</span>
-            <span className="logo-academia">Academia</span>
+            <img src="/img/pagefirst/Vector (89).png" alt="STEM Academia" className="navbar-logo-img" />
           </Link>
 
           <form className="navbar-search" onSubmit={handleSearch}>

@@ -59,8 +59,7 @@ export default function AuthModal() {
       <div className="auth-box" onClick={e => e.stopPropagation()}>
 
         <div className="auth-box__logo">
-          <span className="auth-logo-stem">STEM</span>
-          <span className="auth-logo-academia">Academia</span>
+          <img src="/img/pagefirst/Vector (89).png" alt="STEM Academia" className="auth-logo-img" />
         </div>
 
         <div className="auth-box__tabs">

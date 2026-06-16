@@ -16,9 +16,13 @@
 
 .footer-logo {
   display: flex;
-  flex-direction: column;
-  line-height: 1.1;
+  align-items: center;
   margin-bottom: 12px;
+}
+.footer-logo-img {
+  height: 52px;
+  width: auto;
+  object-fit: contain;
 }
 .footer-logo-stem {
   font-size: 26px;
@@ -231,4 +235,4 @@
 .footer-admin-link:hover {
   color: rgba(255, 255, 255, 0.15) !important;
   cursor: pointer;
-}
+}

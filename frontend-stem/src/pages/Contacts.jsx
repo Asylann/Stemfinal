@@ -45,7 +45,7 @@ export default function Contacts() {
       <div className="contacts-hero">
         <div className="contacts-hero__bg" />
         <div className="contacts-hero__logo">
-          <img src="/img/vvedenie/Vector.png" alt="STEM Academia" className="contacts-hero__logo-img" />
+          <img src="/img/pagefirst/Vector (89).png" alt="STEM Academia" className="contacts-hero__logo-img" />
         </div>
       </div>
 

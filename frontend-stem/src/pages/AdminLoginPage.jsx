@@ -61,8 +61,7 @@ export default function AdminLoginPage() {
 
         {/* Brand mark */}
         <div className="alog-brand">
-          <span className="alog-brand__stem">STEM</span>
-          <span className="alog-brand__academia">Academia</span>
+          <img src="/img/pagefirst/Vector (89).png" alt="STEM Academia" className="alog-brand__img" />
         </div>
 
         <p className="alog-subtitle">Панель администратора</p>
