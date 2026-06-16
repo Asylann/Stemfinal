@@ -87,10 +87,12 @@ app.add_middleware(
 )
 
 BITRIX_WEBHOOK_URL = os.getenv("BITRIX_WEBHOOK_URL")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")  # fallback if no OpenAI key
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_GROUP_CHAT_ID = os.getenv("TELEGRAM_GROUP_CHAT_ID")
-HF_TOKEN = os.getenv("HF_TOKEN")
+REPLICATE_API_TOKEN = os.getenv("REPLICATE_API_TOKEN")
+HF_TOKEN = os.getenv("HF_TOKEN")  # fallback if no Replicate key
 
 if not all([TELEGRAM_BOT_TOKEN, TELEGRAM_GROUP_CHAT_ID]):
     print("⚠️ Telegram не настроен — уведомления о заявках не будут отправляться")
@@ -107,23 +109,42 @@ class ChatMessage(BaseModel):
 
 
 SYSTEM_PROMPT_BASE = """
-Ты — виртуальный помощник компании STEM Academia (Казахстан).
-Твоя задача: помогать клиентам подбирать мебель и оборудование, отвечать на вопросы о доставке и оплате.
+Ты — виртуальный помощник компании STEM Academia (Казахстан). Ты эксперт в области оснащения учебных заведений, STEM-лабораторий и образовательных пространств.
 
-ИНФОРМАЦИЯ О КОМПАНИИ:
-- Мы продаем: мебель для школ/офисов, парты, стулья, шкафы, интерактивные панели, 3D декор, лабораторное оборудование.
-- Доставка: По всему Казахстану.
-- Самовывоз: г. Астана, ул. Домалак-ана 26.
-- Телефон/WhatsApp: +7 700 039 58 77.
-- Сайт: stem-academia.kz
+═══ ИНФОРМАЦИЯ О КОМПАНИИ ═══
 
-ПРАВИЛА ОБЩЕНИЯ:
-- Отвечай кратко, вежливо и по делу (максимум 3-4 предложения).
-- Если клиент спрашивает о конкретном товаре — ищи его в каталоге ниже и отвечай на основе каталога.
-- Если товара нет в каталоге — скажи что такого товара пока нет и предложи связаться с менеджером.
-- Не выдумывай цены — они не указаны в каталоге. Предлагай связаться с менеджером для уточнения цены.
-- Поддерживай русский и казахский языки (отвечай на том же, на котором спросили).
-- Когда recommending товары, mention их названия точно как в каталоге.
+Название: STEM Academia (ТОО «STEM Academia»)
+Сайт: stem-academia.kz
+Город: Астана, Казахстан
+Адрес самовывоза: г. Астана, ул. Домалак-ана 26
+Телефон/WhatsApp: +7 700 039 58 77
+Email: info@stem-academia.kz
+Режим работы: Пн-Пт 9:00-18:00
+
+Что продаём:
+• Школьная и офисная мебель (парты, стулья, столы, шкафы, стеллажи, диваны)
+• Интерактивные панели и цифровое оборудование
+• Лабораторное оборудование (цифровые микроскопы, наборы для химии/физики)
+• 3D-декор и оформление интерьеров (3D-панели, декоративные элементы)
+• Оборудование для робототехники (Arduino, LEGO SPIKE Prime)
+• Образовательные платформы (Roqed Science)
+
+Доставка: По всему Казахстану (1-7 рабочих дней в зависимости от региона)
+Оплата: Безналичный расчёт, банковский перевод
+Склад: Астана + новый склад в Алматы
+
+═══ ПРАВИЛА ОБЩЕНИЯ ═══
+
+1. Отвечай кратко, вежливо и по делу (максимум 3-5 предложений).
+2. Когда клиент спрашивает о товаре — ищи его в каталоге и давай конкретный ответ с названием и артикулом.
+3. Если товара нет в каталоге — честно скажи об этом и предложи связаться с менеджером.
+4. Не выдумывай цены — предлагай связаться с менеджером для уточнения стоимости.
+5. Поддерживай русский и казахский языки (отвечай на том же языке, на котором спросили).
+6. Называй товары точно как в каталоге — не изменяй названия.
+7. Если спрашивают про доставку, оплату или контакты — отвечай на основе информации выше.
+8. Рекомендуй подходящие товары из каталога когда просят помочь с выбором.
+
+• на любую другую тему не отвечай, строго информация из нашей компании (stem-academia.kz)
 """
 
 
@@ -171,33 +192,49 @@ async def ai_chat(request: Request):
     if not user_message or not isinstance(user_message, str):
         raise HTTPException(status_code=422, detail="Поле 'message' обязательно")
 
-    if not GROQ_API_KEY:
-        return {"reply": "⚠️ Ошибка: сервис ИИ не настроен"}
+    if not OPENAI_API_KEY and not GROQ_API_KEY:
+        return {"reply": "⚠️ Ошибка: сервис ИИ не настроен (нужен OPENAI_API_KEY или GROQ_API_KEY)"}
 
     try:
         chat_messages = build_chat_messages(body)
 
+        # Choose provider: OpenAI GPT-4o preferred, Groq as fallback
+        if OPENAI_API_KEY:
+            api_url = "https://api.openai.com/v1/chat/completions"
+            api_key = OPENAI_API_KEY
+            model = "gpt-4o-mini"
+            max_tokens = 500
+        else:
+            api_url = "https://api.groq.com/openai/v1/chat/completions"
+            api_key = GROQ_API_KEY
+            model = "llama-3.3-70b-versatile"
+            max_tokens = 500
+
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                "https://api.groq.com/openai/v1/chat/completions",
+                api_url,
                 headers={
-                    "Authorization": f"Bearer {GROQ_API_KEY}",
+                    "Authorization": f"Bearer {api_key}",
                     "Content-Type": "application/json"
                 },
                 json={
-                    "model": "llama-3.1-8b-instant",
+                    "model": model,
                     "messages": chat_messages,
-                    "temperature": 0.5,
-                    "max_tokens": 300
+                    "temperature": 0.6,
+                    "max_tokens": max_tokens,
                 },
-                timeout=15.0
+                timeout=30.0
             )
             if response.status_code == 200:
                 result = response.json()
                 reply = result["choices"][0]["message"]["content"].strip()
                 return {"reply": reply}
             else:
+                err = response.json() if response.headers.get("content-type","").startswith("application/json") else {}
+                print(f"❌ AI API error {response.status_code}: {err.get('error', {}).get('message', response.text[:200])}")
                 return {"reply": "⚠️ ИИ временно недоступен, попробуйте позже."}
+    except httpx.TimeoutException:
+        return {"reply": "⚠️ ИИ долго отвечает. Попробуйте ещё раз или напишите менеджеру в WhatsApp: +7 700 039 58 77"}
     except Exception as e:
         print(f"❌ Ошибка AI: {e}")
         return {"reply": "❌ Произошла ошибка соединения. Попробуйте ещё раз."}
@@ -226,7 +263,7 @@ def root():
         "services": {
             "telegram":     "configured" if TELEGRAM_BOT_TOKEN else "not set",
             "bitrix24":     "configured" if BITRIX_WEBHOOK_URL else "not set",
-            "ai_chat":      "configured" if GROQ_API_KEY else "not set",
-            "ai_visualize": "configured" if HF_TOKEN else "not set",
+            "ai_chat":      f"configured ({'GPT-4o' if OPENAI_API_KEY else 'Groq fallback'})",
+            "ai_visualize": f"configured ({'Replicate FLUX Kontext Pro' if REPLICATE_API_TOKEN else 'HF fallback'})",
         }
     }
