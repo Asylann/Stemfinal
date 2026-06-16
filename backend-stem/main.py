@@ -264,6 +264,6 @@ def root():
             "telegram":     "configured" if TELEGRAM_BOT_TOKEN else "not set",
             "bitrix24":     "configured" if BITRIX_WEBHOOK_URL else "not set",
             "ai_chat":      f"configured ({'GPT-4o' if OPENAI_API_KEY else 'Groq fallback'})",
-            "ai_visualize": f"configured ({'Replicate FLUX Kontext Pro' if REPLICATE_API_TOKEN else 'HF fallback'})",
+            "ai_visualize": f"configured ({('OpenAI gpt-image-1' if OPENAI_API_KEY else ('Replicate FLUX Kontext Pro' if REPLICATE_API_TOKEN else 'HF fallback'))})",
         }
     }

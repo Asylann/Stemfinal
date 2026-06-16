@@ -23,6 +23,7 @@ load_dotenv()
 router = APIRouter()
 
 REPLICATE_API_TOKEN = os.getenv("REPLICATE_API_TOKEN")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")  # preferred for gpt-image-1
 HF_TOKEN = os.getenv("HF_TOKEN")  # fallback
 
 UPLOAD_DIR = Path("/app/uploads")
@@ -59,21 +60,35 @@ def _enrich_product_name(name: str) -> str:
     return f"furniture item ({clean_name})"
 
 
-def build_prompt(products_list: list[str]) -> str:
-    """Build a descriptive prompt for FLUX Kontext.
+def build_prompt(products_list: list[str], has_product_images: bool = False) -> str:
+    """Build a descriptive prompt for AI image editing.
     
     Uses enriched product names with furniture types for better AI understanding.
+    When product images are provided, tells the model to use them as visual references.
     """
     enriched = [_enrich_product_name(p) for p in products_list]
     items_text = "; ".join(enriched)
-    return (
-        f"Add the following furniture into this room, making each piece large, clearly visible, "
-        f"and prominent: {items_text}. "
-        "Place each item naturally on the floor with correct proportions and realistic shadows. "
-        "Keep the existing walls, floor, ceiling, windows, and doors exactly as they are. "
-        "Only add new furniture — do not remove or change anything already in the room. "
-        "Photorealistic, detailed, professional interior photography."
-    )
+    
+    if has_product_images:
+        return (
+            f"The first image is a room. The additional images are reference photos of the exact furniture products to place in the room. "
+            f"Place each product shown in the reference images into the room: {items_text}. "
+            "Each item must look exactly like its reference photo — same color, shape, material, and style. "
+            "Make each item large, clearly visible, and prominent in the room. "
+            "Place them naturally on the floor with correct proportions and realistic shadows. "
+            "Keep the existing room walls, floor, ceiling, windows, and doors exactly as they are. "
+            "Only add the new furniture — do not remove or change anything already in the room. "
+            "Photorealistic, professional interior photography."
+        )
+    else:
+        return (
+            f"Add the following furniture into this room, making each piece large, clearly visible, "
+            f"and prominent: {items_text}. "
+            "Place each item naturally on the floor with correct proportions and realistic shadows. "
+            "Keep the existing walls, floor, ceiling, windows, and doors exactly as they are. "
+            "Only add new furniture — do not remove or change anything already in the room. "
+            "Photorealistic, detailed, professional interior photography."
+        )
 
 
 def _optimize_image(b64_data: str) -> str:
@@ -206,6 +221,68 @@ async def _upload_temp_image(b64_data: str, filename: str = "room.jpg") -> str:
     img_bytes = base64.b64decode(b64_data)
     path.write_bytes(img_bytes)
     return f"/uploads/{fname}"
+
+
+async def _openai_img2img(room_b64: str, prompt: str, product_images: list[bytes] | None = None) -> str:
+    """Call OpenAI gpt-image-1 for image editing.
+    
+    Uses the OpenAI images/edits API with support for multiple reference images.
+    First image = room to edit, additional images = product references.
+    Returns base64-encoded result image.
+    """
+    from PIL import Image as PILImage
+    
+    def _to_png_bytes(b64_or_bytes, max_dim=1024):
+        """Convert base64 or raw bytes to PNG bytes, resized to max_dim."""
+        if isinstance(b64_or_bytes, str):
+            raw = base64.b64decode(b64_or_bytes)
+        else:
+            raw = b64_or_bytes
+        img = PILImage.open(BytesIO(raw))
+        if img.mode != 'RGB':
+            img = img.convert('RGB')
+        if max(img.size) > max_dim:
+            img.thumbnail((max_dim, max_dim), PILImage.LANCZOS)
+        buf = BytesIO()
+        img.save(buf, format='PNG')
+        return buf.getvalue()
+    
+    # Build multipart files list: room first, then product references
+    files = [("image[]", ("room.png", _to_png_bytes(room_b64), "image/png"))]
+    
+    if product_images:
+        for i, img_bytes in enumerate(product_images[:5]):  # max 5 product refs
+            try:
+                png = _to_png_bytes(img_bytes, max_dim=512)  # smaller for refs
+                files.append(("image[]", (f"product_{i}.png", png, "image/png")))
+            except Exception as e:
+                print(f"  [WARN] Failed to convert product image {i}: {e}")
+        print(f"  [INFO] Sending {len(files) - 1} product reference images to OpenAI")
+    
+    async with httpx.AsyncClient(timeout=120.0) as client:
+        resp = await client.post(
+            "https://api.openai.com/v1/images/edits",
+            headers={"Authorization": f"Bearer {OPENAI_API_KEY}"},
+            files=files,
+            data={
+                "model": "gpt-image-1",
+                "prompt": prompt,
+                "n": 1,
+                "size": "1024x1024",
+                "quality": "high",
+            },
+        )
+        
+        if resp.status_code != 200:
+            err = resp.json().get("error", {})
+            msg = err.get("message", resp.text[:200])
+            raise Exception(f"OpenAI API error {resp.status_code}: {msg}")
+        
+        data = resp.json()
+        if data.get("data") and data["data"][0].get("b64_json"):
+            return data["data"][0]["b64_json"]
+        
+        raise Exception("OpenAI returned unexpected response format")
 
 
 async def _replicate_img2img(image_url: str, prompt: str) -> str:
@@ -360,14 +437,37 @@ async def visualize_interior(request: Request):
             room_b64 = _optimize_image(room_image_b64)
             print("📸 Room image optimized")
 
+        # Download product images for OpenAI reference
+        product_img_bytes_list = []
+        if product_image_urls:
+            urls_to_fetch = product_image_urls[:5]
+            tasks = [_download_image(url) for url in urls_to_fetch]
+            results = await asyncio.gather(*tasks)
+            product_img_bytes_list = [r for r in results if r is not None]
+            print(f"📦 Downloaded {len(product_img_bytes_list)}/{len(urls_to_fetch)} product images for AI reference")
+
         # Build enriched prompt
-        prompt = build_prompt(products_list)
+        prompt = build_prompt(products_list, has_product_images=len(product_img_bytes_list) > 0)
         print(f"💬 Prompt: {prompt[:300]}...")
 
-        # ── Try Replicate (preferred) ──
-        replicate_result_b64 = None
-        if REPLICATE_API_TOKEN and room_b64:
+        # ── Try providers in order: OpenAI gpt-image-1 > Replicate Kontext Pro > HF fallback ──
+        result_b64 = None
+        provider_used = None
+
+        # ── 1. OpenAI gpt-image-1 (preferred — uses existing OpenAI key) ──
+        if OPENAI_API_KEY and room_b64:
             try:
+                print("🖼 Trying OpenAI gpt-image-1...")
+                result_b64 = await _openai_img2img(room_b64, prompt, product_images=product_img_bytes_list)
+                provider_used = "openai-gpt-image-1"
+                print("✅ OpenAI gpt-image-1 success")
+            except Exception as oa_err:
+                print(f"⚠️ OpenAI gpt-image-1 failed: {oa_err}")
+
+        # ── 2. Replicate FLUX Kontext Pro (if credits available) ──
+        if not result_b64 and REPLICATE_API_TOKEN and room_b64:
+            try:
+                print("🖼 Trying Replicate FLUX Kontext Pro...")
                 temp_path = await _upload_temp_image(room_b64)
                 host = os.getenv("PUBLIC_URL", "http://localhost")
                 image_url = f"{host}{temp_path}"
@@ -377,37 +477,38 @@ async def visualize_interior(request: Request):
                 async with httpx.AsyncClient(timeout=30.0) as dl_client:
                     img_resp = await dl_client.get(result_url)
                     img_resp.raise_for_status()
-                replicate_result_b64 = base64.b64encode(img_resp.content).decode("utf-8")
+                result_b64 = base64.b64encode(img_resp.content).decode("utf-8")
+                provider_used = "replicate-flux-kontext-pro"
                 print("✅ Replicate success")
             except Exception as rep_err:
                 err_msg = str(rep_err)
                 if "402" in err_msg or "Insufficient" in err_msg or "credit" in err_msg.lower():
-                    print(f"⚠️ Replicate has no credits (402), falling back to HuggingFace")
+                    print(f"⚠️ Replicate has no credits (402)")
                 else:
                     print(f"⚠️ Replicate failed: {rep_err}")
 
-        # ── Return Replicate result or fall back to HF ──
-        if replicate_result_b64:
-            return {
-                "success": True,
-                "image": f"data:image/png;base64,{replicate_result_b64}",
-                "prompt": prompt,
-                "provider": "replicate-flux-kontext-pro",
-            }
-
-        # ── HuggingFace fallback (free, no credits needed) ──
-        if HF_TOKEN:
-            print("🤗 Using HuggingFace FLUX.1-schnell (free fallback)")
-            img_bytes = await _hf_fallback(prompt)
-            result_b64 = base64.b64encode(img_bytes).decode("utf-8")
+        # ── Return result ──
+        if result_b64:
             return {
                 "success": True,
                 "image": f"data:image/png;base64,{result_b64}",
                 "prompt": prompt,
+                "provider": provider_used,
+            }
+
+        # ── 3. HuggingFace fallback (free, no credits needed) ──
+        if HF_TOKEN:
+            print("🤗 Using HuggingFace FLUX.1-schnell (free fallback)")
+            img_bytes = await _hf_fallback(prompt)
+            hf_b64 = base64.b64encode(img_bytes).decode("utf-8")
+            return {
+                "success": True,
+                "image": f"data:image/png;base64,{hf_b64}",
+                "prompt": prompt,
                 "provider": "hf-flux-schnell",
             }
 
-        return {"success": False, "error": "Replicate без кредитов и HF_TOKEN не настроен. Добавьте кредит на https://replicate.com/account/billing"}
+        return {"success": False, "error": "Нет доступных AI провайдеров. Настройте OPENAI_API_KEY или добавьте кредит на https://replicate.com/account/billing"}
 
     except Exception as e:
         print(f"❌ Visualize error: {e}")
