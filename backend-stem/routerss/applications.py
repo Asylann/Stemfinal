@@ -10,7 +10,7 @@ from fastapi import APIRouter, BackgroundTasks, HTTPException, Depends
 from pydantic import BaseModel, field_validator, model_validator
 from sqlalchemy.orm import Session
 
-from database import get_db
+from database import get_db, SessionLocal
 from models import Application
 
 load_dotenv()
@@ -27,6 +27,7 @@ class CartItem(BaseModel):
     article: Optional[str] = None
     quantity: Optional[int] = 1
     url: Optional[str] = None
+    color: Optional[str] = None
 
 
 class ApplicationCreate(BaseModel):
@@ -53,20 +54,9 @@ class ApplicationCreate(BaseModel):
     @classmethod
     def validate_phone_field(cls, v: str) -> str:
         digits = "".join(ch for ch in v if ch.isdigit())
-        if len(digits) == 11 and digits.startswith("8"):
-            digits = "7" + digits[1:]
-        if len(digits) == 10:
-            digits = "7" + digits
-        if len(digits) < 11 or len(digits) > 15:
+        if len(digits) < 10 or len(digits) > 15:
             raise ValueError("Некорректный номер телефона")
         return v
-
-    @field_validator("username")
-    @classmethod
-    def clean_username(cls, v: Optional[str]) -> Optional[str]:
-        if v:
-            return v.replace("@", "").strip() or None
-        return None
 
     @model_validator(mode="after")
     def check_products_or_product_name(self) -> "ApplicationCreate":
@@ -81,10 +71,6 @@ def normalize_phone(phone: str) -> str:
         digits = "7" + digits[1:]
     if len(digits) == 10:
         digits = "7" + digits
-    if len(digits) < 11 or len(digits) > 15:
-        raise HTTPException(status_code=400, detail="Некорректный номер телефона")
-    if len(digits) == 11 and digits.startswith("7"):
-        return f"+7 ({digits[1:4]}) {digits[4:7]}-{digits[7:9]}-{digits[9:11]}"
     return f"+{digits}"
 
 
@@ -94,71 +80,54 @@ def format_products(products: Optional[List[Dict]]) -> Tuple[str, str]:
     names = [p.get("name", "Товар") for p in products if p.get("name")]
     if not names:
         return "Не указан", "—"
-    short = names[0] if len(names) == 1 else (", ".join(names) if len(names) <= 3 else f"{names[0]}, {names[1]} и ещё {len(names)-2}")
-    detailed = "\n".join(f"• {n}" for n in names)
-    return short, detailed
+    short = names[0] if len(names) == 1 else f"{names[0]} и др."
+    return short, ""
 
 
 async def send_to_telegram(data: Dict, app_id: str) -> None:
     if not BOT_TOKEN or not GROUP_CHAT_ID:
-        print("⚠️ Telegram не настроен")
         return
-
-    username_line = f"🔗 <b>Username:</b> @{data.get('username')}\n" if data.get("username") else ""
-    _, product_detailed = format_products(data.get("products_list"))
 
     text = (
         "📥 <b>Новая заявка с сайта</b>\n\n"
         f"🆔 <b>ID:</b> #{app_id}\n"
-        f"🕒 <b>Время:</b> {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
-        f"📦 <b>Товары ({data.get('items_count', 1)} шт.):</b>\n{product_detailed}\n\n"
         f"👤 <b>Имя:</b> {data.get('name')}\n"
         f"📞 <b>Телефон:</b> {data.get('phone')}\n"
-        f"{username_line}"
         f"💬 <b>Комментарий:</b> {data.get('comment') or '—'}"
     )
 
-    try:
-        async with httpx.AsyncClient(timeout=10) as client:
-            response = await client.post(
-                f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-                json={
-                    "chat_id": GROUP_CHAT_ID,
-                    "text": text,
-                    "parse_mode": "HTML",
-                    "disable_web_page_preview": True,
-                },
-            )
-            if response.status_code == 200:
-                print(f"📩 Telegram: Заявка #{app_id} отправлена")
-            else:
-                print(f"❌ Telegram ошибка: {response.text}")
-    except Exception as e:
-        print(f"❌ Ошибка Telegram: {e}")
+    async with httpx.AsyncClient(timeout=10) as client:
+        response = await client.post(
+            f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+            json={"chat_id": GROUP_CHAT_ID, "text": text, "parse_mode": "HTML"},
+        )
+        if response.status_code == 200:
+            print(f"✅ Telegram: Заявка #{app_id} успешно отправлена")
 
 
-async def send_to_bitrix(data: Dict) -> None:
+async def send_to_bitrix(data: Dict, db_id: int) -> None:
     if not BITRIX_WEBHOOK_URL:
-        print("⚠️ Bitrix не настроен")
         return
 
     url = f"{BITRIX_WEBHOOK_URL.rstrip('/')}/crm.deal.add"
-    short_name, product_detailed = format_products(data.get("products_list"))
-
-    comments = (
-        f"📦 Товары ({data.get('items_count', 1)} шт.):\n{product_detailed}\n\n"
-        f"💬 Комментарий: {data.get('comment') or '—'}\n"
-        f"🌐 Ссылка: {data.get('product_url') or '—'}"
-    ).strip()
+    
+    products = data.get("products_list", [])
+    product_lines = []
+    for p in products:
+        parts = [f"• {p.get('name', 'Товар')}"]
+        if p.get('color'):    parts.append(f"Цвет: {p.get('color')}")
+        if p.get('article'):  parts.append(f"Арт: {p.get('article')}")
+        product_lines.append(" | ".join(parts))
+    
+    product_details = "\n".join(product_lines)
 
     payload = {
         "fields": {
-            "TITLE": f"Заявка с сайта: {short_name}",
-            "NAME": data.get("name") or "Не указано",
-            "PHONE": [{"VALUE": data.get("phone") or "", "VALUE_TYPE": "WORK"}],
-            "COMMENTS": comments,
+            "TITLE": f"Заявка с сайта: {data.get('name', 'Клиент')}",
+            "NAME": data.get("name"),
+            "PHONE": [{"VALUE": data.get("phone"), "VALUE_TYPE": "WORK"}],
+            "COMMENTS": f"📦 Товары:\n{product_details}\n\n💬 Комментарий: {data.get('comment') or '—'}",
             "SOURCE_ID": "WEB",
-            "SOURCE_DESCRIPTION": "Сайт STEM Academia",
             "STATUS_ID": "NEW",
             "OPENED": "Y",
         }
@@ -167,125 +136,21 @@ async def send_to_bitrix(data: Dict) -> None:
     try:
         async with httpx.AsyncClient(timeout=15) as client:
             response = await client.post(url, json=payload)
-            print("=" * 50)
-            print("BITRIX URL:", url)
-            print("BITRIX STATUS:", response.status_code)
-            print("BITRIX RESPONSE:", response.text)
-            print("=" * 50)
-            if response.status_code == 200:
-                result = response.json()
-                if result.get("result"):
-                    print(f"✅ Битрикс24: сделка #{result['result']} создан")
-                else:
-                    print(f"❌ Битрикс24 ошибка: {result}")
+            response.raise_for_status()
+            result = response.json()
+            bitrix_id = result.get("result")
+            
+            if bitrix_id:
+                print(f"✅ Битрикс24: Сделка #{bitrix_id} создана для заявки DB ID {db_id}")
+                with SessionLocal() as db:
+                    app = db.query(Application).filter(Application.id == db_id).first()
+                    if app:
+                        app.bitrix_id = bitrix_id
+                        db.commit()
             else:
-                print(f"❌ Битрикс24 HTTP {response.status_code}")
+                print(f"❌ Битрикс24 ошибка: {result}")
     except Exception as e:
-        print(f"❌ Ошибка Bitrix: {e}")
-
-
-class ContactForm(BaseModel):
-    name: str
-    phone: str
-    message: Optional[str] = None
-
-    @field_validator("name")
-    @classmethod
-    def validate_contact_name(cls, v: str) -> str:
-        cleaned = v.strip()
-        if len(cleaned) < 2 or len(cleaned) > 50:
-            raise ValueError("Имя должно быть от 2 до 50 символов")
-        return cleaned
-
-    @field_validator("phone")
-    @classmethod
-    def validate_contact_phone(cls, v: str) -> str:
-        digits = "".join(ch for ch in v if ch.isdigit())
-        if len(digits) < 10 or len(digits) > 15:
-            raise ValueError("Некорректный номер телефона")
-        return v
-
-
-async def send_contact_to_telegram(data: Dict) -> None:
-    """Send a contact-form message to Telegram."""
-    if not BOT_TOKEN or not GROUP_CHAT_ID:
-        print("⚠️ Telegram не настроен — контактное сообщение не отправлено")
-        return
-
-    text = (
-        "📬 <b>Сообщение с формы обратной связи</b>\n\n"
-        f"🕒 <b>Время:</b> {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
-        f"👤 <b>Имя:</b> {data.get('name')}\n"
-        f"📞 <b>Телефон:</b> {data.get('phone')}\n"
-        f"💬 <b>Сообщение:</b> {data.get('message') or '—'}"
-    )
-
-    try:
-        async with httpx.AsyncClient(timeout=10) as client:
-            response = await client.post(
-                f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-                json={
-                    "chat_id": GROUP_CHAT_ID,
-                    "text": text,
-                    "parse_mode": "HTML",
-                    "disable_web_page_preview": True,
-                },
-            )
-            if response.status_code == 200:
-                print("📩 Telegram: Контактное сообщение отправлено")
-            else:
-                print(f"❌ Telegram ошибка: {response.text}")
-    except Exception as e:
-        print(f"❌ Ошибка Telegram: {e}")
-
-
-@router.post("/contact")
-async def contact_form(
-    data: ContactForm,
-    db: Session = Depends(get_db),
-):
-    print(f"📨 Contact form received: name={data.name}, phone={data.phone}")
-
-    # 1) Send to Telegram FIRST (synchronously, not background)
-    telegram_ok = False
-    try:
-        await send_contact_to_telegram({
-            "name": data.name.strip(),
-            "phone": data.phone.strip(),
-            "message": data.message.strip() if data.message else None,
-        })
-        telegram_ok = True
-    except Exception as e:
-        print(f"❌ Ошибка отправки Telegram из контактной формы: {e}")
-
-    # 2) Save to DB (best-effort)
-    app_id = None
-    try:
-        normalized_phone = normalize_phone(data.phone)
-        new_app = Application(
-            name=data.name.strip(),
-            phone=normalized_phone,
-            comment=data.message.strip() if data.message else None,
-            product_name="Контактная форма",
-            status="new",
-        )
-        db.add(new_app)
-        db.commit()
-        db.refresh(new_app)
-        app_id = new_app.id
-        print(f"✅ Контактная заявка #{app_id} сохранена в БД")
-    except HTTPException:
-        db.rollback()
-        raise
-    except Exception as e:
-        db.rollback()
-        print(f"❌ Ошибка сохранения контактной заявки: {type(e).__name__}: {e}")
-        app_id = None
-
-    if not telegram_ok:
-        raise HTTPException(status_code=500, detail="Не удалось отправить сообщение в Telegram")
-
-    return {"status": "ok", "id": app_id}
+        print(f"❌ Ошибка Bitrix для DB ID {db_id}: {e}")
 
 
 @router.post("")
@@ -298,54 +163,28 @@ async def create_application(
     app_id = str(uuid.uuid4())[:8].upper()
     normalized_phone = normalize_phone(data.phone)
 
-    is_cart = bool(data.products)
+    products_list = [p.model_dump() for p in data.products] if data.products else [{"name": data.product_name, "article": data.article}]
+    short_name = products_list[0].get("name", "Заявка")
 
-    if is_cart:
-        short_name, _ = format_products([p.model_dump() for p in data.products])
-        products_list = [p.model_dump() for p in data.products]
-        items_count = len(data.products)
-        first_url = next((p.url for p in data.products if p.url), None)
-    else:
-        short_name = data.product_name or "Общий запрос"
-        products_list = [{"name": data.product_name, "article": data.article}]
-        items_count = 1
-        first_url = data.product_url
-
-    app_data: Dict = {
-        "id": app_id,
+    app_data = {
         "name": data.name.strip(),
         "phone": normalized_phone,
-        "username": data.username,
-        "comment": data.comment.strip() if data.comment else None,
-        "product_name": short_name,
-        "article": data.article,
-        "product_url": first_url,
+        "comment": data.comment,
         "products_list": products_list,
-        "items_count": items_count,
     }
 
-    # Save to Database
     new_application = Application(
         name=app_data["name"],
         phone=app_data["phone"],
-        username=app_data["username"],
         comment=app_data["comment"],
-        product_name=app_data["product_name"],
-        article=app_data["article"],
-        product_url=app_data["product_url"],
+        product_name=short_name,
         status="new"
     )
     db.add(new_application)
     db.commit()
     db.refresh(new_application)
 
-    background_tasks.add_task(send_to_bitrix, app_data)
+    background_tasks.add_task(send_to_bitrix, app_data, new_application.id)
     background_tasks.add_task(send_to_telegram, app_data, app_id)
 
-    return {
-        "status": "ok",
-        "id": app_id,
-        "db_id": new_application.id,
-        "normalized_phone": normalized_phone,
-        "items_count": items_count,
-    }
+    return {"status": "ok", "id": app_id}

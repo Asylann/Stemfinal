@@ -60,6 +60,7 @@ class Application(Base):
     username = Column(String, nullable=True)
     comment = Column(Text, nullable=True)
     
+    bitrix_id = Column(Integer, nullable=True, index=True)
   
     product_name = Column(String, nullable=True)  
     article = Column(String, nullable=True)
