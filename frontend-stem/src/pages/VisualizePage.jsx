@@ -1,20 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { apiClient } from '../api/api'
 import './VisualizePage.css'
-
-const PRODUCT_OPTIONS = [
-  { id: 1, label: '🛋 Диван мягкий' },
-  { id: 2, label: '📚 Стеллаж деревянный' },
-  { id: 3, label: '💡 Освещение LED' },
-  { id: 4, label: '🪑 Парта ученическая' },
-  { id: 5, label: '🖥 Интерактивная панель' },
-  { id: 6, label: '🗄 Шкаф для документов' },
-  { id: 7, label: '🪑 Стул эргономичный' },
-  { id: 8, label: '🧪 Лабораторный стол' },
-  { id: 9, label: '📐 Стол учительский' },
-  { id: 10, label: '🖼 Маркерная доска' },
-]
 
 function toBase64(file) {
   return new Promise((resolve, reject) => {
@@ -28,11 +15,36 @@ function toBase64(file) {
 export default function VisualizePage() {
   const [preview, setPreview] = useState(null)
   const [file, setFile] = useState(null)
+  const [productOptions, setProductOptions] = useState([])
   const [selected, setSelected] = useState([])
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [retryCount, setRetryCount] = useState(0)
+  const [productsLoading, setProductsLoading] = useState(true)
+
+  // Load real products from API
+  useEffect(() => {
+    apiClient.get('/api/products')
+      .then(res => {
+        const products = (res.data || []).map(p => ({
+          id: p.id,
+          label: p.title,
+          article: p.article || '',
+          img: p.img || '',
+        }))
+        setProductOptions(products)
+      })
+      .catch(() => {
+        // Fallback if API fails
+        setProductOptions([
+          { id: 1, label: '🛋 Диван мягкий' },
+          { id: 2, label: '📚 Стеллаж деревянный' },
+          { id: 3, label: '💡 Освещение LED' },
+        ])
+      })
+      .finally(() => setProductsLoading(false))
+  }, [])
 
   const handleFile = (e) => {
     const f = e.target.files[0]
@@ -57,12 +69,12 @@ export default function VisualizePage() {
     if (f) handleFile({ target: { files: [f] } })
   }
 
-  const toggleProduct = (label) => {
-    setSelected(prev =>
-      prev.includes(label)
-        ? prev.filter(p => p !== label)
-        : [...prev, label]
-    )
+  const toggleProduct = (product) => {
+    setSelected(prev => {
+      const exists = prev.find(p => p.id === product.id)
+      if (exists) return prev.filter(p => p.id !== product.id)
+      return [...prev, product]
+    })
   }
 
   const handleVisualize = async () => {
@@ -76,9 +88,34 @@ export default function VisualizePage() {
     try {
       const imageBase64 = await toBase64(file)
 
+      // Build product descriptions for the AI prompt
+      const productDescriptions = selected.map(s => {
+        let desc = s.label
+        if (s.article) desc += ` (${s.article})`
+        return desc
+      })
+
+      // Collect product image URLs for visual reference
+      const productImageUrls = selected
+        .map(s => s.img)
+        .filter(url => url && url.startsWith('http'))
+
+      // If product images are relative paths (e.g. /uploads/...), make them absolute
+      const baseUrl = window.location.origin
+      const absoluteUrls = selected
+        .map(s => {
+          if (!s.img) return null
+          if (s.img.startsWith('http')) return s.img
+          return `${baseUrl}${s.img.startsWith('/') ? '' : '/'}${s.img}`
+        })
+        .filter(Boolean)
+
+      console.log('Sending product images:', absoluteUrls)
+
       const res = await apiClient.post('/api/ai/visualize', {
         image: imageBase64,
-        products: selected.map(s => s.replace(/^[^\s]+\s/, '')),
+        products: productDescriptions,
+        product_images: absoluteUrls,
       })
 
       const data = res.data
@@ -93,7 +130,7 @@ export default function VisualizePage() {
         }
       }
     } catch (err) {
-      setError('Ошибка соединения с сервером')
+      setError('Ошибка соединения с сервером: ' + (err.response?.data?.detail || err.message))
     } finally {
       setLoading(false)
     }
@@ -102,7 +139,7 @@ export default function VisualizePage() {
   const handleDownload = () => {
     const a = document.createElement('a')
     a.href = result
-    a.download = 'stem-visualization.jpg'
+    a.download = 'stem-visualization.png'
     a.click()
   }
 
@@ -174,18 +211,34 @@ export default function VisualizePage() {
           <div className="viz-section">
             <h2>🛋 Шаг 2 — Выберите товары</h2>
             <p className="viz-section-hint">Выбрано: {selected.length}</p>
-            <div className="viz-products-grid">
-              {PRODUCT_OPTIONS.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  className={`viz-product-chip ${selected.includes(p.label) ? 'active' : ''}`}
-                  onClick={() => toggleProduct(p.label)}
-                >
-                  {p.label}
-                </button>
-              ))}
-            </div>
+            {productsLoading ? (
+              <div style={{ textAlign: 'center', padding: '20px', color: '#888' }}>⏳ Загрузка товаров...</div>
+            ) : (
+              <div className="viz-products-grid">
+                {productOptions.map((p) => {
+                  const isSelected = selected.some(s => s.id === p.id)
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      className={`viz-product-chip ${isSelected ? 'active' : ''}`}
+                      onClick={() => toggleProduct(p)}
+                      title={p.article ? `Артикул: ${p.article}` : ''}
+                    >
+                      {p.img && (
+                        <img
+                          src={p.img}
+                          alt={p.label}
+                          style={{ width: 24, height: 24, objectFit: 'cover', borderRadius: 4, marginRight: 6 }}
+                          onError={e => { e.target.style.display = 'none' }}
+                        />
+                      )}
+                      <span style={{ flex: 1, textAlign: 'left', fontSize: 13 }}>{p.label}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
           </div>
 
           {/* Кнопка */}
@@ -198,7 +251,7 @@ export default function VisualizePage() {
             {loading ? (
               <span className="viz-loading-text">
                 <span className="viz-spinner" />
-                Генерация... (~20 сек)
+                Генерация... (~30 сек)
               </span>
             ) : '✨ Визуализировать'}
           </button>
@@ -234,7 +287,7 @@ export default function VisualizePage() {
                   <div className="viz-pulse" />
                 </div>
                 <p>AI генерирует визуализацию...</p>
-                <span>Обычно занимает 15-30 секунд</span>
+                <span>Обычно занимает 20-40 секунд</span>
               </div>
             )}
 
@@ -278,7 +331,7 @@ export default function VisualizePage() {
       <div className="viz-info-block">
         <div className="viz-info-item">
           <span>⚡</span>
-          <p>Результат за 15-30 секунд</p>
+          <p>Результат за 20-40 секунд</p>
         </div>
         <div className="viz-info-item">
           <span>🆓</span>
