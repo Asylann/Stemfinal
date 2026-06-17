@@ -119,6 +119,7 @@ STATUS_LABELS_RU = {
     "paid":         "Оплачено",
     "completed":    "Завершена",
     "closed":       "Закрыта",
+    "rejected":     "Отклонено",
     "unknown":      "Неизвестно",
 }
 
@@ -288,6 +289,7 @@ async def admin_get_applications(
 _BITRIX_WEBHOOK_READ = os.getenv("BITRIX_WEBHOOK_URL_READ") or os.getenv("BITRIX_WEBHOOK_URL")
 
 _BITRIX_STAGE_MAP = {
+    # Default Bitrix24 system stages
     "NEW":                  "new",
     "PREPARATION":          "preparing",
     "PREPAYMENT_INVOICING": "invoicing",
@@ -295,7 +297,18 @@ _BITRIX_STAGE_MAP = {
     "FINAL_INVOICING":      "final_invoice",
     "PREPAID":              "paid",
     "WON":                  "completed",
+    "LOSE":                 "rejected",
     "CLOSED":               "closed",
+    # Custom pipeline stages from their Bitrix24 instance
+    "UC_4PQZ76":           "new",          # Заявка с сайта
+    "UC_3AWFVA":           "preparing",    # Название
+    "5":                   "new",          # Новая заявка
+    "9":                   "rejected",     # Нецелевая заявка
+    "UC_IZXLGI":           "processing",   # Ожидаем договор
+    "8":                   "processing",   # Согласование Договора
+    "2":                   "processing",   # Реализация
+    "3":                   "completed",    # Закрытие договора/Контроль качества
+    "1":                   "completed",    # Обучение
 }
 
 

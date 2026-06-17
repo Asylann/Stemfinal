@@ -400,6 +400,7 @@ const STATUS_OPTIONS = [
   { code: 'paid',         label: 'Оплачено',       badgeClass: 'badge--green',      bg: '#dcfce7', color: '#15803d' },
   { code: 'completed',    label: 'Завершена',      badgeClass: 'badge--darkgreen',  bg: '#bbf7d0', color: '#14532d' },
   { code: 'closed',       label: 'Закрыта',        badgeClass: 'badge--gray',       bg: '#f3f4f6', color: '#6b7280' },
+  { code: 'rejected',     label: 'Отклонено',      badgeClass: 'badge--red',        bg: '#fee2e2', color: '#b91c1c' },
   { code: 'unknown',      label: 'Неизвестно',     badgeClass: 'badge--gray',       bg: '#f3f4f6', color: '#6b7280' },
 ]
 

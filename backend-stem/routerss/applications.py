@@ -108,14 +108,15 @@ async def send_to_telegram(data: Dict, app_id: str) -> None:
 # ─── Bitrix24 deal stage mapping ─────────────────────────────────────────────────
 # When creating a deal via REST API, Bitrix24 accepts STAGE_ID to set initial stage.
 # Our internal status  →  Bitrix24 STAGE_ID
+# NOTE: 'UC_4PQZ76' is the actual 'Заявка с сайта' stage in their Bitrix24 pipeline.
 LOCAL_TO_BITRIX_STAGE = {
-    "new":        "NEW",
-    "preparing":  "PREPARATION",
-    "invoicing":  "PREPAYMENT_INVOICING",
+    "new":        "UC_4PQZ76",   # Заявка с сайта
+    "preparing":  "UC_3AWFVA",   # Название
+    "invoicing":  "5",           # Новая заявка
     "processing": "EXECUTING",
     "paid":       "PREPAID",
     "completed":  "WON",
-    "closed":     "CLOSED",
+    "closed":     "LOSE",
 }
 
 # Bitrix24 STAGE_ID  →  our internal status  (reverse map)
@@ -142,9 +143,9 @@ async def send_to_bitrix(data: Dict, db_id: int) -> None:
 
     product_details = "\n".join(product_lines)
 
-    # Determine initial Bitrix stage from local status (default: NEW)
+    # Determine initial Bitrix stage from local status (default: UC_4PQZ76 = Заявка с сайта)
     local_status = data.get("status", "new")
-    initial_stage = LOCAL_TO_BITRIX_STAGE.get(local_status, "NEW")
+    initial_stage = LOCAL_TO_BITRIX_STAGE.get(local_status, "UC_4PQZ76")
 
     payload = {
         "fields": {
