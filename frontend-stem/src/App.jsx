@@ -25,6 +25,7 @@ import InstructionsPage from './pages/InstructionsPage'
 import BlogPage from './pages/BlogPage'
 import BlogPostDetail from './pages/BlogPostDetail'
 import HowToOrderPage from './pages/HowToOrderPage'
+import WorksPage from './pages/WorksPage'
 
 import VisualizePage from './pages/VisualizePage'
 import AdminPage from './pages/AdminPage'
@@ -118,6 +119,7 @@ export default function App() {
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/blog/:id" element={<BlogPostDetail />} />
         <Route path="/how-to-order" element={<HowToOrderPage />} />
+        <Route path="/works" element={<WorksPage />} />
 
         {/* Страница товара */}
         <Route path="/product/:id" element={<ProductDetail />} />
