@@ -202,6 +202,46 @@ async def send_to_bitrix(data: Dict, db_id: int) -> None:
         print(f"❌ Ошибка Bitrix для DB ID {db_id}: {e}")
 
 
+class ContactMessage(BaseModel):
+    name: str
+    phone: str
+    message: Optional[str] = None
+
+
+async def send_contact_to_telegram(data: Dict) -> None:
+    """Send contact form message to Telegram."""
+    if not BOT_TOKEN or not GROUP_CHAT_ID:
+        return
+    now = datetime.now(ASTANA_TZ).strftime("%Y-%m-%d %H:%M")
+    text = (
+        "✉️ <b>Сообщение с формы контактов</b>\n\n"
+        f"🕒 <b>Время:</b> {now}\n"
+        f"👤 <b>Имя:</b> {data.get('name')}\n"
+        f"📞 <b>Телефон:</b> {data.get('phone')}\n"
+        f"💬 <b>Сообщение:</b> {data.get('message') or '—'}"
+    )
+    async with httpx.AsyncClient(timeout=10) as client:
+        response = await client.post(
+            f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+            json={"chat_id": GROUP_CHAT_ID, "text": text, "parse_mode": "HTML"},
+        )
+        if response.status_code == 200:
+            print(f"✅ Telegram: Контактное сообщение отправлено")
+
+
+@router.post("/contact")
+async def contact_message(data: ContactMessage, background_tasks: BackgroundTasks):
+    """Handle contact form submissions."""
+    normalized_phone = normalize_phone(data.phone)
+    app_data = {
+        "name": data.name.strip(),
+        "phone": normalized_phone,
+        "message": data.message.strip() if data.message else None,
+    }
+    background_tasks.add_task(send_contact_to_telegram, app_data)
+    return {"status": "ok"}
+
+
 @router.post("")
 @router.post("/")
 async def create_application(

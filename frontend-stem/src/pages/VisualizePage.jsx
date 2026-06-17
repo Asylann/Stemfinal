@@ -463,7 +463,7 @@ export default function VisualizePage() {
                   <div className="viz-pulse" />
                 </div>
                 <p>AI генерирует визуализацию...</p>
-                <span>Обычно занимает 40-60 секунд</span>
+                <span>Обычно занимает 60 секунд</span>
               </div>
             )}
 
