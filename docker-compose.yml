@@ -77,7 +77,6 @@ services:
       - frontend
     networks:
       - stem_network
-      - proxy_network
 
 # ─── Volumes ──────────────────────────────────────────────────────────────────
 volumes:
@@ -90,5 +89,3 @@ volumes:
 networks:
   stem_network:
     driver: bridge
-  proxy_network:
-    external: true
