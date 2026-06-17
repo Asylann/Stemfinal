@@ -128,19 +128,19 @@ export async function chatWithGrok(message, messages = []) {
 
 
 
-export async function login(phone, password) {
+export async function login(email, password) {
   try {
-    const response = await apiClient.post('/auth/login', { phone, password })
+    const response = await apiClient.post('/auth/login', { email, password })
     return response.data
   } catch (error) {
     const errorMessage = error.response?.data?.detail || error.response?.statusText
-    throw new Error(errorMessage || 'Неверный номер телефона или пароль')
+    throw new Error(errorMessage || 'Неверный email или пароль')
   }
 }
 
-export async function register(phone, password) {
+export async function register(email, password, name, phone = '') {
   try {
-    const response = await apiClient.post('/auth/register', { phone, password })
+    const response = await apiClient.post('/auth/register', { name, email, password, phone })
     return response.data
   } catch (error) {
     const errorMessage = error.response?.data?.detail || error.response?.statusText
@@ -164,11 +164,6 @@ export async function getCurrentUser(token) {
 
 export function logout() {
   localStorage.removeItem('stem_access_token')
-}
-
-export async function getMyApplications() {
-  const response = await apiClient.get('/api/applications/me')
-  return response.data
 }
 
 export async function sendContactMessage(data) {

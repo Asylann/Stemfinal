@@ -1,41 +1,44 @@
 import { Link } from 'react-router-dom'
+import { useLang } from '../../i18n/LanguageContext'
 import './DigitalPage.css'
 
-const row1 = [
-  { title: 'ROQED SCIENCE',  img: '/img/pagedigital/roqed.jpg',         path: '/digital/roqed' },
-  { title: 'STEM PLATFORM',  img: '/img/pagedigital/stem-platform.jpg', path: '/digital/stemplatform' },
-]
-
-const row2 = [
-  {
-    title: 'ИНФО СТЕНДЫ',
-    img: '/img/pagedigital/infostend.png',
-    path: '/digital/infostend',
-    description: 'Инфо-стенды для образовательных пространств с современным дизайном и удобной подачей материалов для учеников и преподавателей.',
-  },
-  {
-    title: 'STEAM BOOK',
-    img: '/img/pagedigital/steambook.png',
-    path: '/digital/steambook',
-    description: 'STEAM BOOK — интерактивный образовательный формат с цифровыми ресурсами, практическими заданиями и учебными материалами для STEM-программ.',
-  },
-]
-
-const allItems = [...row1, ...row2]
-
 export default function DigitalPage() {
+  const { t } = useLang()
+
+  const row1 = [
+    { title: t.roqed_title || 'ROQED AI',  img: '/img/Roqed AI/Roqed AI logo.jpeg',         path: '/digital/roqed' },
+    { title: 'STEM PLATFORM',  img: '/img/Roqed AI/New Stem Platform.jpg', path: '/digital/stemplatform' },
+  ]
+
+  const row2 = [
+    {
+      title: t.digital_infostends || 'ИНФО СТЕНДЫ',
+      img: '/img/pagedigital/infostend.png',
+      path: '/digital/infostend',
+      description: t.digital_infostends_desc || 'Инфо-стенды для образовательных пространств с современным дизайном и удобной подачей материалов для учеников и преподавателей.',
+    },
+    {
+      title: 'STEAM BOOK',
+      img: '/img/pagedigital/steambook.png',
+      path: '/digital/steambook',
+      description: t.digital_steambook_desc || 'STEAM BOOK — интерактивный образовательный формат с цифровыми ресурсами, практическими заданиями и учебными материалами для STEM-программ.',
+    },
+  ]
+
+  const allItems = [...row1, ...row2]
+
   return (
     <div className="digital-page">
 
       <div className="digital-breadcrumb">
-        <Link to="/" className="breadcrumb-link">Главная</Link>
+        <Link to="/" className="breadcrumb-link">{t.home}</Link>
         <span> / </span>
-        <span>Цифровые продукты</span>
+        <span>{t.nav_digital}</span>
       </div>
 
       <div className="digital-header">
-        <h1 className="digital-header__title">Цифровые продукты</h1>
-        <span className="digital-header__count">Найдено {allItems.length} категории</span>
+        <h1 className="digital-header__title">{t.nav_digital}</h1>
+        <span className="digital-header__count">{t.found} {allItems.length} {t.categories}</span>
       </div>
 
       <main className="digital-main">

@@ -29,15 +29,15 @@ export default function BlogPage() {
 
       <div className="info-body">
         <section className="info-section">
-          <h2>Все публикации</h2>
+          <h2>{t.blog_all_posts}</h2>
 
           {loading ? (
             <div style={{ textAlign: 'center', padding: '48px 0', color: '#888' }}>
-              ⏳ Загрузка...
+              ⏳ {t.blog_loading}
             </div>
           ) : posts.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '48px 0', color: '#888' }}>
-              Публикаций пока нет.
+              {t.blog_no_posts}
             </div>
           ) : (
             <div className="blog-grid">
@@ -70,9 +70,9 @@ export default function BlogPage() {
         </section>
 
         <div className="info-cta-block">
-          <h2>Подпишитесь на новости</h2>
-          <p>Первыми узнавайте о новых продуктах, акциях и полезных материалах от STEM Academia</p>
-          <Link to="/contacts" className="info-cta-btn">Связаться с нами</Link>
+          <h2>{t.blog_subscribe_title}</h2>
+          <p>{t.blog_subscribe_text}</p>
+          <Link to="/contacts" className="info-cta-btn">{t.blog_subscribe_btn}</Link>
         </div>
       </div>
     </div>

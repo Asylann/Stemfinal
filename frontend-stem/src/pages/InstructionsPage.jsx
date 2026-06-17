@@ -5,65 +5,65 @@ import './InfoPage.css'
 const INSTRUCTIONS = [
   {
     icon: '📋',
-    title: 'Руководство по выбору мебели для учебных кабинетов',
-    desc: 'Как правильно подобрать мебель с учётом возраста учеников, площади помещения и норм СанПиН',
-    tag: 'Мебель',
+    titleKey: 'instruction_1_title',
+    descKey: 'instruction_1_desc',
+    tagKey: 'instruction_1_tag',
     path: '/instructions',
   },
   {
     icon: '🖥️',
-    title: 'Подключение и настройка интерактивных панелей',
-    desc: 'Пошаговая инструкция по установке интерактивной панели, подключению компьютера и настройке ПО',
-    tag: 'Электроника',
+    titleKey: 'instruction_2_title',
+    descKey: 'instruction_2_desc',
+    tagKey: 'instruction_2_tag',
     path: '/instructions',
   },
   {
     icon: '🧪',
-    title: 'Оснащение STEM-лаборатории с нуля',
-    desc: 'Полный гайд по комплектации STEM-лаборатории: мебель, оборудование, программное обеспечение',
-    tag: 'Оборудование',
+    titleKey: 'instruction_3_title',
+    descKey: 'instruction_3_desc',
+    tagKey: 'instruction_3_tag',
     path: '/instructions',
   },
   {
     icon: '🔧',
-    title: 'Сборка и монтаж учебной мебели',
-    desc: 'Инструкции по самостоятельной сборке столов, стульев, стеллажей и другой мебели STEM Academia',
-    tag: 'Мебель',
+    titleKey: 'instruction_4_title',
+    descKey: 'instruction_4_desc',
+    tagKey: 'instruction_4_tag',
     path: '/instructions',
   },
   {
     icon: '💻',
-    title: 'Работа с программой Roqed Science',
-    desc: 'Руководство пользователя для учителей: как создавать уроки, назначать задания и отслеживать прогресс',
-    tag: 'Цифровые продукты',
+    titleKey: 'instruction_5_title',
+    descKey: 'instruction_5_desc',
+    tagKey: 'instruction_5_tag',
     path: '/instructions',
   },
   {
     icon: '📐',
-    title: 'Планировка учебного кабинета',
-    desc: 'Принципы эргономичного расположения мебели в учебном пространстве, требования к освещению',
-    tag: 'Дизайн',
+    titleKey: 'instruction_6_title',
+    descKey: 'instruction_6_desc',
+    tagKey: 'instruction_6_tag',
     path: '/instructions',
   },
   {
     icon: '🖨️',
-    title: 'Запуск и обслуживание 3D-принтера',
-    desc: 'Первый запуск, калибровка, замена нити, решение типичных проблем при печати',
-    tag: 'Оборудование',
+    titleKey: 'instruction_7_title',
+    descKey: 'instruction_7_desc',
+    tagKey: 'instruction_7_tag',
     path: '/instructions',
   },
   {
     icon: '📺',
-    title: 'Использование информационного киоска',
-    desc: 'Администрирование, загрузка контента, обновление ПО и техническое обслуживание инфокиосков',
-    tag: 'Электроника',
+    titleKey: 'instruction_8_title',
+    descKey: 'instruction_8_desc',
+    tagKey: 'instruction_8_tag',
     path: '/instructions',
   },
   {
     icon: '🏫',
-    title: 'Нормы и стандарты для учебных помещений',
-    desc: 'Требования СанПиН, ГОСТ и образовательных стандартов к учебным помещениям и оборудованию',
-    tag: 'Нормативы',
+    titleKey: 'instruction_9_title',
+    descKey: 'instruction_9_desc',
+    tagKey: 'instruction_9_tag',
     path: '/instructions',
   },
 ]
@@ -84,23 +84,23 @@ export default function InstructionsPage() {
 
       <div className="info-body">
         <section className="info-section">
-          <h2>Все материалы</h2>
+          <h2>{t.instructions_all_materials}</h2>
           <div className="instructions-grid">
             {INSTRUCTIONS.map((instr, i) => (
               <div key={i} className="instruction-card">
                 <div className="instruction-card__icon">{instr.icon}</div>
-                <div className="instruction-card__title">{instr.title}</div>
-                <p className="instruction-card__desc">{instr.desc}</p>
-                <span className="instruction-tag">{instr.tag}</span>
+                <div className="instruction-card__title">{t[instr.titleKey]}</div>
+                <p className="instruction-card__desc">{t[instr.descKey]}</p>
+                <span className="instruction-tag">{t[instr.tagKey]}</span>
               </div>
             ))}
           </div>
         </section>
 
         <div className="info-cta-block">
-          <h2>Нужна консультация?</h2>
-          <p>Наши специалисты помогут подобрать оптимальное решение для вашего учебного заведения</p>
-          <Link to="/contacts" className="info-cta-btn">Задать вопрос</Link>
+          <h2>{t.instructions_help_title}</h2>
+          <p>{t.instructions_help_text}</p>
+          <Link to="/contacts" className="info-cta-btn">{t.instructions_help_btn}</Link>
         </div>
       </div>
     </div>

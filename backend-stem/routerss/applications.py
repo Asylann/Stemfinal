@@ -1,24 +1,19 @@
 import os
 import re
 import uuid
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 from typing import Optional, List, Dict, Tuple
 
 import httpx
 from dotenv import load_dotenv
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Depends, Request
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Depends
 from pydantic import BaseModel, field_validator, model_validator
 from sqlalchemy.orm import Session
 
 from database import get_db, SessionLocal
-from models import Application, User
-from routerss.auth import get_current_user
+from models import Application
 
 load_dotenv()
-
-# Astana, Kazakhstan timezone (UTC+5)
-ASTANA_TZ = timezone(timedelta(hours=5))
 
 router = APIRouter()
 
@@ -93,25 +88,9 @@ async def send_to_telegram(data: Dict, app_id: str) -> None:
     if not BOT_TOKEN or not GROUP_CHAT_ID:
         return
 
-    # Format timestamp in Astana time
-    now = datetime.now(ASTANA_TZ).strftime("%Y-%m-%d %H:%M")
-
-    # Format products list
-    products = data.get("products_list", [])
-    products_count = len(products) if products else 0
-    products_lines = []
-    for p in products:
-        parts = [f"• {p.get('name', 'Товар')}"]
-        if p.get('color'):    parts.append(f"Цвет: {p.get('color')}")
-        if p.get('article'):  parts.append(f"Арт: {p.get('article')}")
-        products_lines.append(" | ".join(parts))
-    products_text = "\n".join(products_lines) if products_lines else "—"
-
     text = (
         "📥 <b>Новая заявка с сайта</b>\n\n"
         f"🆔 <b>ID:</b> #{app_id}\n"
-        f"🕒 <b>Время:</b> {now}\n\n"
-        f"📦 <b>Товары ({products_count} шт.):</b>\n{products_text}\n\n"
         f"👤 <b>Имя:</b> {data.get('name')}\n"
         f"📞 <b>Телефон:</b> {data.get('phone')}\n"
         f"💬 <b>Комментарий:</b> {data.get('comment') or '—'}"
@@ -129,15 +108,14 @@ async def send_to_telegram(data: Dict, app_id: str) -> None:
 # ─── Bitrix24 deal stage mapping ─────────────────────────────────────────────────
 # When creating a deal via REST API, Bitrix24 accepts STAGE_ID to set initial stage.
 # Our internal status  →  Bitrix24 STAGE_ID
-# NOTE: 'UC_4PQZ76' is the actual 'Заявка с сайта' stage in their Bitrix24 pipeline.
 LOCAL_TO_BITRIX_STAGE = {
-    "new":        "UC_4PQZ76",   # Заявка с сайта
-    "preparing":  "UC_3AWFVA",   # Название
-    "invoicing":  "5",           # Новая заявка
+    "new":        "NEW",
+    "preparing":  "PREPARATION",
+    "invoicing":  "PREPAYMENT_INVOICING",
     "processing": "EXECUTING",
     "paid":       "PREPAID",
     "completed":  "WON",
-    "closed":     "LOSE",
+    "closed":     "CLOSED",
 }
 
 # Bitrix24 STAGE_ID  →  our internal status  (reverse map)
@@ -164,9 +142,9 @@ async def send_to_bitrix(data: Dict, db_id: int) -> None:
 
     product_details = "\n".join(product_lines)
 
-    # Determine initial Bitrix stage from local status (default: UC_4PQZ76 = Заявка с сайта)
+    # Determine initial Bitrix stage from local status (default: NEW)
     local_status = data.get("status", "new")
-    initial_stage = LOCAL_TO_BITRIX_STAGE.get(local_status, "UC_4PQZ76")
+    initial_stage = LOCAL_TO_BITRIX_STAGE.get(local_status, "NEW")
 
     payload = {
         "fields": {
@@ -205,7 +183,6 @@ async def send_to_bitrix(data: Dict, db_id: int) -> None:
 @router.post("")
 @router.post("/")
 async def create_application(
-    request: Request,
     data: ApplicationCreate, 
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
@@ -223,26 +200,12 @@ async def create_application(
         "products_list": products_list,
     }
 
-    # Try to extract user_id from JWT token (optional — anonymous orders still work)
-    user_id = None
-    auth_header = request.headers.get("Authorization")
-    if auth_header and auth_header.startswith("Bearer "):
-        try:
-            from jose import jwt, JWTError
-            import os
-            token = auth_header.split(" ")[1]
-            payload = jwt.decode(token, os.getenv("SECRET_KEY"), algorithms=["HS256"])
-            user_id = int(payload.get("sub"))
-        except:
-            pass  # Invalid token — proceed as anonymous
-
     new_application = Application(
         name=app_data["name"],
         phone=app_data["phone"],
         comment=app_data["comment"],
         product_name=short_name,
-        status="new",
-        user_id=user_id
+        status="new"
     )
     db.add(new_application)
     db.commit()
@@ -252,33 +215,3 @@ async def create_application(
     background_tasks.add_task(send_to_telegram, app_data, app_id)
 
     return {"status": "ok", "id": app_id}
-
-
-@router.get("/me")
-def get_my_applications(
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
-    """Return the authenticated user's application/order history."""
-    apps = (
-        db.query(Application)
-        .filter(Application.user_id == current_user.id)
-        .order_by(Application.created_at.desc())
-        .all()
-    )
-    return [
-        {
-            "id": a.id,
-            "name": a.name,
-            "phone": a.phone,
-            "comment": a.comment,
-            "product_name": a.product_name,
-            "article": a.article,
-            "status": a.status,
-            "bitrix_stage_id": a.bitrix_stage_id,
-            "bitrix_stage_name": a.bitrix_stage_name,
-            "created_at": a.created_at,
-            "updated_at": a.updated_at,
-        }
-        for a in apps
-    ]

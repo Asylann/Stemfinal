@@ -21,12 +21,12 @@ export default function HowToOrderPage() {
 
       <div className="info-hero">
         <h1>{t.how_to_order_title}</h1>
-        <p>Простой процесс оформления заказа — от выбора товара до получения</p>
+        <p>{t.how_to_order_hero}</p>
       </div>
 
       <div className="info-body">
         <section className="info-section">
-          <h2>Шаги оформления заказа</h2>
+          <h2>{t.how_to_order_steps}</h2>
           <div className="steps-list">
             {steps.map((step, i) => (
               <div key={i} className="step-item">
@@ -41,7 +41,7 @@ export default function HowToOrderPage() {
         </section>
 
         <section className="info-section">
-          <h2>Условия оплаты и доставки</h2>
+          <h2>{t.how_to_order_conditions}</h2>
           <div className="info-two-cols">
             <div className="info-box">
               <h3>💳 {t.how_to_order_payment_title}</h3>
@@ -55,22 +55,19 @@ export default function HowToOrderPage() {
         </section>
 
         <section className="info-section">
-          <h2>Остались вопросы?</h2>
+          <h2>{t.how_to_order_questions}</h2>
           <p>
-            Наши менеджеры готовы помочь вам с выбором товаров, оформлением заказа и любыми другими
-            вопросами. Свяжитесь с нами любым удобным способом — по телефону, email или через форму
-            на странице контактов.
+            {t.how_to_order_questions_text}
           </p>
           <p>
-            Также вы можете воспользоваться кнопкой "Обратный звонок" — наш менеджер перезвонит
-            в течение 15 минут в рабочее время.
+            {t.how_to_order_questions_text2}
           </p>
         </section>
 
         <div className="info-cta-block">
           <h2>{t.how_to_order_cta}</h2>
-          <p>Пн–Пт: 9:00 – 18:00 по времени Астаны</p>
-          <Link to="/contacts" className="info-cta-btn">Связаться с нами</Link>
+          <p>{t.how_to_order_cta_schedule}</p>
+          <Link to="/contacts" className="info-cta-btn">{t.how_to_order_cta_btn}</Link>
         </div>
       </div>
     </div>

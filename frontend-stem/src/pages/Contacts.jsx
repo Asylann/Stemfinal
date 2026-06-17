@@ -67,22 +67,22 @@ export default function Contacts() {
           {/* Почта */}
           <div className="contacts-col">
             <h3 className="contacts-col__title">{t.contacts_email}</h3>
-            <p className="contacts-col__desc">Для приобретения кабинетов и услуг:</p>
+            <p className="contacts-col__desc">{t.contacts_email_desc1}</p>
             <a href="mailto:sm1@stem-academia.com" className="contacts-col__text">sm1@stem-academia.com</a>
             <a href="mailto:sm2@stem-academia.com" className="contacts-col__text">sm2@stem-academia.com</a>
             <a href="mailto:sm3@stem-academia.com" className="contacts-col__text">sm3@stem-academia.com</a>
-            <p className="contacts-col__desc" style={{marginTop:'10px'}}>Поддержка и предложения:</p>
+            <p className="contacts-col__desc" style={{marginTop:'10px'}}>{t.contacts_email_desc2}</p>
             <a href="mailto:info@stem-academia.com" className="contacts-col__text">info@stem-academia.com</a>
           </div>
 
           {/* Адрес */}
           <div className="contacts-col">
             <h3 className="contacts-col__title">{t.contacts_address}</h3>
-            <p className="contacts-col__text">📍 г. Астана, Домалак-ана 26</p>
-            <p className="contacts-col__text">📍 г. Алматы, пр. Аль-Фараби 77/2</p>
+            <p className="contacts-col__text">{t.contacts_address_astana}</p>
+            <p className="contacts-col__text">{t.contacts_address_almaty}</p>
             <h3 className="contacts-col__title" style={{marginTop:'16px'}}>{t.contacts_schedule}</h3>
-            <p className="contacts-col__text">Пн–Пт: 9:00 – 18:00</p>
-            <p className="contacts-col__text">Сб–Вс: выходной</p>
+            <p className="contacts-col__text">{t.contacts_schedule_value}</p>
+            <p className="contacts-col__text">{t.contacts_schedule_weekend}</p>
           </div>
 
           {/* Мессенджеры */}
@@ -133,7 +133,7 @@ export default function Contacts() {
                 <input
                   type="text"
                   name="name"
-                  placeholder="Иван Иванов"
+                  placeholder={t.contacts_form_placeholder_name}
                   value={form.name}
                   onChange={handleChange}
                   required
@@ -144,7 +144,7 @@ export default function Contacts() {
                 <input
                   type="tel"
                   name="phone"
-                  placeholder="+7 (___) ___-__-__"
+                  placeholder={t.contacts_form_placeholder_phone}
                   value={form.phone}
                   onChange={handleChange}
                   required
@@ -154,18 +154,18 @@ export default function Contacts() {
                 <label>{t.contacts_form_message}</label>
                 <textarea
                   name="message"
-                  placeholder="Ваш вопрос или сообщение..."
+                  placeholder={t.contacts_form_placeholder_message}
                   rows={4}
                   value={form.message}
                   onChange={handleChange}
                 />
               </div>
               <button type="submit" className="contacts-form__btn" disabled={loading}>
-                {loading ? t.sending : t.contacts_form_btn}
+                {loading ? t.contacts_form_sending : t.contacts_form_btn}
               </button>
               {error && (
                 <p style={{ color: '#c0392b', fontSize: '13px', marginTop: '8px', textAlign: 'center' }}>
-                  {error}
+                  {error || t.contacts_form_error}
                 </p>
               )}
               <p className="contacts-form__note">{t.data_protected}</p>

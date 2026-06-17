@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom'
 import { createApplication } from '../../api/api'
 import { useCart } from '../../context/CartContext'
 import { useFavorites } from '../../context/FavoritesContext'
-import { useAuth } from '../../context/AuthContext'
-import { useLang } from '../../i18n/LanguageContext'
 import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import './Stanki.css'
 
@@ -12,8 +10,6 @@ export default function Stanki() {
   const { products, loading } = useCategoryProducts('stanki')
   const { addToCart } = useCart()
   const { toggleFavorite, isFavorite } = useFavorites()
-  const { user } = useAuth()
-  const { lang } = useLang()
   const [showModal, setShowModal] = useState(false)
   const [formData, setFormData] = useState({ name: '', phone: '', comment: '', productName: '' })
   const [submitting, setSubmitting] = useState(false)
@@ -23,7 +19,7 @@ export default function Stanki() {
   const handleOpenModal = (productName) => {
     setShowModal(true)
     setSubmitSuccess(false)
-    setFormData({ name: user?.name || '', phone: user?.phone || '', comment: '', productName })
+    setFormData({ name: '', phone: '', comment: '', productName })
   }
 
   const handleCloseModal = () => setShowModal(false)
@@ -91,12 +87,9 @@ export default function Stanki() {
               <h2 className="stanki-card__title">{p.title}</h2>
 
               <p className="stanki-card__desc-label">Описание:</p>
-              {Array.isArray(p.description)
-                ? p.description.map((d, i) => (
-                    <p key={i} className="stanki-card__desc">{d}</p>
-                  ))
-                : <p className="stanki-card__desc">{lang === 'kz' ? p.description_kz : p.description_ru}</p>
-              }
+              {p.description.map((d, i) => (
+                <p key={i} className="stanki-card__desc">{d}</p>
+              ))}
 
               <table className="stanki-card__table">
                 <tbody>

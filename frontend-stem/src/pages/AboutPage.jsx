@@ -3,12 +3,12 @@ import { useLang } from '../i18n/LanguageContext'
 import './InfoPage.css'
 
 const ADVANTAGES = [
-  { title: 'Собственное производство', desc: 'Изготавливаем мебель и поставляем оборудование для STEM-лабораторий любого масштаба' },
-  { title: 'Сертифицированная продукция', desc: 'Вся продукция соответствует стандартам качества и имеет необходимые сертификаты' },
-  { title: 'Широкий ассортимент', desc: 'Мебель, электроника, оборудование и цифровые решения для образовательных пространств' },
-  { title: 'Быстрая поставка', desc: 'Отгружаем заказы в кратчайшие сроки, доставка по Казахстану' },
-  { title: 'Гарантия качества', desc: 'Предоставляем гарантию на всю продукцию и техническую поддержку' },
-  { title: 'Комплексные решения', desc: 'От дизайн-проекта до сдачи готового кабинета — всё под ключ' },
+  { titleKey: 'advantage_1_title', descKey: 'advantage_1_desc' },
+  { titleKey: 'advantage_2_title', descKey: 'advantage_2_desc' },
+  { titleKey: 'advantage_3_title', descKey: 'advantage_3_desc' },
+  { titleKey: 'advantage_4_title', descKey: 'advantage_4_desc' },
+  { titleKey: 'advantage_5_title', descKey: 'advantage_5_desc' },
+  { titleKey: 'advantage_6_title', descKey: 'advantage_6_desc' },
 ]
 
 export default function AboutPage() {
@@ -30,9 +30,7 @@ export default function AboutPage() {
           <h2>{t.about_section1_title}</h2>
           <p>{t.about_section1_text}</p>
           <p>
-            Мы работаем с 2015 года и за это время реализовали более 500 проектов по всему Казахстану.
-            В нашем портфолио — оснащение школ, университетов, техникумов и корпоративных обучающих
-            центров в Астане, Алматы, Шымкенте и других городах страны.
+            {t.about_section1_extra || 'Мы работаем с 2015 года и за это время реализовали более 500 проектов по всему Казахстану. В нашем портфолио — оснащение школ, университетов, техникумов и корпоративных обучающих центров в Астане, Алматы, Шымкенте и других городах страны.'}
           </p>
         </section>
 
@@ -41,8 +39,8 @@ export default function AboutPage() {
           <div className="info-advantages-grid">
             {ADVANTAGES.map((adv, i) => (
               <div key={i} className="info-adv-card">
-                <h3>{adv.title}</h3>
-                <p>{adv.desc}</p>
+                <h3>{t[adv.titleKey]}</h3>
+                <p>{t[adv.descKey]}</p>
               </div>
             ))}
           </div>
@@ -52,17 +50,14 @@ export default function AboutPage() {
           <h2>{t.about_section3_title}</h2>
           <p>{t.about_section3_text}</p>
           <p>
-            Мы сотрудничаем с ведущими производителями учебного оборудования и интерактивных систем.
-            Перед поставкой каждая единица оборудования проверяется нашими специалистами. Для мебели
-            мы используем только экологически чистые материалы, соответствующие требованиям для
-            учебных заведений.
+            {t.about_section3_extra || 'Мы сотрудничаем с ведущими производителями учебного оборудования и интерактивных систем. Перед поставкой каждая единица оборудования проверяется нашими специалистами. Для мебели мы используем только экологически чистые материалы, соответствующие требованиям для учебных заведений.'}
           </p>
         </section>
 
         <div className="info-cta-block">
-          <h2>Готовы к сотрудничеству?</h2>
-          <p>Свяжитесь с нами для получения консультации и коммерческого предложения</p>
-          <Link to="/contacts" className="info-cta-btn">Связаться с нами</Link>
+          <h2>{t.about_cta_title}</h2>
+          <p>{t.about_cta_text}</p>
+          <Link to="/contacts" className="info-cta-btn">{t.about_cta_btn}</Link>
         </div>
       </div>
     </div>

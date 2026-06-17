@@ -6,7 +6,9 @@ export default function AuthModal() {
   const { showModal, login, register, closeModal } = useAuth()
 
   const [mode, setMode] = useState('login')
+  const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -36,9 +38,9 @@ export default function AuthModal() {
     setLoading(true)
     try {
       if (mode === 'register') {
-        await register(phone, password)
+        await register(name, email, password, phone)
       } else {
-        await login(phone, password)
+        await login(email, password)
       }
     } catch (err) {
       setError(err.message || 'Произошла ошибка')
@@ -74,13 +76,40 @@ export default function AuthModal() {
         </div>
 
         <form onSubmit={handleSubmit} className="auth-box__form">
+          {mode === 'register' && (
+            <div className="auth-box__field">
+              <label>Имя</label>
+              <input
+                type="text"
+                placeholder="Ваше имя"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                required
+                disabled={loading}
+              />
+            </div>
+          )}
+
+          {mode === 'register' && (
+            <div className="auth-box__field">
+              <label>Номер телефона</label>
+              <input
+                type="tel"
+                placeholder="+7 (777) 000-00-00"
+                value={phone}
+                onChange={e => setPhone(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+          )}
+
           <div className="auth-box__field">
-            <label>Номер телефона</label>
+            <label>Email</label>
             <input
-              type="tel"
-              placeholder="+7 (777) 000-00-00"
-              value={phone}
-              onChange={e => setPhone(e.target.value)}
+              type="email"
+              placeholder="example@mail.com"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
               required
               disabled={loading}
             />

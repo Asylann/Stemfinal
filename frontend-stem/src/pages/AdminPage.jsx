@@ -400,7 +400,6 @@ const STATUS_OPTIONS = [
   { code: 'paid',         label: 'Оплачено',       badgeClass: 'badge--green',      bg: '#dcfce7', color: '#15803d' },
   { code: 'completed',    label: 'Завершена',      badgeClass: 'badge--darkgreen',  bg: '#bbf7d0', color: '#14532d' },
   { code: 'closed',       label: 'Закрыта',        badgeClass: 'badge--gray',       bg: '#f3f4f6', color: '#6b7280' },
-  { code: 'rejected',     label: 'Отклонено',      badgeClass: 'badge--red',        bg: '#fee2e2', color: '#b91c1c' },
   { code: 'unknown',      label: 'Неизвестно',     badgeClass: 'badge--gray',       bg: '#f3f4f6', color: '#6b7280' },
 ]
 
@@ -1139,7 +1138,6 @@ function UsersTab() {
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [expandedUser, setExpandedUser] = useState(null)
 
   useEffect(() => {
     adminGetUsers()
@@ -1147,10 +1145,6 @@ function UsersTab() {
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
   }, [])
-
-  const toggleExpand = (userId) => {
-    setExpandedUser(expandedUser === userId ? null : userId)
-  }
 
   return (
     <>
@@ -1174,97 +1168,21 @@ function UsersTab() {
                 <th>Email</th>
                 <th>Телефон</th>
                 <th>Роль</th>
-                <th>Визуализации</th>
-                <th>Заявки</th>
-                <th></th>
               </tr>
             </thead>
             <tbody>
               {users.map((u) => (
-                <>
-                  <tr key={u.id} className={expandedUser === u.id ? 'admin-table__row--expanded' : ''}>
-                    <td>{u.id}</td>
-                    <td style={{ fontWeight: 500 }}>{u.name}</td>
-                    <td>{u.email}</td>
-                    <td style={{ fontSize: 13, color: '#888' }}>{u.phone || '—'}</td>
-                    <td>
-                      <span className={`badge ${u.is_admin ? 'badge--blue' : 'badge--green'}`}>
-                        {u.is_admin ? '👑 Админ' : 'Пользователь'}
-                      </span>
-                    </td>
-                    <td style={{ fontSize: 13, textAlign: 'center' }}>
-                      {u.daily_visualize_count || 0} / 2
-                    </td>
-                    <td style={{ textAlign: 'center' }}>
-                      {u.applications && u.applications.length > 0 ? (
-                        <span className="badge badge--blue">{u.applications.length}</span>
-                      ) : (
-                        <span style={{ color: '#ccc' }}>0</span>
-                      )}
-                    </td>
-                    <td>
-                      {u.applications && u.applications.length > 0 && (
-                        <button
-                          className="admin-btn admin-btn--secondary admin-btn--sm"
-                          onClick={() => toggleExpand(u.id)}
-                        >
-                          {expandedUser === u.id ? '▲ Скрыть' : '▼ Заявки'}
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                  {expandedUser === u.id && u.applications && u.applications.length > 0 && (
-                    <tr key={`${u.id}-apps`} className="admin-table__nested">
-                      <td colSpan={8}>
-                        <div className="admin-nested-orders">
-                          <div className="admin-nested-orders__title">
-                            Заявки пользователя ({u.applications.length})
-                          </div>
-                          <table className="admin-table admin-table--nested">
-                            <thead>
-                              <tr>
-                                <th>ID</th>
-                                <th>Дата</th>
-                                <th>Имя</th>
-                                <th>Телефон</th>
-                                <th>Товар</th>
-                                <th>Артикул</th>
-                                <th>Комментарий</th>
-                                <th>Статус</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {u.applications.map((app) => (
-                                <tr key={app.id}>
-                                  <td>{app.id}</td>
-                                  <td style={{ fontSize: 12, color: '#888', whiteSpace: 'nowrap' }}>
-                                    {app.created_at || '—'}
-                                  </td>
-                                  <td style={{ fontWeight: 500 }}>{app.name}</td>
-                                  <td style={{ fontSize: 13, fontWeight: 600, color: '#2d6a4f' }}>
-                                    {app.phone}
-                                  </td>
-                                  <td style={{ maxWidth: 180, fontSize: 13 }}>
-                                    {app.product_name || '—'}
-                                  </td>
-                                  <td style={{ fontSize: 12, color: '#888' }}>
-                                    {app.article || '—'}
-                                  </td>
-                                  <td style={{ maxWidth: 200, fontSize: 12, color: '#666' }}>
-                                    {app.comment || '—'}
-                                  </td>
-                                  <td>
-                                    <span className="badge badge--blue">{app.status || 'new'}</span>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </>
+                <tr key={u.id}>
+                  <td>{u.id}</td>
+                  <td style={{ fontWeight: 500 }}>{u.name}</td>
+                  <td>{u.email}</td>
+                  <td style={{ fontSize: 13, color: '#888' }}>{u.phone || '—'}</td>
+                  <td>
+                    <span className={`badge ${u.is_admin ? 'badge--blue' : 'badge--green'}`}>
+                      {u.is_admin ? '👑 Администратор' : 'Пользователь'}
+                    </span>
+                  </td>
+                </tr>
               ))}
             </tbody>
           </table>

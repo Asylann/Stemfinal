@@ -16,34 +16,34 @@ const ADVANTAGES = [
 const BLOG_POSTS = [
   {
     id: 1,
-    date: '12 мая 2025',
-    title: 'Как оснастить STEM-лабораторию под ключ',
-    excerpt: 'Рассказываем о комплексном подходе к оснащению учебных лабораторий: от дизайн-проекта до выбора оборудования.',
+    dateKey: 'blog_post_1_date',
+    titleKey: 'blog_post_1_title',
+    excerptKey: 'blog_post_1_excerpt',
     img: '/img/pagefirst/room.png',
     path: '/blog',
   },
   {
     id: 2,
-    date: '3 мая 2025',
-    title: 'Интерактивные панели в образовании: обзор 2025',
-    excerpt: 'Сравниваем актуальные модели интерактивных панелей для школ и вузов. Что выбрать в 2025 году?',
+    dateKey: 'blog_post_2_date',
+    titleKey: 'blog_post_2_title',
+    excerptKey: 'blog_post_2_excerpt',
     img: '/img/pagethird/comp.png',
     path: '/blog',
   },
   {
     id: 3,
-    date: '25 апреля 2025',
-    title: 'Мебель для учебных классов: тренды и стандарты',
-    excerpt: 'Разбираем современные тенденции в дизайне учебного пространства и требования к мебели для образовательных учреждений.',
+    dateKey: 'blog_post_3_date',
+    titleKey: 'blog_post_3_title',
+    excerptKey: 'blog_post_3_excerpt',
     img: '/img/pagesecond/bb20aa.png',
     path: '/blog',
   },
 ]
 
 const INSTRUCTIONS = [
-  { icon: '📋', title: 'Руководство по выбору мебели', desc: 'Как подобрать мебель под конкретный учебный кабинет', path: '/instructions' },
-  { icon: '🖥️', title: 'Подключение интерактивных панелей', desc: 'Пошаговая инструкция по установке и настройке', path: '/instructions' },
-  { icon: '🧪', title: 'Оснащение лабораторий', desc: 'Комплектация STEM-лабораторий — с чего начать', path: '/instructions' },
+  { icon: '📋', titleKey: 'instruction_1_title', descKey: 'instruction_1_desc', path: '/instructions' },
+  { icon: '🖥️', titleKey: 'instruction_2_title', descKey: 'instruction_2_desc', path: '/instructions' },
+  { icon: '🧪', titleKey: 'instruction_3_title', descKey: 'instruction_3_desc', path: '/instructions' },
 ]
 
 export default function FirstPage() {
@@ -141,8 +141,8 @@ export default function FirstPage() {
               <Link key={i} to={item.path} className="instr-preview-card">
                 <span className="instr-preview-icon">{item.icon}</span>
                 <div>
-                  <h3 className="instr-preview-title">{item.title}</h3>
-                  <p className="instr-preview-desc">{item.desc}</p>
+                  <h3 className="instr-preview-title">{t[item.titleKey]}</h3>
+                  <p className="instr-preview-desc">{t[item.descKey]}</p>
                 </div>
               </Link>
             ))}
@@ -161,12 +161,12 @@ export default function FirstPage() {
             {BLOG_POSTS.map(post => (
               <Link key={post.id} to={post.path} className="blog-preview-card">
                 <div className="blog-preview-img">
-                  <img src={post.img} alt={post.title} />
+                  <img src={post.img} alt={t[post.titleKey]} />
                 </div>
                 <div className="blog-preview-body">
-                  <span className="blog-preview-date">{post.date}</span>
-                  <h3 className="blog-preview-title">{post.title}</h3>
-                  <p className="blog-preview-excerpt">{post.excerpt}</p>
+                  <span className="blog-preview-date">{t[post.dateKey]}</span>
+                  <h3 className="blog-preview-title">{t[post.titleKey]}</h3>
+                  <p className="blog-preview-excerpt">{t[post.excerptKey]}</p>
                   <span className="blog-preview-link">{t.blog_read_more} →</span>
                 </div>
               </Link>
@@ -183,7 +183,7 @@ export default function FirstPage() {
         <img src="/img/pagefirst/key1.png" alt="" className="dream__key dream__key--br" />
 
         <div className="dream__left">
-          <h2 className="dream__title">Инновационное решение для нашего будущего</h2>
+          <h2 className="dream__title">{t.dream_title}</h2>
           <p className="dream__desc">{t.dream_desc}</p>
           <a href="#" className="dream__btn">{t.dream_btn}</a>
         </div>

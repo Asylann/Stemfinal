@@ -21,7 +21,7 @@
 
 .roqed-layout {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 24px;
   align-items: start;
 }
@@ -41,166 +41,128 @@
 }
 
 .roqed-desc {
-  font-size: 13px;
-  color: #555;
-  line-height: 1.6;
-  margin-bottom: 24px;
-}
-
-.roqed-licenses h2 {
   font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  margin-bottom: 16px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #e5e5e5;
-}
-
-.roqed-licenses-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.roqed-license-col {
-  background: #f9f9f9;
-  border-radius: 10px;
-  padding: 16px;
-}
-
-.roqed-license-col h3 {
-  font-size: 15px;
-  font-weight: 600;
-  margin-bottom: 12px;
-}
-
-.roqed-license-col ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.roqed-license-col li {
-  font-size: 13px;
-  color: #333;
-  padding-left: 24px;
-  position: relative;
-  line-height: 1.4;
-}
-
-.roqed-license-col li.yes::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 3px;
-  width: 16px;
-  height: 16px;
-  background: #2db35d;
-  border-radius: 50%;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
-  background-size: 10px;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-.roqed-license-col li.no::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 3px;
-  width: 16px;
-  height: 16px;
-  background: #e0e0e0;
-  border-radius: 50%;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='3'%3E%3Cpath d='M18 6L6 18M6 6l12 12'/%3E%3C/svg%3E");
-  background-size: 9px;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-.roqed-article {
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid #e5e5e5;
-  font-size: 12px;
-  color: #999;
-}
-
-
-.roqed-tech-title {
-  font-size: 20px;
-  font-weight: 700;
+  color: #555;
+  line-height: 1.7;
   margin-bottom: 20px;
 }
 
-.roqed-tech-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+.roqed-map-image {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-top: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.roqed-tech-card {
-  border-radius: 14px;
-  padding: 24px;
-  color: #fff;
+/* Секции контента */
+.roqed-section {
+  margin-bottom: 32px;
 }
 
-.roqed-tech-windows {
-  background: #1565c0;
+.roqed-section:last-child {
+  margin-bottom: 0;
 }
 
-.roqed-tech-android {
-  background: #2e7d32;
-}
-
-.roqed-tech-icon {
-  margin-bottom: 12px;
-  opacity: 0.9;
-}
-
-.roqed-tech-card h3 {
+.roqed-section h2 {
   font-size: 18px;
   font-weight: 700;
-  margin-bottom: 4px;
+  letter-spacing: 0.03em;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e5e5e5;
+  color: #222;
 }
 
-.roqed-tech-label {
-  font-size: 12px;
-  font-weight: 600;
-  opacity: 0.75;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 14px;
+.roqed-text {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.7;
 }
 
-.roqed-tech-card ul {
+.roqed-games-image {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-top: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.roqed-features-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 10px;
 }
 
-.roqed-tech-card li {
+.roqed-features-list li {
+  font-size: 14px;
+  color: #333;
+  padding-left: 24px;
+  position: relative;
+  line-height: 1.6;
+}
+
+.roqed-features-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 12px;
+  height: 12px;
+  background: #007bff;
+  border-radius: 50%;
+}
+
+/* Статистика */
+.roqed-stats {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 28px;
+  border-radius: 12px;
+  color: #fff;
+}
+
+.roqed-stats h2 {
+  color: #fff;
+  border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+.roqed-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.roqed-stat-item {
+  text-align: center;
+}
+
+.roqed-stat-number {
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.roqed-stat-label {
   font-size: 13px;
   opacity: 0.9;
+  line-height: 1.4;
 }
 
 
 @media (max-width: 768px) {
-  .roqed-layout {
+  .roqed-stats-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
 
-  .roqed-tech-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .roqed-licenses-grid {
-    grid-template-columns: 1fr;
+  .roqed-stat-number {
+    font-size: 36px;
   }
 }

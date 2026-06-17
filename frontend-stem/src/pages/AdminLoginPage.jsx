@@ -7,7 +7,7 @@ export default function AdminLoginPage() {
   const { isAuthenticated, isAdmin, loading, login } = useAuth()
   const navigate = useNavigate()
 
-  const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -25,7 +25,7 @@ export default function AdminLoginPage() {
     setError('')
     setSubmitting(true)
     try {
-      const userData = await login(phone.trim(), password)
+      const userData = await login(email.trim(), password)
       if (!userData?.is_admin) {
         setError('У этого аккаунта нет прав администратора.')
         return
@@ -34,7 +34,7 @@ export default function AdminLoginPage() {
     } catch (err) {
       const msg = err?.message || ''
       if (msg.includes('401') || msg.toLowerCase().includes('неверный')) {
-        setError('Неверный номер телефона или пароль.')
+        setError('Неверный email или пароль.')
       } else if (msg.toLowerCase().includes('fetch') || msg.toLowerCase().includes('network')) {
         setError('Сервер недоступен. Проверьте соединение.')
       } else {
@@ -69,14 +69,14 @@ export default function AdminLoginPage() {
         <form className="alog-form" onSubmit={handleSubmit} noValidate>
 
           <div className="alog-field">
-            <label htmlFor="alog-phone">Номер телефона</label>
+            <label htmlFor="alog-email">Email</label>
             <input
-              id="alog-phone"
-              type="tel"
-              autoComplete="tel"
-              placeholder="+7 (7XX) XXX-XX-XX"
-              value={phone}
-              onChange={e => setPhone(e.target.value)}
+              id="alog-email"
+              type="email"
+              autoComplete="username"
+              placeholder="admin@example.com"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
               required
               disabled={submitting}
             />
