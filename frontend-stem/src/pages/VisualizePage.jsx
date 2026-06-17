@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { apiClient } from '../api/api'
+import { useAuth } from '../context/AuthContext'
 import './VisualizePage.css'
 
 function toBase64(file) {
@@ -13,6 +14,7 @@ function toBase64(file) {
 }
 
 export default function VisualizePage() {
+  const { isAuthenticated, openModal } = useAuth()
   const [preview, setPreview] = useState(null)
   const [file, setFile] = useState(null)
   const [productOptions, setProductOptions] = useState([])
@@ -22,6 +24,19 @@ export default function VisualizePage() {
   const [error, setError] = useState(null)
   const [retryCount, setRetryCount] = useState(0)
   const [productsLoading, setProductsLoading] = useState(true)
+  const [remaining, setRemaining] = useState(null)
+  const [dailyLimit, setDailyLimit] = useState(2)
+
+  // Fetch remaining visualizations for today
+  useEffect(() => {
+    if (!isAuthenticated) return
+    apiClient.get('/api/ai/visualize/status')
+      .then(res => {
+        setRemaining(res.data.remaining)
+        setDailyLimit(res.data.daily_limit)
+      })
+      .catch(() => {})
+  }, [isAuthenticated])
 
   // Load real products from API
   useEffect(() => {
@@ -78,6 +93,10 @@ export default function VisualizePage() {
   }
 
   const handleVisualize = async () => {
+    if (!isAuthenticated) {
+      openModal()
+      return
+    }
     if (!file) { setError('Загрузите фото помещения'); return }
     if (selected.length === 0) { setError('Выберите хотя бы один товар'); return }
 
@@ -123,6 +142,9 @@ export default function VisualizePage() {
       if (data.success) {
         setResult(data.image)
         setRetryCount(0)
+        if (data.remaining !== undefined) {
+          setRemaining(data.remaining)
+        }
       } else {
         setError(data.error || 'Ошибка генерации')
         if (data.error?.includes('загружается')) {
@@ -151,6 +173,22 @@ export default function VisualizePage() {
     setError(null)
   }
 
+  // Show auth gate if not logged in
+  if (!isAuthenticated) {
+    return (
+      <div className="viz-page">
+        <div className="viz-auth-gate">
+          <div className="viz-auth-icon">🔒</div>
+          <h2>Требуется авторизация</h2>
+          <p>Для использования AI-визуализации необходимо войти в аккаунт</p>
+          <button className="viz-auth-btn" onClick={openModal}>
+            Войти / Регистрация
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="viz-page">
       {/* Breadcrumb */}
@@ -164,6 +202,11 @@ export default function VisualizePage() {
       <div className="viz-header">
         <h1>✨ AI-Визуализация интерьера</h1>
         <p>Загрузите фото вашего помещения, выберите товары — и AI покажет как это будет выглядеть</p>
+        {remaining !== null && (
+          <div className="viz-counter">
+            Осталось визуализаций сегодня: <strong>{remaining}</strong> из {dailyLimit}
+          </div>
+        )}
       </div>
 
       <div className="viz-layout">

@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from routerss import categories, orders, products, applications, visualize, auth, admin, uploads, blog
+from routerss import categories, orders, products, applications, visualize, auth, admin, uploads, blog, bitrix
 from database import init_db, SessionLocal
 from models import Product, Category
 
@@ -249,6 +249,7 @@ app.include_router(uploads.router,       prefix="/api/uploads",      tags=["uplo
 app.include_router(blog.router,          prefix="/api/blog",         tags=["blog"])
 app.include_router(auth.router,          prefix="/auth",             tags=["auth"])
 app.include_router(admin.router,         prefix="/admin",            tags=["admin"])
+app.include_router(bitrix.router,        prefix="/admin",            tags=["bitrix"])
 
 # Serve uploaded product images as static files
 # /uploads/<filename> → /app/uploads/<filename>

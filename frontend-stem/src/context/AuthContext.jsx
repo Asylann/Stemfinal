@@ -49,22 +49,22 @@ export function AuthProvider({ children }) {
     checkAuth()
   }, [setUserEmail])
 
-  const register = async (name, email, password, phone = '') => {
-    const data = await apiRegister(email, password, name, phone)
+  const register = async (phone, password) => {
+    const data = await apiRegister(phone, password)
     localStorage.setItem('stem_access_token', data.access_token)
     const userData = await getCurrentUser(data.access_token)
     setUser(userData)
-    setUserEmail(userData.email)
+    setUserEmail(userData.email || userData.phone)
     setShowModal(false)
     return userData
   }
 
-  const login = async (email, password) => {
-    const data = await apiLogin(email, password)
+  const login = async (phone, password) => {
+    const data = await apiLogin(phone, password)
     localStorage.setItem('stem_access_token', data.access_token)
     const userData = await getCurrentUser(data.access_token)
     setUser(userData)
-    setUserEmail(userData.email)
+    setUserEmail(userData.email || userData.phone)
     setShowModal(false)
     return userData
   }

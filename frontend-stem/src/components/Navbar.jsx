@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useLang } from '../i18n/LanguageContext'
 import { useCart } from '../context/CartContext'
 import { useFavorites } from '../context/FavoritesContext'
+import { useAuth } from '../context/AuthContext'
 import './Navbar.css'
 
 function CallbackModal({ onClose }) {
@@ -77,6 +78,7 @@ export default function Navbar() {
 
   const { isOpen, setIsOpen, totalCount } = useCart()
   const { favorites } = useFavorites()
+  const { user, isAuthenticated, openModal, logout } = useAuth()
 
   const cities = [
     { key: 'astana', label: t.city_astana },
@@ -166,6 +168,28 @@ export default function Navbar() {
             >
               {t.nav_callback}
             </button>
+
+            {/* Auth buttons */}
+            {isAuthenticated ? (
+              <div className="topbar-auth-logged">
+                <Link to="/profile" className="topbar-user-name" title={user?.phone}>
+                  {user?.name || user?.phone}
+                </Link>
+                <button className="topbar-logout-btn" onClick={logout} type="button">
+                  Выйти
+                </button>
+              </div>
+            ) : (
+              <div className="topbar-auth-buttons">
+                <button className="topbar-auth-btn" onClick={openModal} type="button">
+                  Войти
+                </button>
+                <button className="topbar-auth-btn topbar-auth-btn--signup" onClick={() => { openModal() }} type="button">
+                  Регистрация
+                </button>
+              </div>
+            )}
+
             <span
               className={`topbar-lang ${lang === 'ru' ? 'active' : ''}`}
               onClick={() => setLang('ru')}

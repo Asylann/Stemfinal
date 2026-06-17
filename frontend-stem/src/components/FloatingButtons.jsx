@@ -9,7 +9,7 @@ export default function FloatingButtons() {
   const inputRef = useRef(null)
   const messagesEndRef = useRef(null)
   const [chatInput, setChatInput] = useState('')
-  const [chatOpen, setChatOpen] = useState(true)
+  const [chatOpen, setChatOpen] = useState(false)
   const [chatLoading, setChatLoading] = useState(false)
   const [chatError, setChatError] = useState('')
   const [chatMessages, setChatMessages] = useState([

@@ -1,10 +1,12 @@
+/* ─── Profile Page ─────────────────────────────────────────────────────────── */
+
 .profile-page {
-  max-width: 900px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 32px 20px 60px;
 }
 
-
+/* ── Auth prompt ───────────────────────────────────────────────────────────── */
 .profile-empty {
   display: flex;
   flex-direction: column;
@@ -29,9 +31,12 @@
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
+.profile-login-btn:hover { background: #155d36; }
 
+/* ── Header card ───────────────────────────────────────────────────────────── */
 .profile-header {
   display: flex;
   align-items: center;
@@ -51,7 +56,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 800;
   color: #fff;
   flex-shrink: 0;
@@ -66,9 +71,10 @@
   margin-bottom: 4px;
 }
 
-.profile-header__email {
+.profile-header__contact {
   font-size: 14px;
-  color: #888;
+  color: #666;
+  margin-top: 2px;
 }
 
 .profile-logout {
@@ -88,7 +94,7 @@
   color: #fff;
 }
 
-
+/* ── Stats grid ────────────────────────────────────────────────────────────── */
 .profile-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -117,10 +123,10 @@
   color: #888;
 }
 
-
+/* ── Tabs ──────────────────────────────────────────────────────────────────── */
 .profile-tabs {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   margin-bottom: 20px;
   background: #f5f5f5;
   padding: 4px;
@@ -129,11 +135,11 @@
 
 .profile-tab {
   flex: 1;
-  padding: 10px;
+  padding: 10px 8px;
   background: transparent;
   border: none;
   border-radius: 9px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: #888;
   cursor: pointer;
@@ -146,7 +152,7 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-
+/* ── Content panel ─────────────────────────────────────────────────────────── */
 .profile-content {
   background: #fff;
   border-radius: 16px;
@@ -154,23 +160,81 @@
   box-shadow: 0 2px 16px rgba(0,0,0,0.07);
 }
 
+.profile-list { display: flex; flex-direction: column; gap: 16px; }
 
-.profile-info { display: flex; flex-direction: column; gap: 16px; }
+/* ── Spinner ───────────────────────────────────────────────────────────────── */
+.profile-spinner {
+  text-align: center;
+  padding: 48px 0;
+  color: #888;
+  font-size: 15px;
+}
 
-.profile-info__row {
+/* ── Order card ────────────────────────────────────────────────────────────── */
+.profile-order-card {
+  background: #fafbfc;
+  border: 1px solid #eef0f4;
+  border-radius: 12px;
+  padding: 18px 20px;
+  transition: box-shadow 0.2s;
+}
+
+.profile-order-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.profile-order-card__top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 14px;
 }
 
-.profile-info__label { font-size: 14px; color: #888; }
-.profile-info__value { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+.profile-order-card__id {
+  font-size: 13px;
+  font-weight: 700;
+  color: #888;
+}
 
+/* Status badges */
+.profile-order-card__status {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
 
-.profile-list { display: flex; flex-direction: column; gap: 16px; }
+.status--blue      { background: #dbeafe; color: #1d4ed8; }
+.status--yellow    { background: #fef3c7; color: #92400e; }
+.status--orange    { background: #ffedd5; color: #9a3412; }
+.status--green     { background: #dcfce7; color: #15803d; }
+.status--darkgreen { background: #bbf7d0; color: #14532d; }
+.status--red       { background: #fee2e2; color: #b91c1c; }
+.status--gray      { background: #f3f4f6; color: #6b7280; }
+.status--purple    { background: #ede9fe; color: #5b21b6; }
 
+.profile-order-card__body { display: flex; flex-direction: column; gap: 8px; }
+
+.profile-order-card__row {
+  display: flex;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.profile-order-card__label {
+  color: #888;
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.profile-order-card__value {
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+/* ── Cart & favorites item ─────────────────────────────────────────────────── */
 .profile-item {
   display: flex;
   align-items: center;
@@ -178,6 +242,8 @@
   padding-bottom: 16px;
   border-bottom: 1px solid #f0f0f0;
 }
+
+.profile-item:last-child { border-bottom: none; }
 
 .profile-item__img {
   width: 64px;
@@ -203,32 +269,12 @@
   color: #888;
 }
 
-.profile-item__price {
-  font-size: 15px;
-  font-weight: 700;
-  color: #1d6f42;
-  white-space: nowrap;
-}
-
-
-.profile-total {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 16px;
-  font-size: 16px;
-}
-
-.profile-total strong {
-  font-size: 20px;
-  color: #1d6f42;
-}
-
-
+/* ── Empty tab ─────────────────────────────────────────────────────────────── */
 .profile-empty-tab {
   text-align: center;
-  padding: 40px;
+  padding: 48px 20px;
   color: #888;
+  font-size: 15px;
 }
 
 .profile-link-btn {
@@ -241,4 +287,16 @@
   font-weight: 700;
   text-decoration: none;
   font-size: 14px;
+  transition: background 0.2s;
+}
+
+.profile-link-btn:hover { background: #155d36; }
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .profile-header { flex-wrap: wrap; }
+  .profile-logout { width: 100%; text-align: center; }
+  .profile-stats { grid-template-columns: 1fr; }
+  .profile-order-card__row { flex-direction: column; gap: 2px; }
+  .profile-order-card__label { min-width: auto; }
 }

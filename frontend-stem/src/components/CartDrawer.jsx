@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 import { createApplication } from '../api/api'
 import './CartDrawer.css'
 
@@ -13,6 +14,7 @@ export default function CartDrawer() {
     decreaseQty,
     clearCart
   } = useCart()
+  const { user, isAuthenticated } = useAuth()
 
   const [showModal, setShowModal] = useState(false)
   const [formData, setFormData] = useState({
@@ -30,7 +32,11 @@ export default function CartDrawer() {
   const handleOpenModal = () => {
     setShowModal(true)
     setSubmitSuccess(false)
-    setFormData({ name: '', phone: '', comment: '' })
+    setFormData({
+      name: user?.name || '',
+      phone: user?.phone || '',
+      comment: ''
+    })
   }
 
   const handleCloseModal = () => setShowModal(false)

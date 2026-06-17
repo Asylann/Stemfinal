@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { createApplication } from '../../api/api'
 import { useCart } from '../../context/CartContext'
 import { useFavorites } from '../../context/FavoritesContext'
+import { useAuth } from '../../context/AuthContext'
 import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import './Lighting.css'
 
@@ -12,6 +13,7 @@ export default function Lighting() {
   const { products, loading } = useCategoryProducts('lighting')
   const { addToCart } = useCart()
   const { toggleFavorite, isFavorite } = useFavorites()
+  const { user } = useAuth()
   const [showModal, setShowModal] = useState(false)
   const [formData, setFormData] = useState({ name: '', phone: '', comment: '', productName: '' })
   const [submitting, setSubmitting] = useState(false)
@@ -21,7 +23,7 @@ export default function Lighting() {
   const handleOpenModal = (productName) => {
     setShowModal(true)
     setSubmitSuccess(false)
-    setFormData({ name: '', phone: '', comment: '', productName })
+    setFormData({ name: user?.name || '', phone: user?.phone || '', comment: '', productName })
   }
 
   const handleCloseModal = () => setShowModal(false)

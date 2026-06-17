@@ -23,22 +23,22 @@ oauth2 = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
 class RegisterData(BaseModel):
-    name: str
-    email: str
+    phone: str
     password: str
-    phone: Optional[str] = None
+    name: Optional[str] = None
+    email: Optional[str] = None
 
 
 class LoginData(BaseModel):
-    email: str
+    phone: str
     password: str
 
 
 class UserOut(BaseModel):
     id: int
-    name: str
-    email: str
-    phone: Optional[str] = None
+    name: Optional[str] = None
+    email: Optional[str] = None
+    phone: str
     is_admin: bool = False
 
     class Config:
@@ -81,7 +81,11 @@ def get_current_admin(current_user: User = Depends(get_current_user)) -> User:
 
 @router.post("/register")
 def register(data: RegisterData, db: Session = Depends(get_db)):
-    if db.query(User).filter(User.email == data.email).first():
+    # Check if phone already registered
+    if db.query(User).filter(User.phone == data.phone).first():
+        raise HTTPException(status_code=400, detail="Этот номер телефона уже зарегистрирован")
+    # Check if email already taken (if provided)
+    if data.email and db.query(User).filter(User.email == data.email).first():
         raise HTTPException(status_code=400, detail="Email уже зарегистрирован")
     user = User(
         name=data.name,
@@ -107,9 +111,9 @@ def register(data: RegisterData, db: Session = Depends(get_db)):
 
 @router.post("/login")
 def login(data: LoginData, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == data.email).first()
+    user = db.query(User).filter(User.phone == data.phone).first()
     if not user or not pwd.verify(data.password, user.password):
-        raise HTTPException(status_code=401, detail="Неверный email или пароль")
+        raise HTTPException(status_code=401, detail="Неверный номер телефона или пароль")
     return {
         "access_token": make_token(user.id),
         "token_type": "bearer",
