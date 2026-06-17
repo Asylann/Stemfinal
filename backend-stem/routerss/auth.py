@@ -1,4 +1,5 @@
 import os
+import re
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
@@ -20,6 +21,23 @@ EXPIRE_DAYS = 7
 
 pwd = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2 = OAuth2PasswordBearer(tokenUrl="/auth/login")
+
+
+def normalize_phone(phone: str) -> str:
+    """Normalize phone numbers so 87055381140 == +77055381140.
+    Kazakhstan: 8 is the national prefix, +7 is the international prefix.
+    Both refer to the same subscriber."""
+    if not phone:
+        return phone
+    digits = re.sub(r'\D', '', phone)
+    if len(digits) == 11 and digits.startswith('8'):
+        return '+7' + digits[1:]
+    if len(digits) == 11 and digits.startswith('7'):
+        return '+' + digits
+    if len(digits) == 10:
+        return '+7' + digits
+    # Return cleaned but preserve original format if unusual
+    return phone.strip()
 
 
 class RegisterData(BaseModel):
@@ -81,8 +99,9 @@ def get_current_admin(current_user: User = Depends(get_current_user)) -> User:
 
 @router.post("/register")
 def register(data: RegisterData, db: Session = Depends(get_db)):
+    phone = normalize_phone(data.phone)
     # Check if phone already registered
-    if db.query(User).filter(User.phone == data.phone).first():
+    if db.query(User).filter(User.phone == phone).first():
         raise HTTPException(status_code=400, detail="Этот номер телефона уже зарегистрирован")
     # Check if email already taken (if provided)
     if data.email and db.query(User).filter(User.email == data.email).first():
@@ -91,7 +110,7 @@ def register(data: RegisterData, db: Session = Depends(get_db)):
         name=data.name,
         email=data.email,
         password=pwd.hash(data.password),
-        phone=data.phone
+        phone=phone
     )
     db.add(user)
     db.commit()
@@ -111,7 +130,8 @@ def register(data: RegisterData, db: Session = Depends(get_db)):
 
 @router.post("/login")
 def login(data: LoginData, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.phone == data.phone).first()
+    phone = normalize_phone(data.phone)
+    user = db.query(User).filter(User.phone == phone).first()
     if not user or not pwd.verify(data.password, user.password):
         raise HTTPException(status_code=401, detail="Неверный номер телефона или пароль")
     return {
@@ -129,4 +149,26 @@ def login(data: LoginData, db: Session = Depends(get_db)):
 
 @router.get("/me", response_model=UserOut)
 def me(current_user: User = Depends(get_current_user)):
+    return current_user
+
+
+class UpdateUserData(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+
+
+@router.patch("/me", response_model=UserOut)
+def update_me(data: UpdateUserData, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Update the current user's profile (name, email)."""
+    if data.name is not None:
+        current_user.name = data.name.strip() or None
+    if data.email is not None:
+        email = data.email.strip() or None
+        if email:
+            existing = db.query(User).filter(User.email == email, User.id != current_user.id).first()
+            if existing:
+                raise HTTPException(status_code=400, detail="Email уже занят")
+        current_user.email = email
+    db.commit()
+    db.refresh(current_user)
     return current_user

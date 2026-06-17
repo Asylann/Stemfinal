@@ -128,18 +128,40 @@
   align-items: center;
   gap: 10px;
 }
+
+.topbar-profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #edf5f1;
+  border: 1px solid #c8e0d5;
+  border-radius: 20px;
+  padding: 4px 12px 4px 8px;
+  text-decoration: none;
+  color: #2d6a4f;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.topbar-profile-btn:hover {
+  background: #d5ece1;
+  border-color: #2d6a4f;
+}
+
+.topbar-profile-btn svg {
+  flex-shrink: 0;
+}
+
 .topbar-user-name {
   color: #2d6a4f;
   font-weight: 600;
-  font-size: 13px;
-  text-decoration: none;
-  max-width: 120px;
+  font-size: 12px;
+  max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-.topbar-user-name:hover {
-  text-decoration: underline;
 }
 .topbar-logout-btn {
   background: none;

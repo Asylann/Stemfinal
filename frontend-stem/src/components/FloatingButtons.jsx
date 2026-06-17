@@ -9,15 +9,21 @@ export default function FloatingButtons() {
   const inputRef = useRef(null)
   const messagesEndRef = useRef(null)
   const [chatInput, setChatInput] = useState('')
-  const [chatOpen, setChatOpen] = useState(false)
+  const [chatOpen, setChatOpen] = useState(() => {
+    return localStorage.getItem('stem_chat_open') === 'true'
+  })
   const [chatLoading, setChatLoading] = useState(false)
   const [chatError, setChatError] = useState('')
-  const [chatMessages, setChatMessages] = useState([
-    {
+  const [chatMessages, setChatMessages] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stem_chat_messages')
+      if (saved) return JSON.parse(saved)
+    } catch {}
+    return [{
       role: 'assistant',
       content: 'Здравствуйте. Я ИИ-помощник STEM Academia. Задайте вопрос о товарах, доставке, оплате или подборе решения.'
-    }
-  ])
+    }]
+  })
 
   const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
   const telegramLink = `https://t.me/${telegramUsername}`
@@ -41,13 +47,20 @@ export default function FloatingButtons() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chatMessages, chatOpen])
 
+  // Persist chat messages
+  useEffect(() => {
+    try { localStorage.setItem('stem_chat_messages', JSON.stringify(chatMessages)) } catch {}
+  }, [chatMessages])
+
   function openChat() {
     setChatOpen(true)
     setChatError('')
+    localStorage.setItem('stem_chat_open', 'true')
   }
 
   function closeChat() {
     setChatOpen(false)
+    localStorage.setItem('stem_chat_open', 'false')
   }
 
   async function handleSendMessage(event) {

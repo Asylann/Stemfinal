@@ -130,7 +130,7 @@ export async function chatWithGrok(message, messages = []) {
 
 export async function login(phone, password) {
   try {
-    const response = await apiClient.post('/auth/login', { phone, password })
+    const response = await apiClient.post('/auth/login', { phone: normalizePhone(phone), password })
     return response.data
   } catch (error) {
     const errorMessage = error.response?.data?.detail || error.response?.statusText
@@ -140,12 +140,26 @@ export async function login(phone, password) {
 
 export async function register(phone, password) {
   try {
-    const response = await apiClient.post('/auth/register', { phone, password })
+    const response = await apiClient.post('/auth/register', { phone: normalizePhone(phone), password })
     return response.data
   } catch (error) {
     const errorMessage = error.response?.data?.detail || error.response?.statusText
     throw new Error(errorMessage || 'Ошибка регистрации')
   }
+}
+
+export function normalizePhone(phone) {
+  if (!phone) return phone
+  const digits = phone.replace(/\D/g, '')
+  if (digits.length === 11 && digits.startsWith('8')) return '+7' + digits.slice(1)
+  if (digits.length === 11 && digits.startsWith('7')) return '+' + digits
+  if (digits.length === 10) return '+7' + digits
+  return phone.trim()
+}
+
+export async function updateUser(data) {
+  const response = await apiClient.patch('/auth/me', data)
+  return response.data
 }
 
 export async function getCurrentUser(token) {

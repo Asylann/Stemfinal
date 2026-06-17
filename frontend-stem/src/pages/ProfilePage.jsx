@@ -5,7 +5,6 @@ import { useFavorites } from '../context/FavoritesContext'
 import { useAuth } from '../context/AuthContext'
 import { getMyApplications } from '../api/api'
 import './ProfilePage.css'
-
 const STATUS_MAP = {
   new:           { label: 'Новая',       class: 'status--blue' },
   processing:    { label: 'В обработке', class: 'status--yellow' },
@@ -35,10 +34,13 @@ function formatDate(dateStr) {
 export default function ProfilePage() {
   const { cartItems } = useCart()
   const { favorites } = useFavorites()
-  const { user, isAuthenticated, logout, openModal } = useAuth()
+  const { user, isAuthenticated, logout, openModal, updateUser } = useAuth()
   const [activeTab, setActiveTab] = useState('orders')
   const [orders, setOrders] = useState([])
   const [loadingOrders, setLoadingOrders] = useState(false)
+  const [editingName, setEditingName] = useState(false)
+  const [nameInput, setNameInput] = useState('')
+  const [savingName, setSavingName] = useState(false)
 
   useEffect(() => {
     if (!isAuthenticated) return
@@ -48,6 +50,28 @@ export default function ProfilePage() {
       .catch(() => setOrders([]))
       .finally(() => setLoadingOrders(false))
   }, [isAuthenticated])
+
+  function handleStartEditName() {
+    setNameInput(user?.name || '')
+    setEditingName(true)
+  }
+
+  async function handleSaveName() {
+    setSavingName(true)
+    try {
+      await updateUser({ name: nameInput.trim() })
+      setEditingName(false)
+    } catch (e) {
+      // silently fail
+    } finally {
+      setSavingName(false)
+    }
+  }
+
+  function handleCancelEditName() {
+    setEditingName(false)
+    setNameInput('')
+  }
 
   // Not logged in — show auth prompt
   if (!isAuthenticated) {
@@ -70,7 +94,30 @@ export default function ProfilePage() {
       <div className="profile-header">
         <div className="profile-avatar">{(user?.name || user?.phone || '?')[0].toUpperCase()}</div>
         <div className="profile-header__info">
-          <h1 className="profile-header__name">{user?.name || 'Пользователь'}</h1>
+          {editingName ? (
+            <div className="profile-name-edit">
+              <input
+                type="text"
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                placeholder="Ваше имя"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSaveName()
+                  if (e.key === 'Escape') handleCancelEditName()
+                }}
+              />
+              <button className="profile-name-save" onClick={handleSaveName} disabled={savingName}>
+                {savingName ? '...' : '✓'}
+              </button>
+              <button className="profile-name-cancel" onClick={handleCancelEditName}>✕</button>
+            </div>
+          ) : (
+            <h1 className="profile-header__name">
+              {user?.name || 'Пользователь'}
+              <button className="profile-edit-icon" onClick={handleStartEditName} title="Изменить имя">✎</button>
+            </h1>
+          )}
           {user?.phone && <p className="profile-header__contact">📞 {user.phone}</p>}
           {user?.email && <p className="profile-header__contact">✉ {user.email}</p>}
         </div>

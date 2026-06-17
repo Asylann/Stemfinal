@@ -69,6 +69,76 @@
   font-weight: 800;
   color: #1a1a1a;
   margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-edit-icon {
+  background: none;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: color 0.2s;
+}
+
+.profile-edit-icon:hover {
+  color: #2d6a4f;
+}
+
+.profile-name-edit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.profile-name-edit input {
+  border: 2px solid #2d6a4f;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 16px;
+  font-weight: 600;
+  outline: none;
+  width: 200px;
+}
+
+.profile-name-save {
+  background: #2d6a4f;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-name-save:disabled { opacity: 0.5; }
+
+.profile-name-cancel {
+  background: none;
+  border: 1px solid #ccc;
+  color: #888;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-name-cancel:hover {
+  border-color: #e53e3e;
+  color: #e53e3e;
 }
 
 .profile-header__contact {

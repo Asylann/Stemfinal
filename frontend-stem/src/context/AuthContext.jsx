@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { useUserEmail } from './UserEmailContext'
-import { login as apiLogin, register as apiRegister, logout as apiLogout, getCurrentUser } from '../api/api'
+import { login as apiLogin, register as apiRegister, logout as apiLogout, getCurrentUser, updateUser as apiUpdateUser } from '../api/api'
 
 const AuthContext = createContext(null)
 
@@ -79,12 +79,19 @@ export function AuthProvider({ children }) {
   const openModal = () => setShowModal(true)
   const closeModal = () => setShowModal(false)
 
+  const updateUser = async (data) => {
+    const updated = await apiUpdateUser(data)
+    setUser(updated)
+    return updated
+  }
+
   return (
     <AuthContext.Provider value={{
       user,
       login,
       register,
       logout,
+      updateUser,
       showModal,
       openModal,
       closeModal,
