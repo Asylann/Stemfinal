@@ -1,3 +1,7 @@
+/* ═══════════════════════════════════════════════════════════════
+   Visualize Page — Category Browser + Product Selection
+   ═══════════════════════════════════════════════════════════════ */
+
 .viz-page {
   max-width: 1200px;
   margin: 0 auto;
@@ -18,6 +22,7 @@
 
 .viz-breadcrumb a:hover { color: #333; }
 
+/* ─── Header ──────────────────────────────────────────────── */
 
 .viz-header {
   margin-bottom: 32px;
@@ -51,6 +56,8 @@
   font-weight: 700;
   font-size: 16px;
 }
+
+/* ─── Auth Gate ───────────────────────────────────────────── */
 
 .viz-auth-gate {
   max-width: 500px;
@@ -100,6 +107,7 @@
   box-shadow: 0 6px 20px rgba(45, 106, 79, 0.35);
 }
 
+/* ─── Layout ──────────────────────────────────────────────── */
 
 .viz-layout {
   display: grid;
@@ -123,12 +131,7 @@
   margin: 0 0 16px;
 }
 
-.viz-section-hint {
-  font-size: 13px;
-  color: #888;
-  margin: -10px 0 12px;
-}
-
+/* ─── Dropzone ────────────────────────────────────────────── */
 
 .viz-dropzone {
   border: 2px dashed #d0e8dc;
@@ -208,35 +211,305 @@
 
 .viz-remove-btn:hover { background: rgba(0,0,0,0.75); }
 
+/* ─── Search Bar ──────────────────────────────────────────── */
 
-.viz-products-grid {
+.viz-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f5f7f6;
+  border: 1.5px solid #e0e8e4;
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  transition: border-color 0.2s;
+}
+
+.viz-search-bar:focus-within {
+  border-color: #2d6a4f;
+  background: #fff;
+}
+
+.viz-search-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.viz-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 14px;
+  color: #333;
+  min-width: 0;
+}
+
+.viz-search-input::placeholder {
+  color: #aaa;
+}
+
+.viz-search-clear {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.viz-search-clear:hover { color: #c53030; }
+
+.viz-selected-badge {
+  flex-shrink: 0;
+  background: #2d6a4f;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+/* ─── Selected Products Pills ─────────────────────────────── */
+
+.viz-selected-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  background: #f0fdf4;
+  border: 1px solid #d1fae5;
+  border-radius: 10px;
 }
 
-.viz-product-chip {
-  padding: 8px 14px;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 20px;
-  background: #fff;
-  font-size: 13px;
-  color: #555;
+.viz-selected-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #2d6a4f;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 8px 4px 10px;
+  border-radius: 14px;
+  white-space: nowrap;
+}
+
+.viz-selected-pill button {
+  background: rgba(255,255,255,0.3);
+  border: none;
+  color: #fff;
+  font-size: 10px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
   cursor: pointer;
-  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  transition: background 0.2s;
 }
 
-.viz-product-chip:hover {
+.viz-selected-pill button:hover {
+  background: rgba(255,255,255,0.5);
+}
+
+/* ─── Loading / Empty states ──────────────────────────────── */
+
+.viz-loading-products {
+  text-align: center;
+  padding: 24px;
+  color: #888;
+  font-size: 14px;
+}
+
+.viz-no-results {
+  text-align: center;
+  padding: 24px;
+  color: #888;
+  font-size: 14px;
+}
+
+/* ─── Categories Accordion ────────────────────────────────── */
+
+.viz-categories {
+  border: 1px solid #e8ece9;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.viz-category {
+  border-bottom: 1px solid #e8ece9;
+}
+
+.viz-category:last-child {
+  border-bottom: none;
+}
+
+.viz-category-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #fafbfa;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-align: left;
+}
+
+.viz-category-header:hover {
+  background: #f0f5f2;
+}
+
+.viz-category.expanded .viz-category-header {
+  background: #edf5f1;
+  border-bottom: 1px solid #e8ece9;
+}
+
+.viz-category-arrow {
+  font-size: 10px;
+  color: #888;
+  flex-shrink: 0;
+  width: 12px;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.viz-category-title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.viz-category-count {
+  flex-shrink: 0;
+  background: #e8ece9;
+  color: #555;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.viz-category.expanded .viz-category-count {
+  background: #2d6a4f;
+  color: #fff;
+}
+
+.viz-category-products {
+  padding: 8px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #fff;
+}
+
+/* ─── Product Card (inside category or search results) ───── */
+
+.viz-product-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1.5px solid #eee;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.18s;
+  text-align: left;
+  width: 100%;
+}
+
+.viz-product-card:hover {
   border-color: #2d6a4f;
-  color: #2d6a4f;
+  background: #f8fdfb;
 }
 
-.viz-product-chip.active {
+.viz-product-card.active {
+  border-color: #2d6a4f;
+  background: #edf8f2;
+}
+
+.viz-product-card-img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+  background: #f5f5f5;
+}
+
+.viz-product-card-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.viz-product-card-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1a1a1a;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viz-product-card-article {
+  font-size: 11px;
+  color: #999;
+}
+
+.viz-product-card-check {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: transparent;
+  transition: all 0.18s;
+}
+
+.viz-product-card.active .viz-product-card-check {
   background: #2d6a4f;
   border-color: #2d6a4f;
   color: #fff;
 }
 
+.viz-product-card.active .viz-product-card-check.checked {
+  background: #2d6a4f;
+  border-color: #2d6a4f;
+  color: #fff;
+}
+
+/* ─── Search Results (flat list) ──────────────────────────── */
+
+.viz-search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+/* ─── Generate Button ─────────────────────────────────────── */
 
 .viz-btn-generate {
   width: 100%;
@@ -276,13 +549,14 @@
   border: 2px solid rgba(255,255,255,0.3);
   border-top-color: #fff;
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: viz-spin 0.8s linear infinite;
 }
 
-@keyframes spin {
+@keyframes viz-spin {
   to { transform: rotate(360deg); }
 }
 
+/* ─── Error ───────────────────────────────────────────────── */
 
 .viz-error {
   background: #fff5f5;
@@ -308,6 +582,7 @@
   white-space: nowrap;
 }
 
+/* ─── Result Section ──────────────────────────────────────── */
 
 .viz-result-placeholder {
   text-align: center;
@@ -331,7 +606,6 @@
   color: #bbb;
 }
 
-
 .viz-generating-animation {
   margin: 0 auto 20px;
   width: 64px;
@@ -344,14 +618,15 @@
   border-radius: 50%;
   background: #2d6a4f;
   opacity: 0.6;
-  animation: pulse 1.2s ease-in-out infinite;
+  animation: viz-pulse 1.2s ease-in-out infinite;
 }
 
-@keyframes pulse {
+@keyframes viz-pulse {
   0%, 100% { transform: scale(0.8); opacity: 0.4; }
   50% { transform: scale(1.1); opacity: 0.8; }
 }
 
+/* ─── Compare View ────────────────────────────────────────── */
 
 .viz-compare {
   display: flex;
@@ -392,6 +667,7 @@
   flex-shrink: 0;
 }
 
+/* ─── Result Actions ──────────────────────────────────────── */
 
 .viz-result-actions {
   display: flex;
@@ -460,6 +736,7 @@
   background: #f0fdf4;
 }
 
+/* ─── Info Block ──────────────────────────────────────────── */
 
 .viz-info-block {
   display: grid;
@@ -487,6 +764,7 @@
   font-weight: 500;
 }
 
+/* ─── Responsive ──────────────────────────────────────────── */
 
 @media (max-width: 900px) {
   .viz-layout {
@@ -514,5 +792,13 @@
   .viz-info-block {
     grid-template-columns: repeat(2, 1fr);
     padding: 16px;
+  }
+
+  .viz-search-bar {
+    flex-wrap: wrap;
+  }
+
+  .viz-search-input {
+    min-width: 120px;
   }
 }

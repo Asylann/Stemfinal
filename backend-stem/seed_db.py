@@ -23,25 +23,32 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # 0. ADMIN USER
 # ─────────────────────────────────────────────────────────────────────────────
 ADMIN_EMAIL    = os.environ.get("ADMIN_EMAIL",    "")
+ADMIN_PHONE    = os.environ.get("ADMIN_PHONE",    "")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
 ADMIN_NAME     = os.environ.get("ADMIN_NAME",     "")
 
-existing_admin = db.query(User).filter(User.email == ADMIN_EMAIL).first()
+# Find existing admin by phone first, then fall back to email
+existing_admin = db.query(User).filter(User.phone == ADMIN_PHONE).first() if ADMIN_PHONE else None
+if not existing_admin:
+    existing_admin = db.query(User).filter(User.email == ADMIN_EMAIL).first()
 if not existing_admin:
     hashed = pwd_context.hash(ADMIN_PASSWORD)
     db.add(User(
         name=ADMIN_NAME,
         email=ADMIN_EMAIL,
+        phone=ADMIN_PHONE,
         password=hashed,
         is_admin=True,
     ))
     db.commit()
-    print(f"✅ Admin user created: {ADMIN_EMAIL}")
+    print(f"✅ Admin user created: {ADMIN_EMAIL} / {ADMIN_PHONE}")
 else:
     existing_admin.is_admin = True
     existing_admin.password = pwd_context.hash(ADMIN_PASSWORD)
+    if ADMIN_PHONE and (not existing_admin.phone or existing_admin.phone.startswith('unknown_')):
+        existing_admin.phone = ADMIN_PHONE
     db.commit()
-    print(f"✅ Admin user verified/updated: {ADMIN_EMAIL}")
+    print(f"✅ Admin user verified/updated: {ADMIN_EMAIL} / {existing_admin.phone}")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
