@@ -252,3 +252,33 @@ async def create_application(
     background_tasks.add_task(send_to_telegram, app_data, app_id)
 
     return {"status": "ok", "id": app_id}
+
+
+@router.get("/me")
+def get_my_applications(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Return the authenticated user's application/order history."""
+    apps = (
+        db.query(Application)
+        .filter(Application.user_id == current_user.id)
+        .order_by(Application.created_at.desc())
+        .all()
+    )
+    return [
+        {
+            "id": a.id,
+            "name": a.name,
+            "phone": a.phone,
+            "comment": a.comment,
+            "product_name": a.product_name,
+            "article": a.article,
+            "status": a.status,
+            "bitrix_stage_id": a.bitrix_stage_id,
+            "bitrix_stage_name": a.bitrix_stage_name,
+            "created_at": a.created_at,
+            "updated_at": a.updated_at,
+        }
+        for a in apps
+    ]

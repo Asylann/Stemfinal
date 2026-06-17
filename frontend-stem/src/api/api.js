@@ -166,6 +166,11 @@ export function logout() {
   localStorage.removeItem('stem_access_token')
 }
 
+export async function getMyApplications() {
+  const response = await apiClient.get('/api/applications/me')
+  return response.data
+}
+
 export async function sendContactMessage(data) {
   try {
     const response = await apiClient.post('/api/applications/contact', data)
