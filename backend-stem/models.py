@@ -68,6 +68,8 @@ class Application(Base):
     comment = Column(Text, nullable=True)
     
     bitrix_id = Column(Integer, nullable=True, index=True)
+    bitrix_stage_id = Column(String, nullable=True)  # raw Bitrix24 STAGE_ID
+    bitrix_stage_name = Column(String, nullable=True)  # human-readable stage name from Bitrix24
   
     product_name = Column(String, nullable=True)  
     article = Column(String, nullable=True)

@@ -389,28 +389,64 @@ function ProductsTab() {
   )
 }
 
-// ─── Applications Tab ─────────────────────────────────────────────────────────
+// ─── Status helpers ────────────────────────────────────────────────────────────────
+
+const STATUS_OPTIONS = [
+  { code: 'new',          label: 'Новая',          badgeClass: 'badge--blue',       bg: '#dbeafe', color: '#1d4ed8' },
+  { code: 'preparing',    label: 'Подготовка',     badgeClass: 'badge--yellow',     bg: '#fef3c7', color: '#92400e' },
+  { code: 'invoicing',    label: 'Счёт отправлен', badgeClass: 'badge--purple',     bg: '#ede9fe', color: '#5b21b6' },
+  { code: 'processing',   label: 'В работе',       badgeClass: 'badge--orange',     bg: '#ffedd5', color: '#9a3412' },
+  { code: 'final_invoice',label: 'Финальный счёт', badgeClass: 'badge--purple',     bg: '#ede9fe', color: '#5b21b6' },
+  { code: 'paid',         label: 'Оплачено',       badgeClass: 'badge--green',      bg: '#dcfce7', color: '#15803d' },
+  { code: 'completed',    label: 'Завершена',      badgeClass: 'badge--darkgreen',  bg: '#bbf7d0', color: '#14532d' },
+  { code: 'closed',       label: 'Закрыта',        badgeClass: 'badge--gray',       bg: '#f3f4f6', color: '#6b7280' },
+  { code: 'rejected',     label: 'Отклонено',      badgeClass: 'badge--red',        bg: '#fee2e2', color: '#b91c1c' },
+  { code: 'unknown',      label: 'Неизвестно',     badgeClass: 'badge--gray',       bg: '#f3f4f6', color: '#6b7280' },
+]
+
+function statusMeta(code) {
+  return STATUS_OPTIONS.find(s => s.code === code) ?? { code, label: code || 'Новая', badgeClass: 'badge--blue', bg: '#dbeafe', color: '#1d4ed8' }
+}
+
+// ─── Applications Tab ────────────────────────────────────────────────────────────
 
 function ApplicationsTab() {
   const [applications, setApplications] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [confirmDelete, setConfirmDelete] = useState(null)
+  const [refreshing, setRefreshing] = useState(false)
+  const [lastUpdated, setLastUpdated] = useState(null)
 
-  const load = useCallback(async () => {
-    setLoading(true)
+  // Load applications (auto-syncs Bitrix on backend)
+  const load = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true)
     setError('')
     try {
       const data = await adminGetApplications()
       setApplications(data)
+      setLastUpdated(new Date())
     } catch (err) {
-      setError(err.message)
+      if (!silent) setError(err.message)
     } finally {
-      setLoading(false)
+      if (!silent) setLoading(false)
     }
   }, [])
 
+  // Initial load
   useEffect(() => { load() }, [load])
+
+  // Auto-poll every 15 seconds (silent refresh — Bitrix syncs automatically)
+  useEffect(() => {
+    const interval = setInterval(() => load(true), 15000)
+    return () => clearInterval(interval)
+  }, [load])
+
+  async function handleRefresh() {
+    setRefreshing(true)
+    await load()
+    setRefreshing(false)
+  }
 
   async function handleDelete(id) {
     try {
@@ -425,9 +461,21 @@ function ApplicationsTab() {
   return (
     <>
       <div className="admin-section-header">
-        <h2 className="admin-section-title">Заявки ({applications.length})</h2>
-        <button className="admin-btn admin-btn--secondary" onClick={load}>
-          🔄 Обновить
+        <h2 className="admin-section-title">
+          Заявки ({applications.length})
+          {lastUpdated && (
+            <span style={{ fontSize: 11, color: '#aaa', fontWeight: 400, marginLeft: 12 }}>
+              Обновлено: {lastUpdated.toLocaleTimeString('ru-RU')}
+            </span>
+          )}
+        </h2>
+        <button
+          className="admin-btn admin-btn--primary"
+          onClick={handleRefresh}
+          disabled={refreshing}
+          title="Обновить данные и синхронизировать статусы из Bitrix24"
+        >
+          {refreshing ? '⏳ Обновление...' : '🔄 Обновить'}
         </button>
       </div>
 
@@ -449,35 +497,64 @@ function ApplicationsTab() {
                 <th>Товар</th>
                 <th>Комментарий</th>
                 <th>Статус</th>
+                <th>Bitrix</th>
+                <th>Менеджер</th>
                 <th>Действие</th>
               </tr>
             </thead>
             <tbody>
-              {applications.map((a) => (
-                <tr key={a.id}>
-                  <td>{a.id}</td>
-                  <td style={{ fontSize: 12, color: '#888', whiteSpace: 'nowrap' }}>
-                    {a.created_at || '—'}
-                  </td>
-                  <td style={{ fontWeight: 500 }}>{a.name}</td>
-                  <td style={{ fontSize: 12 }}>{a.phone}</td>
-                  <td style={{ maxWidth: 180, fontSize: 13 }}>{a.product_name || '—'}</td>
-                  <td style={{ maxWidth: 200, fontSize: 12, color: '#666' }}>
-                    {a.comment || '—'}
-                  </td>
-                  <td>
-                    <span className="badge badge--blue">{a.status || 'new'}</span>
-                  </td>
-                  <td>
-                    <button
-                      className="admin-btn admin-btn--danger admin-btn--sm"
-                      onClick={() => setConfirmDelete({ id: a.id, name: a.name })}
-                    >
-                      🗑️ Удалить
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {applications.map((a) => {
+                const meta = statusMeta(a.status)
+                return (
+                  <tr key={a.id}>
+                    <td>{a.id}</td>
+                    <td style={{ fontSize: 12, color: '#888', whiteSpace: 'nowrap' }}>
+                      {a.created_at || '—'}
+                    </td>
+                    <td style={{ fontWeight: 500 }}>{a.name}</td>
+                    <td style={{ fontSize: 12 }}>{a.phone}</td>
+                    <td style={{ maxWidth: 160, fontSize: 13 }}>{a.product_name || '—'}</td>
+                    <td style={{ maxWidth: 160, fontSize: 12, color: '#666' }}>
+                      {a.comment || '—'}
+                    </td>
+                    <td>
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          padding: '2px 10px',
+                          borderRadius: 20,
+                          fontSize: 11,
+                          fontWeight: 600,
+                          background: meta.bg,
+                          color: meta.color,
+                          position: 'static',
+                          textTransform: 'none',
+                        }}
+                      >
+                        {a.label_ru || meta.label}
+                      </span>
+                    </td>
+                    <td style={{ fontSize: 11, color: '#888' }}>
+                      {a.bitrix_id ? (
+                        <div>#{a.bitrix_id}</div>
+                      ) : (
+                        <span style={{ color: '#ccc' }}>—</span>
+                      )}
+                    </td>
+                    <td style={{ fontSize: 12 }}>
+                      {a.manager_name || <span style={{ color: '#ccc' }}>—</span>}
+                    </td>
+                    <td>
+                      <button
+                        className="admin-btn admin-btn--danger admin-btn--sm"
+                        onClick={() => setConfirmDelete({ id: a.id, name: a.name })}
+                      >
+                        🗑️ Удалить
+                      </button>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>

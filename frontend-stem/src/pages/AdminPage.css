@@ -235,44 +235,75 @@
   color: #1d4ed8;
 }
 
-/* ── Nested Orders (Users Tab) ───────────────────────────────────────────────── */
-.admin-table__row--expanded {
-  background: #f8f9fc;
+.badge--yellow {
+  background: #fef3c7;
+  color: #92400e;
 }
 
-.admin-table__nested td {
-  padding: 0 !important;
-  background: #fafbfe;
+.badge--orange {
+  background: #ffedd5;
+  color: #9a3412;
 }
 
-.admin-nested-orders {
-  padding: 20px 24px;
-  background: #f8f9fc;
-  border-top: 2px solid #e5e7eb;
+.badge--purple {
+  background: #ede9fe;
+  color: #5b21b6;
 }
 
-.admin-nested-orders__title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #1a1a2e;
-  margin-bottom: 12px;
+.badge--green {
+  background: #dcfce7;
+  color: #15803d;
 }
 
-.admin-table--nested {
-  font-size: 13px;
-  background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
+.badge--darkgreen {
+  background: #bbf7d0;
+  color: #14532d;
 }
 
-.admin-table--nested th {
+.badge--gray {
   background: #f3f4f6;
-  font-size: 12px;
-  padding: 10px 12px;
+  color: #6b7280;
 }
 
-.admin-table--nested td {
-  padding: 10px 12px !important;
+/* ── Status dropdown in applications table ────────────────────────────────────── */
+.admin-status-select {
+  padding: 4px 6px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  background: #fff;
+  cursor: pointer;
+  outline: none;
+  min-width: 110px;
+  transition: border-color 0.18s;
+}
+
+.admin-status-select:focus {
+  border-color: #1a1a2e;
+}
+
+.admin-status-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Sync result banner ──────────────────────────────────────────────────────── */
+.admin-sync-banner {
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  border-radius: 7px;
+  padding: 10px 16px;
+  font-size: 13px;
+  color: #14532d;
+  margin-bottom: 14px;
+}
+
+.admin-sync-banner--warn {
+  background: #fef3c7;
+  border-color: #fbbf24;
+  color: #92400e;
 }
 
 /* ── Modal overlay ───────────────────────────────────────────────────────────── */
@@ -439,6 +470,46 @@
   .admin-form__row {
     grid-template-columns: 1fr;
   }
+}
+
+/* ── Nested Orders (Users Tab) ───────────────────────────────────────────────── */
+.admin-table__row--expanded {
+  background: #f8f9fc;
+}
+
+.admin-table__nested td {
+  padding: 0 !important;
+  background: #fafbfe;
+}
+
+.admin-nested-orders {
+  padding: 20px 24px;
+  background: #f8f9fc;
+  border-top: 2px solid #e5e7eb;
+}
+
+.admin-nested-orders__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 12px;
+}
+
+.admin-table--nested {
+  font-size: 13px;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.admin-table--nested th {
+  background: #f3f4f6;
+  font-size: 12px;
+  padding: 10px 12px;
+}
+
+.admin-table--nested td {
+  padding: 10px 12px !important;
 }
 
 /* ── Image upload widget ─────────────────────────────────────────────────────── */
