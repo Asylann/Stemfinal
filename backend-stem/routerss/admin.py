@@ -135,8 +135,9 @@ def _application_out(a: Application) -> dict:
         "article": a.article,
         "product_url": a.product_url,
         "status": a.status,
-        "label_ru": STATUS_LABELS_RU.get(a.status or "new", "Новая"),
+        "label_ru": a.bitrix_stage_name or STATUS_LABELS_RU.get(a.status or "new", "Новая"),
         "bitrix_id": a.bitrix_id,
+        "bitrix_stage_name": a.bitrix_stage_name,
         "manager_id": a.manager_id,
         "manager_name": a.manager_name,
         "created_at": a.created_at,
@@ -289,26 +290,39 @@ async def admin_get_applications(
 _BITRIX_WEBHOOK_READ = os.getenv("BITRIX_WEBHOOK_URL_READ") or os.getenv("BITRIX_WEBHOOK_URL")
 
 _BITRIX_STAGE_MAP = {
-    # Default Bitrix24 system stages
-    "NEW":                  "new",
-    "PREPARATION":          "preparing",
+    # ── Their Bitrix24 pipeline (28 stages, sorted by SORT) ─────────────────
+    "UC_4PQZ76":    "new",         # 10 Заявка с сайта
+    "UC_3AWFVA":    "preparing",   # 20 Название
+    "5":            "new",         # 30 Новая заявка
+    "UC_NRSMGI":    "preparing",   # 40 Разработка дизайна
+    "NEW":          "invoicing",   # 50 Согласование коммерческого предложения
+    "UC_4MBDJM":    "processing",  # 60 Омаркет
+    "EXECUTING":    "processing",  # 70 Прямые договоры
+    "PREPARATION":  "processing",  # 80 Техническая спецификация
+    "UC_3JQFQN":    "processing",  # 90 ТС на проверку
+    "UC_E0IW0O":    "processing",  # 100 ТС готовые на выдачу
+    "4":            "completed",   # 110 1 Мониторинг
+    "UC_DVLQ0A":    "completed",   # 120 Мониторинг (планы)
+    "UC_0FXBOL":    "processing",  # 130 2 Регистрация проекта
+    "UC_2182MG":    "processing",  # 140 3 Обсуждение
+    "UC_KIQRUF":    "processing",  # 150 4 Прием заявок
+    "UC_XRXQRE":    "processing",  # 160 5 Рассмотрение заявок
+    "6":            "processing",  # 170 6 Обжалование 3 р.д.
+    "7":            "processing",  # 180 7 Рассмотрение жалобы 3 р.д.
+    "UC_H14MED":    "processing",  # 190 8 Аудит
+    "UC_IZXLGI":    "processing",  # 200 9 Ожидаем договор
+    "8":            "processing",  # 210 10 Согласование Договора
+    "FINAL_INVOICE":"final_invoice",# 220 11 Договор
+    "2":            "processing",  # 230 12 Реализация
+    "3":            "completed",   # 240 13 Закрытие договора/Контроль качества
+    "1":            "completed",   # 250 Обучение
+    "WON":          "completed",   # 260 Сделка успешна
+    "LOSE":         "rejected",    # 270 Сделка провалена
+    "9":            "rejected",    # 280 Нецелевая заявка
+    # Fallbacks
     "PREPAYMENT_INVOICING": "invoicing",
-    "EXECUTING":            "processing",
-    "FINAL_INVOICING":      "final_invoice",
     "PREPAID":              "paid",
-    "WON":                  "completed",
-    "LOSE":                 "rejected",
     "CLOSED":               "closed",
-    # Custom pipeline stages from their Bitrix24 instance
-    "UC_4PQZ76":           "new",          # Заявка с сайта
-    "UC_3AWFVA":           "preparing",    # Название
-    "5":                   "new",          # Новая заявка
-    "9":                   "rejected",     # Нецелевая заявка
-    "UC_IZXLGI":           "processing",   # Ожидаем договор
-    "8":                   "processing",   # Согласование Договора
-    "2":                   "processing",   # Реализация
-    "3":                   "completed",    # Закрытие договора/Контроль качества
-    "1":                   "completed",    # Обучение
 }
 
 
@@ -322,7 +336,7 @@ def _map_stage(stage_id: str) -> str:
 async def _sync_bitrix_statuses(db: Session) -> None:
     """
     Fetch current deal statuses from Bitrix24 for all applications with a bitrix_id
-    and update local DB rows. Silently skips on errors.
+    and update local DB rows. Also fetches human-readable stage names. Silently skips on errors.
     """
     if not _BITRIX_WEBHOOK_READ:
         return
@@ -332,6 +346,17 @@ async def _sync_bitrix_statuses(db: Session) -> None:
         return
 
     base_url = _BITRIX_WEBHOOK_READ.rstrip("/")
+
+    # Fetch stage name lookup from Bitrix24
+    stage_names = {}
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            resp = await client.post(f"{base_url}/crm.status.list", json={"filter": {"ENTITY_ID": "DEAL_STAGE"}})
+            resp.raise_for_status()
+            for item in resp.json().get("result", []):
+                stage_names[item["STATUS_ID"]] = item["NAME"]
+    except Exception:
+        pass  # fall back to empty stage_names
 
     async with httpx.AsyncClient(timeout=15) as client:
         for app in apps:
@@ -349,6 +374,7 @@ async def _sync_bitrix_statuses(db: Session) -> None:
 
                 app.status = new_status
                 app.bitrix_stage_id = stage_id
+                app.bitrix_stage_name = stage_names.get(stage_id, "")
                 if manager_name:
                     app.manager_name = manager_name
                 if manager_id_raw:
