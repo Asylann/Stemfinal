@@ -103,6 +103,7 @@ export default function Navbar() {
   const mainNav = [
     { label: t.nav_about,        path: '/about' },
     { label: t.nav_cooperation,  path: '/cooperation' },
+    { label: t.nav_works,        path: '/works' },
     { label: t.nav_instructions, path: '/instructions' },
     { label: t.nav_blog,         path: '/blog' },
     { label: t.nav_how_to_order, path: '/how-to-order' },
