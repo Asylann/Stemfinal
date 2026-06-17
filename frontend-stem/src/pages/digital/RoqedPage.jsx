@@ -14,7 +14,7 @@ export default function RoqedPage() {
         <div className="roqed-left">
           <div className="roqed-card">
             <div className="roqed-title-block">
-              <h1>ROQED SINCE</h1>
+              <h1>ROQED SCIENCE</h1>
               <p className="roqed-desc">
                 ROQED — глобальная EdTech-компания, которая создает захватывающую среду для увлекательного
                 преподавания физики, химии, биологии и наук о Земле на более чем 18 языках. Интерактивное,
