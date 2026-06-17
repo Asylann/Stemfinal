@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { apiClient } from '../api/api'
 import { useAuth } from '../context/AuthContext'
+import { useLang } from '../i18n/LanguageContext'
 import './VisualizePage.css'
 
 function toBase64(file) {
@@ -15,9 +16,11 @@ function toBase64(file) {
 
 export default function VisualizePage() {
   const { isAuthenticated, openModal } = useAuth()
+  const { lang } = useLang()
   const [preview, setPreview] = useState(null)
   const [file, setFile] = useState(null)
-  const [productOptions, setProductOptions] = useState([])
+  const [categories, setCategories] = useState([])
+  const [allProducts, setAllProducts] = useState([])
   const [selected, setSelected] = useState([])
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -26,6 +29,8 @@ export default function VisualizePage() {
   const [productsLoading, setProductsLoading] = useState(true)
   const [remaining, setRemaining] = useState(null)
   const [dailyLimit, setDailyLimit] = useState(2)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [expandedCats, setExpandedCats] = useState({})
 
   // Fetch remaining visualizations for today
   useEffect(() => {
@@ -38,28 +43,55 @@ export default function VisualizePage() {
       .catch(() => {})
   }, [isAuthenticated])
 
-  // Load real products from API
+  // Load categories and products
   useEffect(() => {
-    apiClient.get('/api/products')
-      .then(res => {
-        const products = (res.data || []).map(p => ({
+    Promise.all([
+      apiClient.get('/api/categories').then(res => res.data || []),
+      apiClient.get('/api/products').then(res => res.data || []),
+    ])
+      .then(([cats, prods]) => {
+        setCategories(cats)
+        setAllProducts(prods.map(p => ({
           id: p.id,
           label: p.title,
           article: p.article || '',
           img: p.img || '',
-        }))
-        setProductOptions(products)
+          category_slug: p.category_slug || '',
+          category_title: p.category?.title_ru || '',
+        })))
       })
       .catch(() => {
-        // Fallback if API fails
-        setProductOptions([
-          { id: 1, label: '🛋 Диван мягкий' },
-          { id: 2, label: '📚 Стеллаж деревянный' },
-          { id: 3, label: '💡 Освещение LED' },
-        ])
+        setCategories([])
+        setAllProducts([])
       })
       .finally(() => setProductsLoading(false))
   }, [])
+
+  // Group products by category
+  const productsByCategory = useMemo(() => {
+    const groups = {}
+    allProducts.forEach(p => {
+      const slug = p.category_slug || '_uncategorized'
+      if (!groups[slug]) groups[slug] = []
+      groups[slug].push(p)
+    })
+    return groups
+  }, [allProducts])
+
+  // Filter products by search query
+  const filteredProducts = useMemo(() => {
+    if (!searchQuery.trim()) return null // null = no filter
+    const q = searchQuery.toLowerCase()
+    return allProducts.filter(p =>
+      p.label.toLowerCase().includes(q) ||
+      p.article.toLowerCase().includes(q) ||
+      p.category_title.toLowerCase().includes(q)
+    )
+  }, [allProducts, searchQuery])
+
+  const toggleCategory = (slug) => {
+    setExpandedCats(prev => ({ ...prev, [slug]: !prev[slug] }))
+  }
 
   const handleFile = (e) => {
     const f = e.target.files[0]
@@ -92,11 +124,12 @@ export default function VisualizePage() {
     })
   }
 
+  const removeSelected = (id) => {
+    setSelected(prev => prev.filter(p => p.id !== id))
+  }
+
   const handleVisualize = async () => {
-    if (!isAuthenticated) {
-      openModal()
-      return
-    }
+    if (!isAuthenticated) { openModal(); return }
     if (!file) { setError('Загрузите фото помещения'); return }
     if (selected.length === 0) { setError('Выберите хотя бы один товар'); return }
 
@@ -106,20 +139,11 @@ export default function VisualizePage() {
 
     try {
       const imageBase64 = await toBase64(file)
-
-      // Build product descriptions for the AI prompt
       const productDescriptions = selected.map(s => {
         let desc = s.label
         if (s.article) desc += ` (${s.article})`
         return desc
       })
-
-      // Collect product image URLs for visual reference
-      const productImageUrls = selected
-        .map(s => s.img)
-        .filter(url => url && url.startsWith('http'))
-
-      // If product images are relative paths (e.g. /uploads/...), make them absolute
       const baseUrl = window.location.origin
       const absoluteUrls = selected
         .map(s => {
@@ -129,8 +153,6 @@ export default function VisualizePage() {
         })
         .filter(Boolean)
 
-      console.log('Sending product images:', absoluteUrls)
-
       const res = await apiClient.post('/api/ai/visualize', {
         image: imageBase64,
         products: productDescriptions,
@@ -138,18 +160,13 @@ export default function VisualizePage() {
       })
 
       const data = res.data
-
       if (data.success) {
         setResult(data.image)
         setRetryCount(0)
-        if (data.remaining !== undefined) {
-          setRemaining(data.remaining)
-        }
+        if (data.remaining !== undefined) setRemaining(data.remaining)
       } else {
         setError(data.error || 'Ошибка генерации')
-        if (data.error?.includes('загружается')) {
-          setRetryCount(prev => prev + 1)
-        }
+        if (data.error?.includes('загружается')) setRetryCount(prev => prev + 1)
       }
     } catch (err) {
       setError('Ошибка соединения с сервером: ' + (err.response?.data?.detail || err.message))
@@ -173,7 +190,30 @@ export default function VisualizePage() {
     setError(null)
   }
 
-  // Show auth gate if not logged in
+  // Build sorted category list: match categories from API, then uncategorized
+  const sortedCategories = useMemo(() => {
+    const apiSlugs = new Set(categories.map(c => c.slug))
+    const result = categories.map(c => ({
+      slug: c.slug,
+      title: lang === 'kz' ? c.title_kz : c.title_ru,
+      img: c.img,
+      path: c.path,
+      count: (productsByCategory[c.slug] || []).length,
+    }))
+    // Add uncategorized if exists
+    if (productsByCategory['_uncategorized']) {
+      result.push({
+        slug: '_uncategorized',
+        title: lang === 'kz' ? 'Басқа' : 'Другое',
+        img: null,
+        path: null,
+        count: productsByCategory['_uncategorized'].length,
+      })
+    }
+    return result.filter(c => c.count > 0)
+  }, [categories, productsByCategory, lang])
+
+  // Auth gate
   if (!isAuthenticated) {
     return (
       <div className="viz-page">
@@ -188,6 +228,8 @@ export default function VisualizePage() {
       </div>
     )
   }
+
+  const isSearching = filteredProducts !== null
 
   return (
     <div className="viz-page">
@@ -253,31 +295,122 @@ export default function VisualizePage() {
           {/* Выбор товаров */}
           <div className="viz-section">
             <h2>🛋 Шаг 2 — Выберите товары</h2>
-            <p className="viz-section-hint">Выбрано: {selected.length}</p>
+
+            {/* Search bar */}
+            <div className="viz-search-bar">
+              <span className="viz-search-icon">🔍</span>
+              <input
+                type="text"
+                placeholder="Поиск по названию, артикулу или категории..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="viz-search-input"
+              />
+              {searchQuery && (
+                <button className="viz-search-clear" onClick={() => setSearchQuery('')} type="button">✕</button>
+              )}
+              <span className="viz-selected-badge">{selected.length} выбрано</span>
+            </div>
+
+            {/* Selected products pills */}
+            {selected.length > 0 && (
+              <div className="viz-selected-list">
+                {selected.map(s => (
+                  <span key={s.id} className="viz-selected-pill">
+                    {s.label}
+                    <button type="button" onClick={() => removeSelected(s.id)}>✕</button>
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Product browser */}
             {productsLoading ? (
-              <div style={{ textAlign: 'center', padding: '20px', color: '#888' }}>⏳ Загрузка товаров...</div>
+              <div className="viz-loading-products">⏳ Загрузка товаров...</div>
+            ) : isSearching ? (
+              /* Search results - flat list */
+              <div className="viz-search-results">
+                {filteredProducts.length === 0 ? (
+                  <div className="viz-no-results">Ничего не найдено по запросу «{searchQuery}»</div>
+                ) : (
+                  filteredProducts.map((p) => {
+                    const isSelected = selected.some(s => s.id === p.id)
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        className={`viz-product-card ${isSelected ? 'active' : ''}`}
+                        onClick={() => toggleProduct(p)}
+                      >
+                        {p.img && (
+                          <img
+                            src={p.img}
+                            alt={p.label}
+                            className="viz-product-card-img"
+                            onError={e => { e.target.style.display = 'none' }}
+                          />
+                        )}
+                        <div className="viz-product-card-info">
+                          <span className="viz-product-card-title">{p.label}</span>
+                          {p.article && <span className="viz-product-card-article">Арт. {p.article}</span>}
+                        </div>
+                        <span className={`viz-product-card-check ${isSelected ? 'checked' : ''}`}>
+                          {isSelected ? '✓' : ''}
+                        </span>
+                      </button>
+                    )
+                  })
+                )}
+              </div>
             ) : (
-              <div className="viz-products-grid">
-                {productOptions.map((p) => {
-                  const isSelected = selected.some(s => s.id === p.id)
+              /* Category accordion */
+              <div className="viz-categories">
+                {sortedCategories.map((cat) => {
+                  const isExpanded = expandedCats[cat.slug]
+                  const products = productsByCategory[cat.slug] || []
                   return (
-                    <button
-                      key={p.id}
-                      type="button"
-                      className={`viz-product-chip ${isSelected ? 'active' : ''}`}
-                      onClick={() => toggleProduct(p)}
-                      title={p.article ? `Артикул: ${p.article}` : ''}
-                    >
-                      {p.img && (
-                        <img
-                          src={p.img}
-                          alt={p.label}
-                          style={{ width: 24, height: 24, objectFit: 'cover', borderRadius: 4, marginRight: 6 }}
-                          onError={e => { e.target.style.display = 'none' }}
-                        />
+                    <div key={cat.slug} className={`viz-category ${isExpanded ? 'expanded' : ''}`}>
+                      <button
+                        type="button"
+                        className="viz-category-header"
+                        onClick={() => toggleCategory(cat.slug)}
+                      >
+                        <span className="viz-category-arrow">{isExpanded ? '▼' : '▶'}</span>
+                        <span className="viz-category-title">{cat.title}</span>
+                        <span className="viz-category-count">{products.length}</span>
+                      </button>
+                      {isExpanded && (
+                        <div className="viz-category-products">
+                          {products.map((p) => {
+                            const isSelected = selected.some(s => s.id === p.id)
+                            return (
+                              <button
+                                key={p.id}
+                                type="button"
+                                className={`viz-product-card ${isSelected ? 'active' : ''}`}
+                                onClick={() => toggleProduct(p)}
+                              >
+                                {p.img && (
+                                  <img
+                                    src={p.img}
+                                    alt={p.label}
+                                    className="viz-product-card-img"
+                                    onError={e => { e.target.style.display = 'none' }}
+                                  />
+                                )}
+                                <div className="viz-product-card-info">
+                                  <span className="viz-product-card-title">{p.label}</span>
+                                  {p.article && <span className="viz-product-card-article">Арт. {p.article}</span>}
+                                </div>
+                                <span className={`viz-product-card-check ${isSelected ? 'checked' : ''}`}>
+                                  {isSelected ? '✓' : ''}
+                                </span>
+                              </button>
+                            )
+                          })}
+                        </div>
                       )}
-                      <span style={{ flex: 1, textAlign: 'left', fontSize: 13 }}>{p.label}</span>
-                    </button>
+                    </div>
                   )
                 })}
               </div>
