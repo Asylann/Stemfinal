@@ -1,19 +1,24 @@
 import os
 import re
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from typing import Optional, List, Dict, Tuple
 
 import httpx
 from dotenv import load_dotenv
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Depends
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Depends, Request
+from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel, field_validator, model_validator
 from sqlalchemy.orm import Session
 
 from database import get_db, SessionLocal
-from models import Application
+from models import Application, User
+from routerss.auth import get_current_user
 
 load_dotenv()
+
+# Astana, Kazakhstan timezone (UTC+5)
+ASTANA_TZ = timezone(timedelta(hours=5))
 
 router = APIRouter()
 
@@ -88,9 +93,25 @@ async def send_to_telegram(data: Dict, app_id: str) -> None:
     if not BOT_TOKEN or not GROUP_CHAT_ID:
         return
 
+    # Format timestamp in Astana time
+    now = datetime.now(ASTANA_TZ).strftime("%Y-%m-%d %H:%M")
+
+    # Format products list
+    products = data.get("products_list", [])
+    products_count = len(products) if products else 0
+    products_lines = []
+    for p in products:
+        parts = [f"• {p.get('name', 'Товар')}"]
+        if p.get('color'):    parts.append(f"Цвет: {p.get('color')}")
+        if p.get('article'):  parts.append(f"Арт: {p.get('article')}")
+        products_lines.append(" | ".join(parts))
+    products_text = "\n".join(products_lines) if products_lines else "—"
+
     text = (
         "📥 <b>Новая заявка с сайта</b>\n\n"
         f"🆔 <b>ID:</b> #{app_id}\n"
+        f"🕒 <b>Время:</b> {now}\n\n"
+        f"📦 <b>Товары ({products_count} шт.):</b>\n{products_text}\n\n"
         f"👤 <b>Имя:</b> {data.get('name')}\n"
         f"📞 <b>Телефон:</b> {data.get('phone')}\n"
         f"💬 <b>Комментарий:</b> {data.get('comment') or '—'}"
@@ -156,6 +177,7 @@ async def send_to_bitrix(data: Dict, db_id: int) -> None:
 @router.post("")
 @router.post("/")
 async def create_application(
+    request: Request,
     data: ApplicationCreate, 
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
@@ -173,12 +195,26 @@ async def create_application(
         "products_list": products_list,
     }
 
+    # Try to extract user_id from JWT token (optional — anonymous orders still work)
+    user_id = None
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        try:
+            from jose import jwt, JWTError
+            import os
+            token = auth_header.split(" ")[1]
+            payload = jwt.decode(token, os.getenv("SECRET_KEY"), algorithms=["HS256"])
+            user_id = int(payload.get("sub"))
+        except:
+            pass  # Invalid token — proceed as anonymous
+
     new_application = Application(
         name=app_data["name"],
         phone=app_data["phone"],
         comment=app_data["comment"],
         product_name=short_name,
-        status="new"
+        status="new",
+        user_id=user_id
     )
     db.add(new_application)
     db.commit()

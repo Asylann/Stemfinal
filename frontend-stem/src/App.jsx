@@ -5,6 +5,7 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import FloatingButtons from './components/FloatingButtons'
 import CartDrawer from './components/CartDrawer'
+import AuthModal from './components/AuthModal'
 
 
 import FirstPage from './pages/FirstPage'
@@ -88,6 +89,7 @@ export default function App() {
     <>
       {!isAdminRoute && <Navbar />}
       {!isAdminRoute && <CartDrawer />}
+      <AuthModal />
 
       <Routes>
         {/* Admin panel — own layout, no Navbar/Footer */}

@@ -36,6 +36,70 @@
   margin: 0;
 }
 
+.viz-counter {
+  margin-top: 12px;
+  padding: 10px 16px;
+  background: #f0fdf4;
+  border: 1px solid #d1fae5;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #2d6a4f;
+  display: inline-block;
+}
+
+.viz-counter strong {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.viz-auth-gate {
+  max-width: 500px;
+  margin: 120px auto;
+  text-align: center;
+  padding: 60px 40px;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.viz-auth-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.viz-auth-gate h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 12px;
+}
+
+.viz-auth-gate p {
+  font-size: 15px;
+  color: #666;
+  margin: 0 0 32px;
+  line-height: 1.5;
+}
+
+.viz-auth-btn {
+  padding: 14px 36px;
+  background: #2d6a4f;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.viz-auth-btn:hover {
+  background: #1b4332;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(45, 106, 79, 0.35);
+}
+
 
 .viz-layout {
   display: grid;

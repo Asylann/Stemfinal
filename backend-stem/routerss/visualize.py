@@ -13,11 +13,17 @@ import base64
 import json
 import os
 import time
+from datetime import date
 from io import BytesIO
 from pathlib import Path
 from dotenv import load_dotenv
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
+from sqlalchemy.orm import Session
 import httpx
+
+from database import get_db
+from models import User
+from routerss.auth import get_current_user
 
 load_dotenv()
 router = APIRouter()
@@ -408,11 +414,36 @@ async def _hf_fallback(prompt: str) -> bytes:
     return buffer.getvalue()
 
 
+DAILY_LIMIT = 2  # max visualizations per user per day
+
+
 @router.post("/visualize")
 @router.post("/visualize/")
-async def visualize_interior(request: Request):
-    if not REPLICATE_API_TOKEN and not HF_TOKEN:
-        raise HTTPException(status_code=500, detail="REPLICATE_API_TOKEN или HF_TOKEN не настроен")
+async def visualize_interior(
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if not REPLICATE_API_TOKEN and not OPENAI_API_KEY and not HF_TOKEN:
+        raise HTTPException(status_code=500, detail="AI provider not configured")
+
+    # ── Rate limiting ──
+    today_str = date.today().isoformat()
+    if current_user.last_visualize_date != today_str:
+        # New day — reset counter
+        current_user.daily_visualize_count = 0
+        current_user.last_visualize_date = today_str
+        db.commit()
+
+    if current_user.daily_visualize_count >= DAILY_LIMIT:
+        return {
+            "success": False,
+            "error": "Вы достигли лимита 2 визуализации в день. Попробуйте завтра.",
+            "remaining": 0,
+            "daily_limit": DAILY_LIMIT,
+        }
+
+    remaining = DAILY_LIMIT - current_user.daily_visualize_count
 
     try:
         body = await request.json()
@@ -489,27 +520,59 @@ async def visualize_interior(request: Request):
 
         # ── Return result ──
         if result_b64:
+            # Increment daily count
+            current_user.daily_visualize_count += 1
+            db.commit()
+            new_remaining = DAILY_LIMIT - current_user.daily_visualize_count
             return {
                 "success": True,
                 "image": f"data:image/png;base64,{result_b64}",
                 "prompt": prompt,
                 "provider": provider_used,
+                "remaining": new_remaining,
+                "daily_limit": DAILY_LIMIT,
             }
 
         # ── 3. HuggingFace fallback (free, no credits needed) ──
         if HF_TOKEN:
-            print("🤗 Using HuggingFace FLUX.1-schnell (free fallback)")
+            print("[FALLBACK] Using HuggingFace FLUX.1-schnell")
             img_bytes = await _hf_fallback(prompt)
             hf_b64 = base64.b64encode(img_bytes).decode("utf-8")
+            # Increment daily count
+            current_user.daily_visualize_count += 1
+            db.commit()
+            new_remaining = DAILY_LIMIT - current_user.daily_visualize_count
             return {
                 "success": True,
                 "image": f"data:image/png;base64,{hf_b64}",
                 "prompt": prompt,
                 "provider": "hf-flux-schnell",
+                "remaining": new_remaining,
+                "daily_limit": DAILY_LIMIT,
             }
 
         return {"success": False, "error": "Нет доступных AI провайдеров. Настройте OPENAI_API_KEY или добавьте кредит на https://replicate.com/account/billing"}
 
     except Exception as e:
-        print(f"❌ Visualize error: {e}")
+        print(f"Visualize error: {e}")
         return {"success": False, "error": f"Ошибка генерации: {e}"}
+
+
+@router.get("/visualize/status")
+@router.get("/visualize/status/")
+def visualize_status(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Return how many visualizations the user has remaining today."""
+    today_str = date.today().isoformat()
+    if current_user.last_visualize_date != today_str:
+        current_user.daily_visualize_count = 0
+        current_user.last_visualize_date = today_str
+        db.commit()
+    remaining = max(0, DAILY_LIMIT - current_user.daily_visualize_count)
+    return {
+        "remaining": remaining,
+        "used": current_user.daily_visualize_count,
+        "daily_limit": DAILY_LIMIT,
+    }

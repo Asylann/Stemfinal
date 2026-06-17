@@ -2,11 +2,13 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useFavorites } from '../context/FavoritesContext'
+import { useAuth } from '../context/AuthContext'
 import './ProfilePage.css'
 
 export default function ProfilePage() {
   const { cartItems } = useCart()
   const { favorites } = useFavorites()
+  const { user } = useAuth()
   const [activeTab, setActiveTab] = useState('cart')
 
   return (
@@ -15,8 +17,8 @@ export default function ProfilePage() {
       <div className="profile-header" style={{ justifyContent: 'flex-start', gap: '16px' }}>
         <div className="profile-avatar">★</div>
         <div className="profile-header__info">
-          <h1 className="profile-header__name">Мои товары</h1>
-          <p className="profile-header__email">Корзина и избранное</p>
+          <h1 className="profile-header__name">{user?.name || user?.phone || 'Мои товары'}</h1>
+          <p className="profile-header__email">{user?.phone ? `📞 ${user.phone}` : 'Корзина и избранное'}</p>
         </div>
       </div>
 

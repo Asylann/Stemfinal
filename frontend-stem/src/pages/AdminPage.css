@@ -235,6 +235,46 @@
   color: #1d4ed8;
 }
 
+/* ── Nested Orders (Users Tab) ───────────────────────────────────────────────── */
+.admin-table__row--expanded {
+  background: #f8f9fc;
+}
+
+.admin-table__nested td {
+  padding: 0 !important;
+  background: #fafbfe;
+}
+
+.admin-nested-orders {
+  padding: 20px 24px;
+  background: #f8f9fc;
+  border-top: 2px solid #e5e7eb;
+}
+
+.admin-nested-orders__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 12px;
+}
+
+.admin-table--nested {
+  font-size: 13px;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.admin-table--nested th {
+  background: #f3f4f6;
+  font-size: 12px;
+  padding: 10px 12px;
+}
+
+.admin-table--nested td {
+  padding: 10px 12px !important;
+}
+
 /* ── Modal overlay ───────────────────────────────────────────────────────────── */
 .admin-modal-overlay {
   position: fixed;

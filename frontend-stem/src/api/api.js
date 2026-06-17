@@ -128,19 +128,19 @@ export async function chatWithGrok(message, messages = []) {
 
 
 
-export async function login(email, password) {
+export async function login(phone, password) {
   try {
-    const response = await apiClient.post('/auth/login', { email, password })
+    const response = await apiClient.post('/auth/login', { phone, password })
     return response.data
   } catch (error) {
     const errorMessage = error.response?.data?.detail || error.response?.statusText
-    throw new Error(errorMessage || 'Неверный email или пароль')
+    throw new Error(errorMessage || 'Неверный номер телефона или пароль')
   }
 }
 
-export async function register(email, password, name, phone = '') {
+export async function register(phone, password) {
   try {
-    const response = await apiClient.post('/auth/register', { name, email, password, phone })
+    const response = await apiClient.post('/auth/register', { phone, password })
     return response.data
   } catch (error) {
     const errorMessage = error.response?.data?.detail || error.response?.statusText

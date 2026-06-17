@@ -28,6 +28,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import Application, BlogPost, Category, Product, User
 from routerss.auth import get_current_admin
+from sqlalchemy.orm import joinedload
 
 router = APIRouter()
 
@@ -127,12 +128,30 @@ def _application_out(a: Application) -> dict:
 
 
 def _user_out(u: User) -> dict:
+    apps = []
+    if u.applications:
+        apps = [
+            {
+                "id": a.id,
+                "name": a.name,
+                "phone": a.phone,
+                "product_name": a.product_name,
+                "article": a.article,
+                "comment": a.comment,
+                "status": a.status,
+                "created_at": a.created_at,
+            }
+            for a in u.applications
+        ]
     return {
         "id": u.id,
         "name": u.name,
         "email": u.email,
         "phone": u.phone,
         "is_admin": u.is_admin,
+        "daily_visualize_count": u.daily_visualize_count or 0,
+        "last_visualize_date": u.last_visualize_date,
+        "applications": apps,
     }
 
 
@@ -285,7 +304,12 @@ def admin_get_users(
     db: Session = Depends(get_db),
     _admin: User = Depends(get_current_admin),
 ):
-    return [_user_out(u) for u in db.query(User).all()]
+    users = (
+        db.query(User)
+        .options(joinedload(User.applications))
+        .all()
+    )
+    return [_user_out(u) for u in users]
 
 
 # ─── Blog Posts ───────────────────────────────────────────────────────────────

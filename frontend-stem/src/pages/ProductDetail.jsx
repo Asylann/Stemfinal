@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useLang } from '../i18n/LanguageContext'
 import { useCart } from '../context/CartContext'
 import { useFavorites } from '../context/FavoritesContext'
+import { useAuth } from '../context/AuthContext'
 import { createApplication, apiClient } from '../api/api'
 import './ProductDetail.css'
 
@@ -24,6 +25,7 @@ export default function ProductDetail() {
   const { id } = useParams()
   const { t } = useLang()
   const { addToCart } = useCart()
+  const { user } = useAuth()
   const { toggleFavorite, isFavorite } = useFavorites()
   
   const [product, setProduct] = useState(null)
@@ -68,7 +70,7 @@ export default function ProductDetail() {
   const handleOpenModal = () => {
     setShowModal(true)
     setSubmitSuccess(false)
-    setFormData({ name: '', phone: '', comment: '' })
+    setFormData({ name: user?.name || '', phone: user?.phone || '', comment: '' })
   }
 
   const handleCloseModal = () => setShowModal(false)

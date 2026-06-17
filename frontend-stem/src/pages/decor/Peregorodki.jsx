@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { createApplication } from '../../api/api'
 import { useCart } from '../../context/CartContext'
 import { useFavorites } from '../../context/FavoritesContext'
+import { useAuth } from '../../context/AuthContext'
 import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import './Peregorodki.css'
 
@@ -28,6 +29,7 @@ export default function Peregorodki() {
   const { products, loading } = useCategoryProducts('peregorodki')
   const { addToCart } = useCart()
   const { toggleFavorite, isFavorite } = useFavorites()
+  const { user } = useAuth()
   const [showModal, setShowModal] = useState(false)
   const [formData, setFormData] = useState({ name: '', phone: '', comment: '', productName: '', article: '' })
   const [submitting, setSubmitting] = useState(false)
@@ -38,7 +40,7 @@ export default function Peregorodki() {
   const handleOpenModal = (product) => {
     setShowModal(true)
     setSubmitSuccess(false)
-    setFormData({ name: '', phone: '', comment: '', productName: product.title, article: product.article })
+    setFormData({ name: user?.name || '', phone: user?.phone || '', comment: '', productName: product.title, article: product.article })
   }
 
   const handleCloseModal = () => setShowModal(false)

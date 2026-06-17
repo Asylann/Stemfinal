@@ -1,8 +1,15 @@
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 from sqlalchemy import Column, Integer, String, Text, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from database import Base
+
+# Astana, Kazakhstan timezone (UTC+5)
+ASTANA_TZ = timezone(timedelta(hours=5))
+
+def astana_now_str():
+    """Return current Astana time as formatted string."""
+    return datetime.now(ASTANA_TZ).strftime("%Y-%m-%d %H:%M:%S")
 
 
 class Category(Base):
@@ -70,19 +77,29 @@ class Application(Base):
     status = Column(String, default="new")
     manager_id = Column(Integer, nullable=True)
     manager_name = Column(String, nullable=True)
-    created_at = Column(String, default=lambda: datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    updated_at = Column(String, default=lambda: datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    created_at = Column(String, default=astana_now_str)
+    updated_at = Column(String, default=astana_now_str)
+
+    # Link to authenticated user (nullable — anonymous orders still work)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    user = relationship("User", back_populates="applications")
 
 
 class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    email = Column(String, unique=True, index=True, nullable=False)
+    name = Column(String, nullable=True)
+    email = Column(String, unique=True, index=True, nullable=True)
     password = Column(String, nullable=False)
-    phone = Column(String, nullable=True)
+    phone = Column(String, unique=True, index=True, nullable=False)
     is_admin = Column(Boolean, default=False, nullable=False, server_default="false")
+
+    # AI visualize rate-limiting
+    daily_visualize_count = Column(Integer, default=0, nullable=False, server_default="0")
+    last_visualize_date = Column(String, nullable=True)  # "YYYY-MM-DD"
+
+    applications = relationship("Application", back_populates="user")
 
 
 class BlogPost(Base):
@@ -96,4 +113,4 @@ class BlogPost(Base):
     img = Column(String, nullable=True)
     category = Column(String, nullable=True)      # e.g. "Мебель", "Оборудование"
     published = Column(Boolean, default=True)
-    created_at = Column(String, default=lambda: datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    created_at = Column(String, default=astana_now_str)
