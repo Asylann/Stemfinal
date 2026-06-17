@@ -105,31 +105,56 @@ async def send_to_telegram(data: Dict, app_id: str) -> None:
             print(f"✅ Telegram: Заявка #{app_id} успешно отправлена")
 
 
+# ─── Bitrix24 deal stage mapping ─────────────────────────────────────────────────
+# When creating a deal via REST API, Bitrix24 accepts STAGE_ID to set initial stage.
+# Our internal status  →  Bitrix24 STAGE_ID
+LOCAL_TO_BITRIX_STAGE = {
+    "new":        "NEW",
+    "preparing":  "PREPARATION",
+    "invoicing":  "PREPAYMENT_INVOICING",
+    "processing": "EXECUTING",
+    "paid":       "PREPAID",
+    "completed":  "WON",
+    "closed":     "CLOSED",
+}
+
+# Bitrix24 STAGE_ID  →  our internal status  (reverse map)
+BITRIX_TO_LOCAL_STATUS = {v: k for k, v in LOCAL_TO_BITRIX_STAGE.items()}
+
+
 async def send_to_bitrix(data: Dict, db_id: int) -> None:
+    """
+    Create a deal in Bitrix24 CRM and persist the returned deal ID + stage
+    back to the local Application row.
+    """
     if not BITRIX_WEBHOOK_URL:
         return
 
     url = f"{BITRIX_WEBHOOK_URL.rstrip('/')}/crm.deal.add"
-    
+
     products = data.get("products_list", [])
     product_lines = []
     for p in products:
         parts = [f"• {p.get('name', 'Товар')}"]
-        if p.get('color'):    parts.append(f"Цвет: {p.get('color')}")
-        if p.get('article'):  parts.append(f"Арт: {p.get('article')}")
+        if p.get('color'):   parts.append(f"Цвет: {p.get('color')}")
+        if p.get('article'): parts.append(f"Арт: {p.get('article')}")
         product_lines.append(" | ".join(parts))
-    
+
     product_details = "\n".join(product_lines)
+
+    # Determine initial Bitrix stage from local status (default: NEW)
+    local_status = data.get("status", "new")
+    initial_stage = LOCAL_TO_BITRIX_STAGE.get(local_status, "NEW")
 
     payload = {
         "fields": {
-            "TITLE": f"Заявка с сайта: {data.get('name', 'Клиент')}",
-            "NAME": data.get("name"),
-            "PHONE": [{"VALUE": data.get("phone"), "VALUE_TYPE": "WORK"}],
-            "COMMENTS": f"📦 Товары:\n{product_details}\n\n💬 Комментарий: {data.get('comment') or '—'}",
+            "TITLE":     f"Заявка с сайта: {data.get('name', 'Клиент')}",
+            "NAME":      data.get("name"),
+            "PHONE":     [{"VALUE": data.get("phone"), "VALUE_TYPE": "WORK"}],
+            "COMMENTS":  f"📦 Товары:\n{product_details}\n\n💬 Комментарий: {data.get('comment') or '—'}",
             "SOURCE_ID": "WEB",
-            "STATUS_ID": "NEW",
-            "OPENED": "Y",
+            "STAGE_ID":  initial_stage,
+            "OPENED":    "Y",
         }
     }
 
@@ -139,13 +164,15 @@ async def send_to_bitrix(data: Dict, db_id: int) -> None:
             response.raise_for_status()
             result = response.json()
             bitrix_id = result.get("result")
-            
+
             if bitrix_id:
                 print(f"✅ Битрикс24: Сделка #{bitrix_id} создана для заявки DB ID {db_id}")
                 with SessionLocal() as db:
                     app = db.query(Application).filter(Application.id == db_id).first()
                     if app:
                         app.bitrix_id = bitrix_id
+                        app.bitrix_stage_id = initial_stage
+                        app.status = local_status
                         db.commit()
             else:
                 print(f"❌ Битрикс24 ошибка: {result}")

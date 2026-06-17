@@ -146,6 +146,43 @@ export function adminDeleteApplication(id) {
   return adminFetch(`/admin/applications/${id}`, { method: 'DELETE' })
 }
 
+/**
+ * Update application status and/or manager.
+ * @param {number} id - Application ID
+ * @param {object} data - { status, manager_name, manager_id }
+ */
+export function adminUpdateApplicationStatus(id, data) {
+  return adminFetch(`/admin/applications/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}
+
+// ── Bitrix24 Sync ──────────────────────────────────────────────────────────────
+
+/**
+ * Fetch the current Bitrix24 deal status for a single application.
+ * Returns { id, status, bitrix_id, bitrix_stage_id, label_ru, manager_name }
+ */
+export function adminGetBitrixStatus(appId) {
+  return adminFetch(`/admin/applications/${appId}/bitrix-status`)
+}
+
+/**
+ * Bulk sync all applications with bitrix_id from Bitrix24.
+ * Returns { synced, errors, total, results[] }
+ */
+export function adminSyncBitrix() {
+  return adminFetch('/admin/bitrix/sync', { method: 'POST' })
+}
+
+/**
+ * Get the list of all valid status codes and their Russian labels.
+ */
+export function adminGetStatusLabels() {
+  return adminFetch('/admin/bitrix/statuses')
+}
+
 // ── Users ─────────────────────────────────────────────────────────────────────
 
 export function adminGetUsers() {

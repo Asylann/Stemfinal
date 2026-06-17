@@ -21,6 +21,7 @@ import re
 import os
 from typing import Optional
 
+import httpx
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -108,6 +109,20 @@ def _category_out(c: Category) -> dict:
     }
 
 
+# ─── Application status labels (fallback for apps without Bitrix) ────────────────
+STATUS_LABELS_RU = {
+    "new":          "Новая",
+    "preparing":    "Подготовка",
+    "invoicing":    "Счёт отправлен",
+    "processing":   "В работе",
+    "final_invoice":"Финальный счёт",
+    "paid":         "Оплачено",
+    "completed":    "Завершена",
+    "closed":       "Закрыта",
+    "unknown":      "Неизвестно",
+}
+
+
 def _application_out(a: Application) -> dict:
     return {
         "id": a.id,
@@ -119,6 +134,8 @@ def _application_out(a: Application) -> dict:
         "article": a.article,
         "product_url": a.product_url,
         "status": a.status,
+        "label_ru": STATUS_LABELS_RU.get(a.status or "new", "Новая"),
+        "bitrix_id": a.bitrix_id,
         "manager_id": a.manager_id,
         "manager_name": a.manager_name,
         "created_at": a.created_at,
@@ -257,11 +274,127 @@ def admin_delete_category(
 # ─── Applications (Orders from customers) ─────────────────────────────────────
 
 @router.get("/applications")
-def admin_get_applications(
+async def admin_get_applications(
     db: Session = Depends(get_db),
     _admin: User = Depends(get_current_admin),
 ):
+    # Auto-sync Bitrix statuses before returning
+    await _sync_bitrix_statuses(db)
     return [_application_out(a) for a in db.query(Application).order_by(Application.id.desc()).all()]
+
+
+# ─── Bitrix auto-sync helper ──────────────────────────────────────────────────
+
+_BITRIX_WEBHOOK_READ = os.getenv("BITRIX_WEBHOOK_URL_READ") or os.getenv("BITRIX_WEBHOOK_URL")
+
+_BITRIX_STAGE_MAP = {
+    "NEW":                  "new",
+    "PREPARATION":          "preparing",
+    "PREPAYMENT_INVOICING": "invoicing",
+    "EXECUTING":            "processing",
+    "FINAL_INVOICING":      "final_invoice",
+    "PREPAID":              "paid",
+    "WON":                  "completed",
+    "CLOSED":               "closed",
+}
+
+
+def _map_stage(stage_id: str) -> str:
+    if not stage_id:
+        return "unknown"
+    clean = stage_id.split(":")[-1] if ":" in stage_id else stage_id
+    return _BITRIX_STAGE_MAP.get(clean, "unknown")
+
+
+async def _sync_bitrix_statuses(db: Session) -> None:
+    """
+    Fetch current deal statuses from Bitrix24 for all applications with a bitrix_id
+    and update local DB rows. Silently skips on errors.
+    """
+    if not _BITRIX_WEBHOOK_READ:
+        return
+
+    apps = db.query(Application).filter(Application.bitrix_id.isnot(None)).all()
+    if not apps:
+        return
+
+    base_url = _BITRIX_WEBHOOK_READ.rstrip("/")
+
+    async with httpx.AsyncClient(timeout=15) as client:
+        for app in apps:
+            try:
+                resp = await client.post(f"{base_url}/crm.deal.get", json={"id": app.bitrix_id})
+                resp.raise_for_status()
+                deal = resp.json().get("result", {})
+                if not deal:
+                    continue
+
+                stage_id = deal.get("STAGE_ID", "")
+                new_status = _map_stage(stage_id)
+                manager_name = deal.get("ASSIGNED_BY_NAME") or deal.get("CREATED_BY_NAME")
+                manager_id_raw = deal.get("ASSIGNED_BY_ID") or deal.get("CREATED_BY_ID")
+
+                app.status = new_status
+                app.bitrix_stage_id = stage_id
+                if manager_name:
+                    app.manager_name = manager_name
+                if manager_id_raw:
+                    try:
+                        app.manager_id = int(manager_id_raw)
+                    except (ValueError, TypeError):
+                        pass
+
+                from datetime import datetime
+                app.updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            except Exception:
+                continue  # skip individual errors
+
+    db.commit()
+
+
+class ApplicationUpdate(BaseModel):
+    status: Optional[str] = None
+    manager_name: Optional[str] = None
+    manager_id: Optional[int] = None
+
+
+VALID_STATUSES = {"new", "preparing", "invoicing", "processing", "final_invoice", "paid", "completed", "closed"}
+
+
+@router.put("/applications/{application_id}")
+def admin_update_application(
+    application_id: int,
+    data: ApplicationUpdate,
+    db: Session = Depends(get_db),
+    _admin: User = Depends(get_current_admin),
+):
+    """
+    Update an application's status and/or manager.
+    Valid statuses: new, preparing, invoicing, processing, final_invoice, paid, completed, closed.
+    """
+    application = db.query(Application).filter(Application.id == application_id).first()
+    if not application:
+        raise HTTPException(status_code=404, detail="Заявка не найдена")
+
+    if data.status is not None:
+        if data.status not in VALID_STATUSES:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Недопустимый статус '{data.status}'. Допустимые: {', '.join(sorted(VALID_STATUSES))}"
+            )
+        application.status = data.status
+
+    if data.manager_name is not None:
+        application.manager_name = data.manager_name
+    if data.manager_id is not None:
+        application.manager_id = data.manager_id
+
+    from datetime import datetime
+    application.updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    db.commit()
+    db.refresh(application)
+    return _application_out(application)
 
 
 @router.delete("/applications/{application_id}", status_code=204)
