@@ -25,7 +25,7 @@ export default function BlogPostDetail() {
   if (loading) {
     return (
       <div className="info-page" style={{ textAlign: 'center', padding: '80px 20px', color: '#888' }}>
-        ⏳ Загрузка...
+        Загрузка...
       </div>
     )
   }

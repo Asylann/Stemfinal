@@ -1,11 +1,12 @@
 import { Link, useParams } from 'react-router-dom'
 import { useLang } from '../i18n/LanguageContext'
+import Icon from '../components/Icons'
 import './InfoPage.css'
 
 const INSTRUCTIONS = [
   {
     slug: 'furniture-selection',
-    icon: '📋',
+    icon: 'ClipboardList',
     title: 'Руководство по выбору мебели для учебных кабинетов',
     desc: 'Как правильно подобрать мебель с учётом возраста учеников, площади помещения и норм СанПиН',
     tag: 'Мебель',
@@ -19,7 +20,7 @@ const INSTRUCTIONS = [
   },
   {
     slug: 'interactive-panels',
-    icon: '🖥️',
+    icon: 'Monitor',
     title: 'Подключение и настройка интерактивных панелей',
     desc: 'Пошаговая инструкция по установке интерактивной панели, подключению компьютера и настройке ПО',
     tag: 'Электроника',
@@ -33,7 +34,7 @@ const INSTRUCTIONS = [
   },
   {
     slug: 'stem-lab-setup',
-    icon: '🧪',
+    icon: 'FlaskConical',
     title: 'Оснащение STEM-лаборатории с нуля',
     desc: 'Полный гайд по комплектации STEM-лаборатории: мебель, оборудование, программное обеспечение',
     tag: 'Оборудование',
@@ -48,7 +49,7 @@ const INSTRUCTIONS = [
   },
   {
     slug: 'furniture-assembly',
-    icon: '🔧',
+    icon: 'Wrench',
     title: 'Сборка и монтаж учебной мебели',
     desc: 'Инструкции по самостоятельной сборке столов, стульев, стеллажей и другой мебели STEM Academia',
     tag: 'Мебель',
@@ -63,7 +64,7 @@ const INSTRUCTIONS = [
   },
   {
     slug: 'roqed-science',
-    icon: '💻',
+    icon: 'Laptop',
     title: 'Работа с программой Roqed Science',
     desc: 'Руководство пользователя для учителей: как создавать уроки, назначать задания и отслеживать прогресс',
     tag: 'Цифровые продукты',
@@ -77,7 +78,7 @@ const INSTRUCTIONS = [
   },
   {
     slug: 'classroom-layout',
-    icon: '📐',
+    icon: 'Ruler',
     title: 'Планировка учебного кабинета',
     desc: 'Принципы эргономичного расположения мебели в учебном пространстве, требования к освещению',
     tag: 'Дизайн',
@@ -91,7 +92,7 @@ const INSTRUCTIONS = [
   },
   {
     slug: '3d-printer',
-    icon: '🖨️',
+    icon: 'Printer',
     title: 'Запуск и обслуживание 3D-принтера',
     desc: 'Первый запуск, калибровка, замена нити, решение типичных проблем при печати',
     tag: 'Оборудование',
@@ -105,7 +106,7 @@ const INSTRUCTIONS = [
   },
   {
     slug: 'info-kiosk',
-    icon: '📺',
+    icon: 'Tv',
     title: 'Использование информационного киоска',
     desc: 'Администрирование, загрузка контента, обновление ПО и техническое обслуживание инфокиосков',
     tag: 'Электроника',
@@ -119,7 +120,7 @@ const INSTRUCTIONS = [
   },
   {
     slug: 'standards',
-    icon: '🏫',
+    icon: 'School',
     title: 'Нормы и стандарты для учебных помещений',
     desc: 'Требования СанПиН, ГОСТ и образовательных стандартов к учебным помещениям и оборудованию',
     tag: 'Нормативы',
@@ -202,14 +203,17 @@ export default function InstructionsPage() {
         <section className="info-section">
           <h2>Все материалы</h2>
           <div className="instructions-grid">
-            {INSTRUCTIONS.map((instr) => (
+            {INSTRUCTIONS.map((instr) => {
+              const IconComp = Icon[instr.icon]
+              return (
               <Link key={instr.slug} to={`/instructions/${instr.slug}`} className="instruction-card">
-                <div className="instruction-card__icon">{instr.icon}</div>
+                <div className="instruction-card__icon">{IconComp && <IconComp width="32" height="32" />}</div>
                 <div className="instruction-card__title">{instr.title}</div>
                 <p className="instruction-card__desc">{instr.desc}</p>
                 <span className="instruction-tag">{instr.tag}</span>
               </Link>
-            ))}
+              )
+            })}
           </div>
         </section>
 

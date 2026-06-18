@@ -5,6 +5,7 @@ import { useFavorites } from '../context/FavoritesContext'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { apiClient } from '../api/api'
+import Icon from './Icons'
 import './ProductList.css'
 
 function ApplicationModal({ product, onClose }) {
@@ -127,10 +128,10 @@ function ApplicationModal({ product, onClose }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose} type="button">×</button>
+        <button className="modal-close" onClick={onClose} type="button"><Icon.X width="16" height="16" /></button>
         {sent ? (
           <div className="modal-success">
-            <strong>✅ Заявка отправлена!</strong> Менеджер свяжется с вами в ближайшее время.
+            <strong><Icon.CheckCircle width="16" height="16" style={{display:'inline'}} /> Заявка отправлена!</strong> Менеджер свяжется с вами в ближайшее время.
           </div>
         ) : (
           <>
@@ -345,14 +346,14 @@ function ProductCard({ product }) {
               disabled={addedToCart || product.in_stock === false}
               type="button"
             >
-              {addedToCart ? '✓ Добавлено!' : '🛒 В корзину'}
+              {addedToCart ? <><Icon.Check width="14" height="14" /> Добавлено!</> : <><Icon.ShoppingCart width="16" height="16" /> В корзину</>}
             </button>
             <button
               className={`btn-favorite ${inFavorite ? 'active' : ''}`}
               onClick={() => toggleFavorite(product)}
               type="button"
             >
-              ❤ {inFavorite ? 'В избранном' : 'В избранное'}
+              <Icon.Heart width="16" height="16" /> {inFavorite ? 'В избранном' : 'В избранное'}
             </button>
           </div>
 
@@ -361,7 +362,7 @@ function ProductCard({ product }) {
             onClick={handleOrderClick}
             type="button"
           >
-            📝 Оставить заявку
+            <Icon.FileText width="16" height="16" /> Оставить заявку
           </button>
         </div>
       </div>
@@ -396,7 +397,7 @@ export default function ProductList({ products, title, backPath, backLabel }) {
     return (
       <div className="divany-page">
         <div className="empty-state">
-          <h2>😕 Товары не найдены</h2>
+          <h2>Товары не найдены</h2>
           <Link to={backPath || '/'} className="btn-back">
             ← Вернуться назад
           </Link>

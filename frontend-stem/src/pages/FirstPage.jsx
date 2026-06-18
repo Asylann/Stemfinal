@@ -3,14 +3,15 @@ import './FirstPage.css'
 import HeroSlider from '../components/HeroSlider'
 import CategoryGrid from '../components/CategoryGrid'
 import { useLang } from '../i18n/LanguageContext'
+import Icon from '../components/Icons'
 
 const ADVANTAGES = [
-  { icon: '🏭', key: 'adv_1' },
-  { icon: '✅', key: 'adv_2' },
-  { icon: '📦', key: 'adv_3' },
-  { icon: '🚚', key: 'adv_4' },
-  { icon: '🛡️', key: 'adv_5' },
-  { icon: '🔧', key: 'adv_6' },
+  { icon: 'Factory', key: 'adv_1' },
+  { icon: 'CheckCircle', key: 'adv_2' },
+  { icon: 'Package', key: 'adv_3' },
+  { icon: 'Truck', key: 'adv_4' },
+  { icon: 'Shield', key: 'adv_5' },
+  { icon: 'Wrench', key: 'adv_6' },
 ]
 
 const BLOG_POSTS = [
@@ -41,9 +42,9 @@ const BLOG_POSTS = [
 ]
 
 const INSTRUCTIONS = [
-  { icon: '📋', title: 'Руководство по выбору мебели', desc: 'Как подобрать мебель под конкретный учебный кабинет', path: '/instructions' },
-  { icon: '🖥️', title: 'Подключение интерактивных панелей', desc: 'Пошаговая инструкция по установке и настройке', path: '/instructions' },
-  { icon: '🧪', title: 'Оснащение лабораторий', desc: 'Комплектация STEM-лабораторий — с чего начать', path: '/instructions' },
+  { icon: 'ClipboardList', title: 'Руководство по выбору мебели', desc: 'Как подобрать мебель под конкретный учебный кабинет', path: '/instructions' },
+  { icon: 'Monitor', title: 'Подключение интерактивных панелей', desc: 'Пошаговая инструкция по установке и настройке', path: '/instructions' },
+  { icon: 'FlaskConical', title: 'Оснащение лабораторий', desc: 'Комплектация STEM-лабораторий — с чего начать', path: '/instructions' },
 ]
 
 export default function FirstPage() {
@@ -118,13 +119,16 @@ export default function FirstPage() {
         <div className="advantages-container">
           <h2 className="advantages-title">{t.advantages_title}</h2>
           <div className="advantages-grid">
-            {ADVANTAGES.map(({ icon, key }) => (
+            {ADVANTAGES.map(({ icon, key }) => {
+              const IconComp = Icon[icon]
+              return (
               <div key={key} className="advantage-card">
-                <div className="advantage-icon">{icon}</div>
+                <div className="advantage-icon">{IconComp ? <IconComp width="24" height="24" /> : ''}</div>
                 <h3 className="advantage-card__title">{t[`${key}_title`]}</h3>
                 <p className="advantage-card__desc">{t[`${key}_desc`]}</p>
               </div>
-            ))}
+            )
+            })}
           </div>
         </div>
       </section>
@@ -137,15 +141,18 @@ export default function FirstPage() {
             <Link to="/instructions" className="section-link">{t.instructions_all} →</Link>
           </div>
           <div className="instr-preview-grid">
-            {INSTRUCTIONS.map((item, i) => (
+            {INSTRUCTIONS.map((item, i) => {
+              const IconComp = Icon[item.icon]
+              return (
               <Link key={i} to={item.path} className="instr-preview-card">
-                <span className="instr-preview-icon">{item.icon}</span>
+                <span className="instr-preview-icon">{IconComp ? <IconComp width="24" height="24" /> : ''}</span>
                 <div>
                   <h3 className="instr-preview-title">{item.title}</h3>
                   <p className="instr-preview-desc">{item.desc}</p>
                 </div>
               </Link>
-            ))}
+            )
+            })}
           </div>
         </div>
       </section>

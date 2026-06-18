@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { createApplication } from '../api/api'
+import Icon from './Icons'
 import './CartDrawer.css'
 
 export default function CartDrawer() {
@@ -85,7 +86,7 @@ export default function CartDrawer() {
       }, 2000)
     } catch (err) {
       console.error('Ошибка отправки заявки:', err)
-      alert('❌ Ошибка при отправке. Попробуйте снова.')
+      alert('Ошибка при отправке. Попробуйте снова.')
     } finally {
       setSubmitting(false)
     }
@@ -107,13 +108,13 @@ export default function CartDrawer() {
             type="button"
             aria-label="Закрыть корзину"
           >
-            ✕
+            <Icon.X width="16" height="16" />
           </button>
         </div>
 
         {cartItems.length === 0 ? (
           <div className="cart-drawer__empty">
-            <span>🛒</span>
+            <span><Icon.ShoppingCart width="48" height="48" /></span>
             <p>Ваша корзина пуста</p>
             <button
               className="cart-drawer__checkout"
@@ -159,7 +160,7 @@ export default function CartDrawer() {
                       onClick={() => removeFromCart(item.id)}
                       type="button"
                     >
-                      ✕
+                      <Icon.X width="14" height="14" />
                     </button>
                   </div>
                 )
@@ -172,7 +173,7 @@ export default function CartDrawer() {
                 onClick={handleOpenModal}
                 type="button"
               >
-                📝 Оформить заявку
+                Оформить заявку
               </button>
             </div>
           </>
@@ -187,10 +188,10 @@ export default function CartDrawer() {
               onClick={handleCloseModal}
               type="button"
             >
-              ×
+              <Icon.X width="16" height="16" />
             </button>
 
-            <h2>📝 Оформить заявку</h2>
+            <h2>Оформить заявку</h2>
 
             <div className="modal-product-info">
               <p>
@@ -209,7 +210,7 @@ export default function CartDrawer() {
 
             {submitSuccess ? (
               <div className="modal-success">
-                <span>✅</span>
+                <span><Icon.CheckCircle width="48" height="48" /></span>
                 <h3>Заявка отправлена!</h3>
                 <p>Наш менеджер свяжется с вами в ближайшее время.</p>
               </div>
@@ -257,7 +258,7 @@ export default function CartDrawer() {
                   {submitting ? 'Отправка...' : 'Отправить заявку'}
                 </button>
 
-                <p className="form-note">🔒 Ваши данные защищены.</p>
+                <p className="form-note">Ваши данные защищены.</p>
               </form>
             )}
           </div>

@@ -268,7 +268,7 @@
 .navbar-categories {
   display: flex;
   align-items: center;
-  gap: 4px;
+  justify-content: space-between;
   padding: 0 40px;
   background: #fff;
   border-top: 1px solid #f0f0f0;
@@ -284,6 +284,7 @@
   white-space: nowrap;
   border-bottom: 3px solid transparent;
   transition: color 0.15s, border-color 0.15s;
+  text-align: center;
 }
 .cat-link:hover, .cat-link.active {
   color: #2d6a4f;
@@ -394,6 +395,7 @@
   border-bottom: 3px solid transparent;
   white-space: nowrap;
   transition: color 0.15s, border-color 0.15s;
+  justify-content: center;
 }
 .cat-link--catalog:hover { border-bottom-color: #2d6a4f; }
 

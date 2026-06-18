@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { apiClient } from '../api/api'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../i18n/LanguageContext'
+import Icon from '../components/Icons'
 import './VisualizePage.css'
 
 function toBase64(file) {
@@ -218,7 +219,7 @@ export default function VisualizePage() {
     return (
       <div className="viz-page">
         <div className="viz-auth-gate">
-          <div className="viz-auth-icon">🔒</div>
+          <div className="viz-auth-icon"><Icon.Lock width="32" height="32" /></div>
           <h2>Требуется авторизация</h2>
           <p>Для использования AI-визуализации необходимо войти в аккаунт</p>
           <button className="viz-auth-btn" onClick={openModal}>
@@ -242,7 +243,7 @@ export default function VisualizePage() {
 
       {/* Header */}
       <div className="viz-header">
-        <h1>✨ AI-Визуализация интерьера</h1>
+        <h1><Icon.Sparkles width="24" height="24" /> AI-Визуализация интерьера</h1>
         <p>Загрузите фото вашего помещения, выберите товары — и AI покажет как это будет выглядеть</p>
         {remaining !== null && (
           <div className="viz-counter">
@@ -257,7 +258,7 @@ export default function VisualizePage() {
 
           {/* Загрузка фото */}
           <div className="viz-section">
-            <h2>📸 Шаг 1 — Фото помещения</h2>
+            <h2><Icon.Camera width="20" height="20" /> Шаг 1 — Фото помещения</h2>
             <div
               className={`viz-dropzone ${preview ? 'has-file' : ''}`}
               onDrop={handleDrop}
@@ -272,12 +273,12 @@ export default function VisualizePage() {
                     onClick={(e) => { e.stopPropagation(); handleReset() }}
                     type="button"
                   >
-                    ✕
+                    <Icon.X width="14" height="14" />
                   </button>
                 </div>
               ) : (
                 <div className="viz-dropzone-content">
-                  <div className="viz-upload-icon">📁</div>
+                  <div className="viz-upload-icon"><Icon.Upload width="32" height="32" /></div>
                   <p>Перетащите фото сюда или нажмите для выбора</p>
                   <span>JPG, PNG до 5MB</span>
                 </div>
@@ -294,11 +295,11 @@ export default function VisualizePage() {
 
           {/* Выбор товаров */}
           <div className="viz-section">
-            <h2>🛋 Шаг 2 — Выберите товары</h2>
+            <h2><Icon.Sofa width="20" height="20" /> Шаг 2 — Выберите товары</h2>
 
             {/* Search bar */}
             <div className="viz-search-bar">
-              <span className="viz-search-icon">🔍</span>
+              <span className="viz-search-icon"><Icon.Search width="16" height="16" /></span>
               <input
                 type="text"
                 placeholder="Поиск по названию, артикулу или категории..."
@@ -307,7 +308,7 @@ export default function VisualizePage() {
                 className="viz-search-input"
               />
               {searchQuery && (
-                <button className="viz-search-clear" onClick={() => setSearchQuery('')} type="button">✕</button>
+                <button className="viz-search-clear" onClick={() => setSearchQuery('')} type="button"><Icon.X width="14" height="14" /></button>
               )}
               <span className="viz-selected-badge">{selected.length} выбрано</span>
             </div>
@@ -318,7 +319,7 @@ export default function VisualizePage() {
                 {selected.map(s => (
                   <span key={s.id} className="viz-selected-pill">
                     {s.label}
-                    <button type="button" onClick={() => removeSelected(s.id)}>✕</button>
+                    <button type="button" onClick={() => removeSelected(s.id)}><Icon.X width="12" height="12" /></button>
                   </span>
                 ))}
               </div>
@@ -326,7 +327,7 @@ export default function VisualizePage() {
 
             {/* Product browser */}
             {productsLoading ? (
-              <div className="viz-loading-products">⏳ Загрузка товаров...</div>
+              <div className="viz-loading-products"><Icon.Clock width="16" height="16" /> Загрузка товаров...</div>
             ) : isSearching ? (
               /* Search results - flat list */
               <div className="viz-search-results">
@@ -355,7 +356,7 @@ export default function VisualizePage() {
                           {p.article && <span className="viz-product-card-article">Арт. {p.article}</span>}
                         </div>
                         <span className={`viz-product-card-check ${isSelected ? 'checked' : ''}`}>
-                          {isSelected ? '✓' : ''}
+                          {isSelected ? <Icon.Check width="14" height="14" /> : ''}
                         </span>
                       </button>
                     )
@@ -403,7 +404,7 @@ export default function VisualizePage() {
                                   {p.article && <span className="viz-product-card-article">Арт. {p.article}</span>}
                                 </div>
                                 <span className={`viz-product-card-check ${isSelected ? 'checked' : ''}`}>
-                                  {isSelected ? '✓' : ''}
+                                  {isSelected ? <Icon.Check width="14" height="14" /> : ''}
                                 </span>
                               </button>
                             )
@@ -429,15 +430,15 @@ export default function VisualizePage() {
                 <span className="viz-spinner" />
                 Генерация... (~30 сек)
               </span>
-            ) : '✨ Визуализировать'}
+            ) : <><Icon.Sparkles width="16" height="16" /> Визуализировать</>}
           </button>
 
           {error && (
             <div className="viz-error">
-              ⚠️ {error}
+              <Icon.AlertTriangle width="16" height="16" /> {error}
               {retryCount > 0 && (
                 <button className="viz-retry-btn" onClick={handleVisualize} type="button">
-                  🔄 Попробовать снова
+                  <Icon.RefreshCw width="16" height="16" /> Попробовать снова
                 </button>
               )}
             </div>
@@ -447,11 +448,11 @@ export default function VisualizePage() {
         {/* Правая колонка — результат */}
         <div className="viz-right">
           <div className="viz-section">
-            <h2>🎨 Шаг 3 — Результат</h2>
+            <h2><Icon.Palette width="20" height="20" /> Шаг 3 — Результат</h2>
 
             {!result && !loading && (
               <div className="viz-result-placeholder">
-                <div className="viz-placeholder-icon">🏫</div>
+                <div className="viz-placeholder-icon"><Icon.School width="40" height="40" /></div>
                 <p>Здесь появится визуализация вашего интерьера</p>
                 <span>Загрузите фото и выберите товары</span>
               </div>
@@ -483,19 +484,19 @@ export default function VisualizePage() {
 
                 <div className="viz-result-actions">
                   <button className="viz-btn-download" onClick={handleDownload} type="button">
-                    💾 Скачать
+                    <Icon.ArrowRight width="16" height="16" /> Скачать
                   </button>
                   <button className="viz-btn-new" onClick={handleReset} type="button">
-                    🔄 Новая визуализация
+                    <Icon.RefreshCw width="16" height="16" /> Новая визуализация
                   </button>
                 </div>
 
                 <div className="viz-result-note">
-                  💡 Нравится результат? Оставьте заявку и наши менеджеры помогут с оформлением
+                  <Icon.Lightbulb width="16" height="16" /> Нравится результат? Оставьте заявку и наши менеджеры помогут с оформлением
                 </div>
 
                 <Link to="/catalog" className="viz-btn-catalog">
-                  📦 Перейти в каталог
+                  <Icon.Package width="16" height="16" /> Перейти в каталог
                 </Link>
               </div>
             )}
@@ -506,19 +507,19 @@ export default function VisualizePage() {
       {/* Инфо-блок */}
       <div className="viz-info-block">
         <div className="viz-info-item">
-          <span>⚡</span>
+          <span><Icon.Zap width="20" height="20" /></span>
           <p>Результат за  секунд</p>
         </div>
         <div className="viz-info-item">
-          <span>🆓</span>
+          <span><Icon.CheckCircle width="20" height="20" /></span>
           <p>Полностью бесплатно</p>
         </div>
         <div className="viz-info-item">
-          <span>🎯</span>
+          <span><Icon.Target width="20" height="20" /></span>
           <p>Подбор под ваше помещение</p>
         </div>
         <div className="viz-info-item">
-          <span>📱</span>
+          <span><Icon.Smartphone width="20" height="20" /></span>
           <p>Работает на телефоне</p>
         </div>
       </div>

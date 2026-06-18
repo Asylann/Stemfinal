@@ -2,14 +2,14 @@ import { Link } from 'react-router-dom'
 import './Kuhnya.css'
 
 const features = [
-  { icon: '🪵', label: 'Материалы отделки', sub: 'ЛДСП / МДФ / Дерево / Стекло / Металл' },
-  { icon: '💡', label: 'Освещение' },
-  { icon: '🔧', label: 'Вытяжки' },
-  { icon: '💧', label: 'Фильтры для воды' },
-  { icon: '📦', label: 'Микроволновые печи' },
-  { icon: '❄️', label: 'Холодильники' },
-  { icon: '🔥', label: 'Печи' },
-  { icon: '☕', label: 'Электрочайники' },
+  { label: 'Материалы отделки', sub: 'ЛДСП / МДФ / Дерево / Стекло / Металл' },
+  { label: 'Освещение' },
+  { label: 'Вытяжки' },
+  { label: 'Фильтры для воды' },
+  { label: 'Микроволновые печи' },
+  { label: 'Холодильники' },
+  { label: 'Печи' },
+  { label: 'Электрочайники' },
 ]
 
 export default function Kuhnya() {
@@ -54,7 +54,6 @@ export default function Kuhnya() {
             <div className="kuhnya-features">
               {features.map((f, i) => (
                 <div className="kuhnya-feature" key={i}>
-                  <span className="kuhnya-feature__icon">{f.icon}</span>
                   <span className="kuhnya-feature__label">{f.label}</span>
                   {f.sub && <span className="kuhnya-feature__sub">{f.sub}</span>}
                 </div>

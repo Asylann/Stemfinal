@@ -1,3 +1,4 @@
+import Icon from '../../components/Icons'
 import './EquipmentDetail.css'
 
 export default function Ulab() {
@@ -31,42 +32,42 @@ export default function Ulab() {
             <h3 className="detail-chars__title">Характеристики</h3>
             <div className="detail-chars__grid">
               <div className="char-card">
-                <span className="char-card__icon">🖥️</span>
+                <span className="char-card__icon"><Icon.Cpu width="18" height="18" /></span>
                 <span className="char-card__label">Серия процессора</span>
                 <span className="char-card__value">Intel Core i3 GEN6</span>
               </div>
               <div className="char-card">
-                <span className="char-card__icon">🖼️</span>
+                <span className="char-card__icon"><Icon.Monitor width="18" height="18" /></span>
                 <span className="char-card__label">Разрешение дисплея</span>
                 <span className="char-card__value">FullHD</span>
               </div>
               <div className="char-card">
-                <span className="char-card__icon">💾</span>
+                <span className="char-card__icon"><Icon.Folder width="18" height="18" /></span>
                 <span className="char-card__label">Объём оперативной памяти</span>
                 <span className="char-card__value">8Gb</span>
               </div>
               <div className="char-card">
-                <span className="char-card__icon">⚡</span>
+                <span className="char-card__icon"><Icon.Zap width="18" height="18" /></span>
                 <span className="char-card__label">Тип оперативной памяти</span>
                 <span className="char-card__value">DDR3</span>
               </div>
               <div className="char-card">
-                <span className="char-card__icon">💿</span>
+                <span className="char-card__icon"><Icon.Folder width="18" height="18" /></span>
                 <span className="char-card__label">Тип накопителя</span>
                 <span className="char-card__value">SSD 128Gb</span>
               </div>
               <div className="char-card">
-                <span className="char-card__icon">🪟</span>
+                <span className="char-card__icon"><Icon.Monitor width="18" height="18" /></span>
                 <span className="char-card__label">Операционная система</span>
                 <span className="char-card__value">Windows 10</span>
               </div>
               <div className="char-card">
-                <span className="char-card__icon">📐</span>
+                <span className="char-card__icon"><Icon.Ruler width="18" height="18" /></span>
                 <span className="char-card__label">Диагональ</span>
                 <span className="char-card__value">49"</span>
               </div>
               <div className="char-card">
-                <span className="char-card__icon">👆</span>
+                <span className="char-card__icon"><Icon.Smartphone width="18" height="18" /></span>
                 <span className="char-card__label">Количество касаний</span>
                 <span className="char-card__value">10 касаний</span>
               </div>

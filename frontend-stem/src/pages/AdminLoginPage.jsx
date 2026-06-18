@@ -49,7 +49,7 @@ export default function AdminLoginPage() {
     return (
       <div className="alog-wrapper">
         <div className="alog-card">
-          <p className="alog-checking">⏳ Проверка сессии...</p>
+          <p className="alog-checking">Проверка сессии...</p>
         </div>
       </div>
     )
@@ -102,14 +102,14 @@ export default function AdminLoginPage() {
                 tabIndex={-1}
                 aria-label={showPwd ? 'Скрыть пароль' : 'Показать пароль'}
               >
-                {showPwd ? '🙈' : '👁'}
+                {showPwd ? 'Скрыть' : 'Показать'}
               </button>
             </div>
           </div>
 
           {error && (
             <div className="alog-error" role="alert">
-              ⚠️ {error}
+              {error}
             </div>
           )}
 

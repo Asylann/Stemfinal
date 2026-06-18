@@ -58,7 +58,7 @@ export const translations = {
     order_application: 'Оформить заявку',
     application_sent: 'Заявка отправлена!',
     manager_contact: 'Наш менеджер свяжется с вами в ближайшее время.',
-    data_protected: '🔒 Ваши данные защищены.',
+    data_protected: 'Ваши данные защищены.',
     product_label: 'Товары:',
     total_label: 'Итого:',
     cart_name_label: 'Ваше имя *',
@@ -68,8 +68,8 @@ export const translations = {
     cart_placeholder_phone: '+7 (___) ___-__-__',
     cart_placeholder_comment: 'Дополнительная информация (необязательно)',
     telegram_username_placeholder: 'Telegram username (необязательно)',
-    added_to_cart: '✓ Добавлено!',
-    add_to_cart: '🛒 В корзину',
+    added_to_cart: 'Добавлено!',
+    add_to_cart: 'В корзину',
     auth_login_tab: 'Войти',
     auth_register_tab: 'Регистрация',
     auth_name_label: 'Имя',
@@ -185,12 +185,12 @@ export const translations = {
     { title: 'Самостоятельный поиск информации:', text: 'Пользователи могут самостоятельно проводить поиск по необходимым темам.' },
     ],
     bytovaya_cats: [
-    { icon: '🫧', label: 'Стиральные машины' },
-    { icon: '🥤', label: 'Блендеры' },
-    { icon: '📺', label: 'Телевизоры' },
-    { icon: '📡', label: 'Микроволновые печи' },
-    { icon: '❄️', label: 'Холодильники' },
-    { icon: '🔥', label: 'Печи' },
+    { icon: 'Droplets', label: 'Стиральные машины' },
+    { icon: 'Droplets', label: 'Блендеры' },
+    { icon: 'Tv', label: 'Телевизоры' },
+    { icon: 'Radio', label: 'Микроволновые печи' },
+    { icon: 'Snowflake', label: 'Холодильники' },
+    { icon: 'Flame', label: 'Печи' },
 ],
     printer_features_title: 'Основные характеристики',
 printer_features: [
@@ -266,15 +266,15 @@ printer_features: [
     favorites_remove_title: 'Убрать из избранного',
     favorites_no_photo: 'Нет фото',
     favorites_article: 'Арт.',
-    favorites_added: '✓ Добавлено!',
-    favorites_add_to_cart: '🛒 В корзину',
-    favorites_order: '📋 Оставить заявку',
+    favorites_added: 'Добавлено!',
+    favorites_add_to_cart: 'В корзину',
+    favorites_order: 'Оставить заявку',
     favorites_loading: 'Загрузка...',
     favorites_login_title: 'Войдите в аккаунт',
     favorites_login_desc: 'Чтобы сохранять товары, нужно авторизоваться',
     favorites_login_btn: 'Войти / Зарегистрироваться',
     favorites_empty_title: 'Список пуст',
-    favorites_empty_desc: 'Нажмите ❤ на товаре, чтобы добавить его сюда',
+    favorites_empty_desc: 'Нажмите на товаре, чтобы добавить его сюда',
     favorites_catalog_link: 'Перейти в каталог',
     favorites_breadcrumb: 'Главная / Избранное',
     favorites_title: 'Избранное',
@@ -296,9 +296,9 @@ printer_features: [
     profile_notifications: 'Уведомления',
     profile_privacy: 'Приватность',
 
-    profile_tab_info: '👤 Мои данные',
-    profile_tab_cart: '🛒 Корзина',
-    profile_tab_favorites: '❤ Избранное',
+    profile_tab_info: 'Мои данные',
+    profile_tab_cart: 'Корзина',
+    profile_tab_favorites: 'Избранное',
     profile_info_name: 'Имя',
     profile_info_email: 'Email',
     profile_info_city: 'Город',
@@ -310,9 +310,9 @@ printer_features: [
     profile_favorites_empty: 'Список избранного пуст', 
 
     product_loading: 'Загрузка товара...', 
-    product_error_title: '⚠️ Не удалось загрузить товар', // #⚠️ Не удалось загрузить товар
+    product_error_title: 'Не удалось загрузить товар', // #⚠️ Не удалось загрузить товар
     product_error_back: '← К поиску', // #← К поиску
-    product_not_found_title: '😔 Товар не найден', // #😔 Товар не найден
+    product_not_found_title: 'Товар не найден', // #😔 Товар не найден
     product_not_found_back: '← Вернуться к поиску', // #← Вернуться к поиску
     product_breadcrumb_furniture: 'Мебель', // #Мебель
     product_description: 'Описание', // #Описание
@@ -521,7 +521,7 @@ printer_features: [
     order_application: 'Өтінімді жасау',
     application_sent: 'Өтінім жіберілді!',
     manager_contact: 'Біздің менеджер сізбен жақын арада байланысады.',
-    data_protected: '🔒 Сіздің деректеріңіз қорғалған.',
+    data_protected: 'Сіздің деректеріңіз қорғалған.',
     product_label: 'Өнімдер:',
     total_label: 'Барлығы:',
     cart_name_label: 'Сіздің атыңыз *',
@@ -531,8 +531,8 @@ printer_features: [
     cart_placeholder_phone: '+7 (___) ___-__-__',
     cart_placeholder_comment: 'Қосымша ақпарат (міндетті емес)',
     telegram_username_placeholder: 'Telegram username (міндетті емес)',
-    added_to_cart: '✓ Қоржынға қосылды!',
-    add_to_cart: '🛒 Қоржынға салу',
+    added_to_cart: 'Қоржынға қосылды!',
+    add_to_cart: 'Қоржынға салу',
     auth_login_tab: 'Кіру',
     auth_register_tab: 'Тіркелу',
     auth_name_label: 'Аты',
@@ -614,15 +614,15 @@ printer_features: [
     favorites_remove_title: 'Таңдаулылардан алып тастау',
     favorites_no_photo: 'Фото жоқ',
     favorites_article: 'Арт.',
-    favorites_added: '✓ Қосылды!',
-    favorites_add_to_cart: '🛒 Қоржынға',
-    favorites_order: '📋 Өтініш қалдыру',
+    favorites_added: 'Қосылды!',
+    favorites_add_to_cart: 'Қоржынға',
+    favorites_order: 'Өтініш қалдыру',
     favorites_loading: 'Жүктелуде...',
     favorites_login_title: 'Аккаунтқа кіріңіз',
     favorites_login_desc: 'Таңдаулыларды сақтау үшін аккаунтқа кіру керек',
     favorites_login_btn: 'Кіру / Тіркелу',
     favorites_empty_title: 'Тізім бос',
-    favorites_empty_desc: 'Тауарға ❤ басу арқылы осында қосыңыз',
+    favorites_empty_desc: 'Тауарды басу арқылы осында қосыңыз',
     favorites_catalog_link: 'Каталогқа өту',
     favorites_breadcrumb: 'Басты бет / Таңдаулылар',
     favorites_title: 'Таңдаулылар',
@@ -642,9 +642,9 @@ printer_features: [
     profile_change_password: 'Құпия сөзді өзгерту',
     profile_notifications: 'Хабарламалар',
     profile_privacy: 'Құпиялылық',
-    profile_tab_info: '👤 Менің деректерім',
-    profile_tab_cart: '🛒 Қоржын',
-    profile_tab_favorites: '❤ Таңдаулылар',
+    profile_tab_info: 'Менің деректерім',
+    profile_tab_cart: 'Қоржын',
+    profile_tab_favorites: 'Таңдаулылар',
     profile_info_name: 'Аты',
     profile_info_email: 'Email',
     profile_info_city: 'Қала',
@@ -745,12 +745,12 @@ printer_features: [
       { title: 'Ақпаратты өз бетінше іздеу:', text: 'Пайдаланушылар қажетті тақырыптар бойынша өз бетінше іздеу жүргізе алады.' },
     ],
     bytovaya_cats: [
-      { icon: '🫧', label: 'Кір жуу машиналары' },
-      { icon: '🥤', label: 'Блендерлер' },
-      { icon: '📺', label: 'Теледидарлар' },
-      { icon: '📡', label: 'Микротолқынды пештер' },
-      { icon: '❄️', label: 'Тоңазытқыштар' },
-      { icon: '🔥', label: 'Пештер' },
+      { icon: 'Droplets', label: 'Кір жуу машиналары' },
+      { icon: 'Droplets', label: 'Блендерлер' },
+      { icon: 'Tv', label: 'Теледидарлар' },
+      { icon: 'Radio', label: 'Микротолқынды пештер' },
+      { icon: 'Snowflake', label: 'Тоңазытқыштар' },
+      { icon: 'Flame', label: 'Пештер' },
     ],
     printer_features_title: 'Негізгі сипаттамалар',
     printer_features: [
@@ -773,9 +773,9 @@ printer_features: [
 
     // ==================== Новые переводы для ProductDetail ====================
     product_loading: 'Өнім жүктелуде...', // #Загрузка товара...
-    product_error_title: '⚠️ Өнімді жүктеу мүмкін болмады', // #⚠️ Не удалось загрузить товар
+    product_error_title: 'Өнімді жүктеу мүмкін болмады', // #⚠️ Не удалось загрузить товар
     product_error_back: '← Іздеуге', // #← К поиску
-    product_not_found_title: '😔 Өнім табылмады', // #😔 Товар не найден
+    product_not_found_title: 'Өнім табылмады', // #😔 Товар не найден
     product_not_found_back: '← Іздеуге қайту', // #← Вернуться к поиску
     product_breadcrumb_furniture: 'Жиһаз', // #Мебель
     product_description: 'Сипаттама', // #Описание
@@ -881,13 +881,13 @@ printer_features: [
     { title: 'Ақпаратты өздігінен іздеу:', text: 'Пайдаланушылар қажетті тақырыптар бойынша өздігінен іздеу жүргізе алады.' },
     ], // #Справочная информация в одно касание: Благодаря сенсорному экрану и интуитивно понятному интерфейсу, пользователь получает необходимую информацию быстро и легко. Простой и удобный интерфейс: Дружественный пользовательский интерфейс делает взаимодействие с киоском лёгким даже для тех, кто не имеет опыта. Наглядная подача любого контента: Графический интерфейс и возможность воспроизведения видео обеспечивают наглядную передачу информации. Возможность выбрать язык взаимодействия: Пользователи могут выбрать предпочтительный язык общения. Самостоятельный поиск информации: Пользователи могут самостоятельно проводить поиск по необходимым темам.
     bytovaya_cats: [
-    { icon: '🫧', label: 'Кір жуғыш машиналар' }, // #Стиральные машины
-    { icon: '🥤', label: 'Блендерлер' }, // #Блендеры
-    { icon: '📺', label: 'Телевизорлар' }, // #Телевизоры
-    { icon: '📡', label: 'Микротолқынды пештер' }, // #Микроволновые печи
-    { icon: '❄️', label: 'Тоңазытқыштар' }, // #Холодильники
-    { icon: '🔥', label: 'Пештер' }, // #Печи
-],
+      { icon: 'Droplets', label: 'Кір жуғыш машиналар' },
+      { icon: 'Droplets', label: 'Блендерлер' },
+      { icon: 'Tv', label: 'Телевизорлар' },
+      { icon: 'Radio', label: 'Микротолқынды пештер' },
+      { icon: 'Snowflake', label: 'Тоңазытқыштар' },
+      { icon: 'Flame', label: 'Пештер' },
+    ],
     printer_features_title: 'Негізгі сипаттамалар', // #Основные характеристики
     printer_features: [
   '10 минут ішінде жылдам орнату', // #Быстрая настройка в течение 10 минут

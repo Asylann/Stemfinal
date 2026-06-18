@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import Icon from '../../components/Icons'
 import './StemPlatformPage.css'
 
 export default function SteamBookPage() {
@@ -32,7 +33,7 @@ export default function SteamBookPage() {
         {/* ПРАВАЯ КОЛОНКА */}
         <div className="stemplatform-right">
           <div style={{ background: '#f0f7f4', borderRadius: 16, padding: '48px 32px', textAlign: 'center', width: '100%' }}>
-            <div style={{ fontSize: 64, marginBottom: 16 }}>📚</div>
+            <div style={{ fontSize: 64, marginBottom: 16, color: '#2d6a4f' }}><Icon.BookOpen width="48" height="48" /></div>
             <div style={{ fontSize: 18, fontWeight: 700, color: '#1a4731' }}>STEAM BOOK</div>
             <div style={{ fontSize: 13, color: '#555', marginTop: 8 }}>Интерактивный образовательный формат</div>
           </div>

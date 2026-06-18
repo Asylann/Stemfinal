@@ -33,7 +33,7 @@ export default function BlogPage() {
 
           {loading ? (
             <div style={{ textAlign: 'center', padding: '48px 0', color: '#888' }}>
-              ⏳ Загрузка...
+              Загрузка...
             </div>
           ) : posts.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '48px 0', color: '#888' }}>

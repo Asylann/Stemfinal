@@ -5,6 +5,7 @@ import { useCart } from '../../context/CartContext'
 import { useFavorites } from '../../context/FavoritesContext'
 import { useAuth } from '../../context/AuthContext'
 import { useCategoryProducts } from '../../hooks/useCategoryProducts'
+import Icon from '../../components/Icons'
 import './Lighting.css'
 
 
@@ -61,11 +62,11 @@ export default function Lighting() {
     } catch (err) {
       console.error('Ошибка отправки заявки:', err)
       if (err.response?.status === 400) {
-        alert('❌ Проверьте правильность заполнения формы')
+        alert('Проверьте правильность заполнения формы')
       } else if (err.response?.status === 500) {
-        alert('⚠️ Сервер временно недоступен. Попробуйте позже')
+        alert('Сервер временно недоступен. Попробуйте позже')
       } else {
-        alert('❌ Не удалось отправить заявку. Проверьте соединение')
+        alert('Не удалось отправить заявку. Проверьте соединение')
       }
     } finally {
       setSubmitting(false)
@@ -115,15 +116,15 @@ export default function Lighting() {
 
                 <div className="product-actions">
                   <button className="btn-cart" onClick={() => handleAddToCart(p)}>
-                    🛒 В корзину
+                    <Icon.ShoppingCart width="16" height="16" /> В корзину
                   </button>
                   <button className="btn-favorite" onClick={() => toggleFavorite(p)}>
-                    {isFavorite(p.id) ? '❤️ В избранном' : '🤍 В избранное'}
+                    {isFavorite(p.id) ? <><Icon.HeartFilled width="16" height="16" /> В избранном</> : <><Icon.Heart width="16" height="16" /> В избранное</>}
                   </button>
                 </div>
 
                 <button className="btn-application" onClick={() => handleOpenModal(p.title)}>
-                  📝 Оставить заявку
+                  <Icon.FileText width="16" height="16" /> Оставить заявку
                 </button>
               </div>
             </div>
@@ -134,16 +135,16 @@ export default function Lighting() {
       {showModal && (
         <div className="modal-overlay" onClick={handleCloseModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={handleCloseModal}>×</button>
+            <button className="modal-close" onClick={handleCloseModal}><Icon.X width="16" height="16" /></button>
 
-            <h2 className="modal-title">📝 Оставить заявку</h2>
+            <h2 className="modal-title"><Icon.FileText width="20" height="20" /> Оставить заявку</h2>
             <p className="modal-subtitle">
               Товар: <strong>{formData.productName}</strong>
             </p>
 
             {submitSuccess ? (
               <div className="success-message">
-                <div className="success-icon">✅</div>
+                <div className="success-icon"><Icon.CheckCircle width="40" height="40" /></div>
                 <h3>Заявка отправлена!</h3>
                 <p>Наш менеджер свяжется с вами в ближайшее время.</p>
               </div>
@@ -185,10 +186,10 @@ export default function Lighting() {
                   />
                 </div>
                 <button type="submit" className="btn-submit" disabled={submitting}>
-                  {submitting ? '⏳ Отправка...' : '📤 Отправить заявку'}
+                  {submitting ? 'Отправка...' : <><Icon.Send width="16" height="16" /> Отправить заявку</>}
                 </button>
                 <p className="form-note">
-                  🔒 Ваши данные защищены. Мы не передаём их третьим лицам.
+                  <Icon.Lock width="14" height="14" /> Ваши данные защищены. Мы не передаём их третьим лицам.
                 </p>
               </form>
             )}

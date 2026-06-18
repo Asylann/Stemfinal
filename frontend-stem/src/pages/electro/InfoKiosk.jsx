@@ -1,16 +1,17 @@
 import { useLang } from '../../i18n/LanguageContext'
 import { Link } from 'react-router-dom'
+import Icon from '../../components/Icons'
 import './InfoKiosk.css'
 
 const specs = [
-  { icon: '🖥', label_ru: 'Серия процессора',         label_kz: 'Процессор сериясы',      value: 'Intel Core i3 GEN6' },
-  { icon: '⊞', label_ru: 'Разрешение дисплея',         label_kz: 'Дисплей ажыратымдылығы', value: 'FullHD' },
-  { icon: '💾', label_ru: 'Объём оперативной памяти',   label_kz: 'Жедел жад көлемі',       value: '8Gb' },
-  { icon: '🔧', label_ru: 'Тип оперативной памяти',     label_kz: 'Жедел жад түрі',         value: 'DDR3' },
-  { icon: '💿', label_ru: 'Тип накопителя',             label_kz: 'Жинақтауыш түрі',        value: 'SSD 128Gb' },
-  { icon: '⊞', label_ru: 'Операционная система',        label_kz: 'Операциялық жүйе',       value: 'Windows 10' },
-  { icon: '📐', label_ru: 'Диагональ',                  label_kz: 'Диагональ',              value: '49"' },
-  { icon: '👆', label_ru: 'Количество касаний',         label_kz: 'Тию саны',               value: '10' },
+  { icon: 'Cpu', label_ru: 'Серия процессора',         label_kz: 'Процессор сериясы',      value: 'Intel Core i3 GEN6' },
+  { icon: 'Grid', label_ru: 'Разрешение дисплея',         label_kz: 'Дисплей ажыратымдылығы', value: 'FullHD' },
+  { icon: 'Folder', label_ru: 'Объём оперативной памяти',   label_kz: 'Жедел жад көлемі',       value: '8Gb' },
+  { icon: 'Settings', label_ru: 'Тип оперативной памяти',     label_kz: 'Жедел жад түрі',         value: 'DDR3' },
+  { icon: 'Disc', label_ru: 'Тип накопителя',             label_kz: 'Жинақтауыш түрі',        value: 'SSD 128Gb' },
+  { icon: 'Grid', label_ru: 'Операционная система',        label_kz: 'Операциялық жүйе',       value: 'Windows 10' },
+  { icon: 'Maximize', label_ru: 'Диагональ',                  label_kz: 'Диагональ',              value: '49"' },
+  { icon: 'MousePointer', label_ru: 'Количество касаний',         label_kz: 'Тию саны',               value: '10' },
 ]
 
 export default function InfoKiosk() {
@@ -57,13 +58,16 @@ export default function InfoKiosk() {
           <div className="infokiosk-card__specs-section">
             <h3 className="infokiosk-card__specs-title">{t.computers_specs}</h3>
             <div className="infokiosk-card__specs">
-              {specs.map((s, i) => (
-                <div key={i} className="kiosk-spec">
-                  <div className="kiosk-spec__icon">{s.icon}</div>
-                  <div className="kiosk-spec__label">{lang === 'kz' ? s.label_kz : s.label_ru}</div>
-                  <div className="kiosk-spec__value">{s.value}</div>
-                </div>
-              ))}
+              {specs.map((s, i) => {
+                const IconComp = Icon[s.icon]
+                return (
+                  <div key={i} className="kiosk-spec">
+                    <div className="kiosk-spec__icon">{IconComp ? <IconComp width="20" height="20" /> : ''}</div>
+                    <div className="kiosk-spec__label">{lang === 'kz' ? s.label_kz : s.label_ru}</div>
+                    <div className="kiosk-spec__value">{s.value}</div>
+                  </div>
+                )
+              })}
             </div>
           </div>
 

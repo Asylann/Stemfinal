@@ -6,6 +6,7 @@ import { useFavorites } from '../../context/FavoritesContext'
 import { useAuth } from '../../context/AuthContext'
 import { useLang } from '../../i18n/LanguageContext'
 import { useCategoryProducts } from '../../hooks/useCategoryProducts'
+import Icon from '../../components/Icons'
 import './Stanki.css'
 
 export default function Stanki() {
@@ -61,11 +62,11 @@ export default function Stanki() {
     } catch (err) {
       console.error('Ошибка отправки заявки:', err)
       if (err.response?.status === 400) {
-        alert('❌ Проверьте правильность заполнения формы')
+        alert('Проверьте правильность заполнения формы')
       } else if (err.response?.status === 500) {
-        alert('⚠️ Сервер временно недоступен. Попробуйте позже')
+        alert('Сервер временно недоступен. Попробуйте позже')
       } else {
-        alert('❌ Не удалось отправить заявку. Проверьте соединение')
+        alert('Не удалось отправить заявку. Проверьте соединение')
       }
     } finally {
       setSubmitting(false)
@@ -108,29 +109,29 @@ export default function Stanki() {
               </table>
 
               <div className="stanki-card__delivery">
-                <p>🚚 Доставка по Казахстану</p>
-                <p>📍 Самовывоз: г. Астана, ул. Домалак-ана 26</p>
+                <p><Icon.Truck width="16" height="16" /> Доставка по Казахстану</p>
+                <p><Icon.MapPin width="16" height="16" /> Самовывоз: г. Астана, ул. Домалак-ана 26</p>
               </div>
 
               <div className="stanki-card__actions">
                 <button className="btn-cart" onClick={() => handleAddToCart(p)} type="button">
-                  🛒 В корзину
+                  <Icon.ShoppingCart width="16" height="16" /> В корзину
                 </button>
                 <button className="btn-order" onClick={() => handleOpenModal(p.title)} type="button">
-                  📝 Оставить заявку
+                  <Icon.FileText width="16" height="16" /> Оставить заявку
                 </button>
                 <button
                   className={`btn-favorite ${isFavorite(p.id) ? 'active' : ''}`}
                   onClick={() => toggleFavorite(p)}
                   type="button"
                 >
-                  {isFavorite(p.id) ? '❤️ В избранном' : '🤍 В избранное'}
+                  {isFavorite(p.id) ? <><Icon.HeartFilled width="16" height="16" /> В избранном</> : <><Icon.Heart width="16" height="16" /> В избранное</>}
                 </button>
               </div>
 
               <div className="stanki-card__links">
                 <span>↗ Поделиться</span>
-                <span>⚖ Сравнить</span>
+                <span>Сравнить</span>
               </div>
             </div>
           </div>
@@ -140,13 +141,13 @@ export default function Stanki() {
       {showModal && (
         <div className="modal-overlay" onClick={handleCloseModal}>
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={handleCloseModal} type="button">×</button>
-            <h3 className="modal-title">📝 Оставить заявку</h3>
+            <button className="modal-close" onClick={handleCloseModal} type="button"><Icon.X width="16" height="16" /></button>
+            <h3 className="modal-title"><Icon.FileText width="20" height="20" /> Оставить заявку</h3>
             <p className="modal-product-name">Товар: <strong>{formData.productName}</strong></p>
 
             {submitSuccess ? (
               <div className="modal-success">
-                <span style={{ fontSize: '40px' }}>✅</span>
+                <span style={{ fontSize: '40px' }}><Icon.CheckCircle width="40" height="40" /></span>
                 <h4>Заявка отправлена!</h4>
                 <p>Наш менеджер свяжется с вами в ближайшее время.</p>
               </div>
@@ -191,9 +192,9 @@ export default function Stanki() {
                   />
                 </div>
                 <button type="submit" className="btn-submit" disabled={submitting}>
-                  {submitting ? '⏳ Отправка...' : '📤 Отправить заявку'}
+                  {submitting ? 'Отправка...' : <><Icon.Send width="16" height="16" /> Отправить заявку</>}
                 </button>
-                <p className="form-note">🔒 Ваши данные защищены. Мы не передаём их третьим лицам.</p>
+                <p className="form-note"><Icon.Lock width="14" height="14" /> Ваши данные защищены. Мы не передаём их третьим лицам.</p>
               </form>
             )}
           </div>

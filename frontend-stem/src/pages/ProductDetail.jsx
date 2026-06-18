@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext'
 import { useFavorites } from '../context/FavoritesContext'
 import { useAuth } from '../context/AuthContext'
 import { createApplication, apiClient } from '../api/api'
+import Icon from '../components/Icons'
 import './ProductDetail.css'
 
 
@@ -85,13 +86,13 @@ export default function ProductDetail() {
     
     
     if (!validateName(formData.name)) {
-      alert('❌ Введите корректное имя (2-50 букв, без цифр и спецсимволов)')
+      alert('Введите корректное имя (2-50 букв, без цифр и спецсимволов)')
       return
     }
     
    
     if (!validatePhone(formData.phone)) {
-      alert('❌ Введите корректный номер телефона (11 цифр, например: +7 700 123 45 67)')
+      alert('Введите корректный номер телефона (11 цифр, например: +7 700 123 45 67)')
       return
     }
     
@@ -112,11 +113,11 @@ export default function ProductDetail() {
       console.error('Ошибка отправки заявки:', err)
       
       if (err.response?.status === 400) {
-        alert('❌ Проверьте правильность заполнения формы')
+        alert('Проверьте правильность заполнения формы')
       } else if (err.response?.status === 500) {
-        alert('⚠️ Сервер временно недоступен. Попробуйте позже')
+        alert('Сервер временно недоступен. Попробуйте позже')
       } else {
-        alert('❌ Не удалось отправить заявку. Проверьте соединение')
+        alert('Не удалось отправить заявку. Проверьте соединение')
       }
     } finally {
       setSubmitting(false)
@@ -145,7 +146,7 @@ export default function ProductDetail() {
   if (error) {
     return (
       <div className="product-error">
-        <h2>⚠️ Не удалось загрузить товар</h2>
+        <h2>Не удалось загрузить товар</h2>
         <p className="error-message">{error}</p>
         <Link to="/search" className="btn-back">← К поиску</Link>
       </div>
@@ -155,7 +156,7 @@ export default function ProductDetail() {
   if (!product) {
     return (
       <div className="product-not-found">
-        <h2>😔 Товар не найден</h2>
+        <h2>Товар не найден</h2>
         <Link to="/search" className="btn-back">← Вернуться к поиску</Link>
       </div>
     )
@@ -201,25 +202,25 @@ export default function ProductDetail() {
             )}
 
             <div className="product-delivery">
-              <div className="delivery-item">🚚 Доставка по Казахстану</div>
-              <div className="delivery-item">📍 Самовывоз: Астана, Домалак-ана 26</div>
+              <div className="delivery-item"><Icon.Truck width="16" height="16" /> Доставка по Казахстану</div>
+              <div className="delivery-item"><Icon.MapPin width="16" height="16" /> Самовывоз: Астана, Домалак-ана 26</div>
             </div>
 
             <div className="product-actions">
               <button className="btn-add-to-cart" onClick={handleAddToCart}>
-                🛒 В корзину
+                <Icon.ShoppingCart width="16" height="16" /> В корзину
               </button>
               <button
                 className={`btn-favorite ${isFavorite(product.id) ? 'active' : ''}`}
                 onClick={() => toggleFavorite(product)}
                 type="button"
               >
-                ❤ {isFavorite(product.id) ? 'В избранном' : 'В избранное'}
+                <Icon.Heart width="16" height="16" /> {isFavorite(product.id) ? 'В избранном' : 'В избранное'}
               </button>
             </div>
 
             <button className="btn-application" onClick={handleOpenModal}>
-              📝 Оставить заявку
+              <Icon.FileText width="16" height="16" /> Оставить заявку
             </button>
           </div>
         </div>
@@ -228,9 +229,9 @@ export default function ProductDetail() {
       {showModal && (
         <div className="modal-overlay" onClick={handleCloseModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={handleCloseModal}>×</button>
+            <button className="modal-close" onClick={handleCloseModal}><Icon.X width="16" height="16" /></button>
 
-            <h2 className="modal-title">📝 Оставить заявку</h2>
+            <h2 className="modal-title"><Icon.FileText width="20" height="20" /> Оставить заявку</h2>
             <p className="modal-subtitle">
               Товар: <strong>{product.title}</strong><br />
               Артикул: {product.article}
@@ -238,7 +239,7 @@ export default function ProductDetail() {
 
             {submitSuccess ? (
               <div className="success-message">
-                <div className="success-icon">✅</div>
+                <div className="success-icon"><Icon.CheckCircle width="40" height="40" /></div>
                 <h3>Заявка отправлена!</h3>
                 <p>Наш менеджер свяжется с вами в ближайшее время.</p>
               </div>
@@ -303,11 +304,11 @@ export default function ProductDetail() {
                 </div>
 
                 <button type="submit" className="btn-submit" disabled={submitting}>
-                  {submitting ? '⏳ Отправка...' : '📤 Отправить заявку'}
+                  {submitting ? <><Icon.Clock width="16" height="16" /> Отправка...</> : <><Icon.Send width="16" height="16" /> Отправить заявку</>}
                 </button>
 
                 <p className="form-note">
-                  🔒 Ваши данные защищены. Мы не передаём их третьим лицам
+                  <Icon.Lock width="14" height="14" /> Ваши данные защищены. Мы не передаём их третьим лицам
                 </p>
               </form>
             )}

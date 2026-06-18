@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import Icon from '../../components/Icons'
 import './EquipmentDetail.css'
 
 export default function LegoSpike() {
@@ -41,42 +42,42 @@ export default function LegoSpike() {
             <h3 className="detail-chars__title">Характеристики</h3>
             <div className="detail-chars__grid">
               <div className="char-card">
-                <span className="char-card__icon">🧱</span>
+                <span className="char-card__icon"><Icon.Puzzle width="18" height="18" /></span>
                 <span className="char-card__label">Количество деталей</span>
                 <span className="char-card__value">528 элементов</span>
               </div>
               <div className="char-card">
-                <span className="char-card__icon">🖥️</span>
+                <span className="char-card__icon"><Icon.Cpu width="18" height="18" /></span>
                 <span className="char-card__label">Программируемый хаб</span>
                 <span className="char-card__value">6 портов ввода/вывода</span>
               </div>
               <div className="char-card">
-                <span className="char-card__icon">⚡</span>
+                <span className="char-card__icon"><Icon.Zap width="18" height="18" /></span>
                 <span className="char-card__label">Моторы</span>
                 <span className="char-card__value">4 шт. (2 больших, 2 средних)</span>
               </div>
               <div className="char-card">
-                <span className="char-card__icon">📡</span>
+                <span className="char-card__icon"><Icon.Radio width="18" height="18" /></span>
                 <span className="char-card__label">Датчики</span>
                 <span className="char-card__value">Цвет, расстояние, усилие</span>
               </div>
               <div className="char-card">
-                <span className="char-card__icon">🔋</span>
+                <span className="char-card__icon"><Icon.Battery width="18" height="18" /></span>
                 <span className="char-card__label">Аккумулятор</span>
                 <span className="char-card__value">Li-Ion, перезаряжаемый</span>
               </div>
               <div className="char-card">
-                <span className="char-card__icon">🔗</span>
+                <span className="char-card__icon"><Icon.Link2 width="18" height="18" /></span>
                 <span className="char-card__label">Подключение</span>
                 <span className="char-card__value">Bluetooth + USB</span>
               </div>
               <div className="char-card">
-                <span className="char-card__icon">💻</span>
+                <span className="char-card__icon"><Icon.Laptop width="18" height="18" /></span>
                 <span className="char-card__label">Совместимость</span>
                 <span className="char-card__value">Scratch, Python</span>
               </div>
               <div className="char-card">
-                <span className="char-card__icon">📱</span>
+                <span className="char-card__icon"><Icon.Smartphone width="18" height="18" /></span>
                 <span className="char-card__label">Платформы</span>
                 <span className="char-card__value">Win, Mac, iOS, Android</span>
               </div>

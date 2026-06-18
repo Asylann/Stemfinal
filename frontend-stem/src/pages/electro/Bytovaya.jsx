@@ -1,5 +1,6 @@
 import { useLang } from '../../i18n/LanguageContext'
 import { Link } from 'react-router-dom'
+import Icon from '../../components/Icons'
 import './Bytovaya.css'
 
 export default function Bytovaya() {
@@ -32,12 +33,15 @@ export default function Bytovaya() {
           ))}
 
           <div className="bytovaya-card__categories">
-            {t.bytovaya_cats.map((c, i) => (
-              <div key={i} className="bytovaya-cat">
-                <div className="bytovaya-cat__icon">{c.icon}</div>
+            {t.bytovaya_cats.map((c, i) => {
+              const IconComp = Icon[c.icon]
+              return (
+                <div key={i} className="bytovaya-cat">
+                  <div className="bytovaya-cat__icon">{IconComp ? <IconComp width="24" height="24" /> : ''}</div>
                 <p className="bytovaya-cat__label">{c.label}</p>
               </div>
-            ))}
+            )
+            })}
           </div>
 
           <div className="bytovaya-card__divider" />

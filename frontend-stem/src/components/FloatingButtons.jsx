@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import './FloatingButtons.css'
 import { chatWithGrok } from '../api/api'
+import Icon from './Icons'
 
 export default function FloatingButtons() {
   const phoneNumber = '77770016786'
@@ -160,7 +161,7 @@ export default function FloatingButtons() {
                 <h3 id="grok-chat-title">Чат с ИИ</h3>
               </div>
               <button type="button" className="grok-chat-close" onClick={closeChat} aria-label="Закрыть чат">
-                ✕
+                <Icon.X width="14" height="14" />
               </button>
             </div>
 

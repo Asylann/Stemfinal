@@ -1,27 +1,28 @@
 import { useLang } from '../../i18n/LanguageContext'
 import { Link } from 'react-router-dom'
+import Icon from '../../components/Icons'
 import './Computers.css'
 
 const specs1 = [
-  { icon: '🖥', label_ru: 'Серия процессора',          label_kz: 'Процессор сериясы',       value: 'Intel Core i3 10100' },
-  { icon: '⊞', label_ru: 'Разрешение дисплея',         label_kz: 'Дисплей ажыратымдылығы',  value: 'FullHD' },
-  { icon: '💾', label_ru: 'Объём оперативной памяти',   label_kz: 'Жедел жад көлемі',        value: '8Gb' },
-  { icon: '📷', label_ru: 'Встроенная веб-камера',      label_kz: 'Кірістірілген веб-камера', value: '720p' },
-  { icon: '💿', label_ru: 'Тип накопителя',             label_kz: 'Жинақтауыш түрі',         value: 'HDD+SSD' },
-  { icon: '⊞', label_ru: 'Операционная система',        label_kz: 'Операциялық жүйе',        value: 'Windows 10 pro' },
-  { icon: '📐', label_ru: 'Диагональ, дюйм',            label_kz: 'Диагональ, дюйм',         value: '23.8' },
-  { icon: '🔧', label_ru: 'Тип оперативной памяти',     label_kz: 'Жедел жад түрі',          value: 'DDR4' },
+  { icon: 'Cpu', label_ru: 'Серия процессора',          label_kz: 'Процессор сериясы',       value: 'Intel Core i3 10100' },
+  { icon: 'Grid', label_ru: 'Разрешение дисплея',         label_kz: 'Дисплей ажыратымдылығы',  value: 'FullHD' },
+  { icon: 'Folder', label_ru: 'Объём оперативной памяти',   label_kz: 'Жедел жад көлемі',        value: '8Gb' },
+  { icon: 'Camera', label_ru: 'Встроенная веб-камера',      label_kz: 'Кірістірілген веб-камера', value: '720p' },
+  { icon: 'Disc', label_ru: 'Тип накопителя',             label_kz: 'Жинақтауыш түрі',         value: 'HDD+SSD' },
+  { icon: 'Grid', label_ru: 'Операционная система',        label_kz: 'Операциялық жүйе',        value: 'Windows 10 pro' },
+  { icon: 'Maximize', label_ru: 'Диагональ, дюйм',            label_kz: 'Диагональ, дюйм',         value: '23.8' },
+  { icon: 'Settings', label_ru: 'Тип оперативной памяти',     label_kz: 'Жедел жад түрі',          value: 'DDR4' },
 ]
 
 const specs2 = [
-  { icon: '🖥', label_ru: 'Серия процессора',          label_kz: 'Процессор сериясы',       value: 'Intel Core i3 10100' },
-  { icon: '⊞', label_ru: 'Разрешение дисплея',         label_kz: 'Дисплей ажыратымдылығы',  value: 'FullHD' },
-  { icon: '💾', label_ru: 'Объём оперативной памяти',   label_kz: 'Жедел жад көлемі',        value: '8Gb' },
-  { icon: '📷', label_ru: 'Встроенная веб-камера',      label_kz: 'Кірістірілген веб-камера', value: '720p' },
-  { icon: '💿', label_ru: 'Тип накопителя',             label_kz: 'Жинақтауыш түрі',         value: 'SSD' },
-  { icon: '⊞', label_ru: 'Операционная система',        label_kz: 'Операциялық жүйе',        value: 'Windows 11 pro' },
-  { icon: '📐', label_ru: 'Диагональ, дюйм',            label_kz: 'Диагональ, дюйм',         value: '14.0' },
-  { icon: '🖥', label_ru: 'Тип матрицы экрана',         label_kz: 'Экран матрицасының түрі', value: 'IPS' },
+  { icon: 'Cpu', label_ru: 'Серия процессора',          label_kz: 'Процессор сериясы',       value: 'Intel Core i3 10100' },
+  { icon: 'Grid', label_ru: 'Разрешение дисплея',         label_kz: 'Дисплей ажыратымдылығы',  value: 'FullHD' },
+  { icon: 'Folder', label_ru: 'Объём оперативной памяти',   label_kz: 'Жедел жад көлемі',        value: '8Gb' },
+  { icon: 'Camera', label_ru: 'Встроенная веб-камера',      label_kz: 'Кірістірілген веб-камера', value: '720p' },
+  { icon: 'Disc', label_ru: 'Тип накопителя',             label_kz: 'Жинақтауыш түрі',         value: 'SSD' },
+  { icon: 'Grid', label_ru: 'Операционная система',        label_kz: 'Операциялық жүйе',        value: 'Windows 11 pro' },
+  { icon: 'Maximize', label_ru: 'Диагональ, дюйм',            label_kz: 'Диагональ, дюйм',         value: '14.0' },
+  { icon: 'Monitor', label_ru: 'Тип матрицы экрана',         label_kz: 'Экран матрицасының түрі', value: 'IPS' },
 ]
 
 export default function Computers() {
@@ -88,13 +89,16 @@ export default function Computers() {
             <div className="computer-card__specs-section">
               <h3 className="computer-card__specs-title">{t.computers_specs}</h3>
               <div className="computer-card__specs">
-                {c.specs.map((s, i) => (
+                {c.specs.map((s, i) => {
+                const IconComp = Icon[s.icon]
+                return (
                   <div key={i} className="comp-spec">
-                    <div className="comp-spec__icon">{s.icon}</div>
+                    <div className="comp-spec__icon">{IconComp ? <IconComp width="20" height="20" /> : ''}</div>
                     <div className="comp-spec__label">{lang === 'kz' ? s.label_kz : s.label_ru}</div>
                     <div className="comp-spec__value">{s.value}</div>
                   </div>
-                ))}
+                )
+                })}
               </div>
             </div>
 

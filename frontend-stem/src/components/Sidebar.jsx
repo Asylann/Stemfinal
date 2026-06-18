@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import Icon from './Icons'
 import './Sidebar.css'
 
 const menuItems = [
@@ -85,7 +86,7 @@ export default function Sidebar({ isOpen, onClose }) {
       <div className={`menu-overlay ${isOpen ? 'active' : ''}`} onClick={onClose} />
 
       <nav className={`menu-sidebar ${isOpen ? 'active' : ''}`}>
-        <button className="menu-close" onClick={onClose}>✕</button>
+        <button className="menu-close" onClick={onClose}><Icon.X width="16" height="16" /></button>
         <h2 className="menu-title">МЕНЮ</h2>
 
         <div className="accordion">

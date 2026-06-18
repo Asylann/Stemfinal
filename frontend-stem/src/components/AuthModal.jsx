@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
+import Icon from './Icons'
 import './AuthModal.css'
 
 export default function AuthModal() {
@@ -99,7 +100,7 @@ export default function AuthModal() {
             />
           </div>
 
-          {error && <div className="auth-box__error">⚠️ {error}</div>}
+          {error && <div className="auth-box__error">{error}</div>}
 
           <button type="submit" className="auth-box__submit" disabled={loading}>
             {loading ? 'Загрузка...' : mode === 'login' ? 'Войти в аккаунт' : 'Создать аккаунт'}
@@ -128,7 +129,7 @@ export default function AuthModal() {
           }}
           onMouseOver={e => e.currentTarget.style.color = '#000'}
           onMouseOut={e => e.currentTarget.style.color = '#666'}
-        >✕</button>
+        ><Icon.X width="16" height="16" /></button>
 
       </div>
     </div>

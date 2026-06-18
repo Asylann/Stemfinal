@@ -5,6 +5,7 @@ import { useCart } from '../../context/CartContext'
 import { useFavorites } from '../../context/FavoritesContext'
 import { useAuth } from '../../context/AuthContext'
 import { useCategoryProducts } from '../../hooks/useCategoryProducts'
+import Icon from '../../components/Icons'
 import './Peregorodki.css'
 
 
@@ -79,11 +80,11 @@ export default function Peregorodki() {
     } catch (err) {
       console.error('Ошибка отправки заявки:', err)
       if (err.response?.status === 400) {
-        alert('❌ Проверьте правильность заполнения формы')
+        alert('Проверьте правильность заполнения формы')
       } else if (err.response?.status === 500) {
-        alert('⚠️ Сервер временно недоступен. Попробуйте позже')
+        alert('Сервер временно недоступен. Попробуйте позже')
       } else {
-        alert('❌ Не удалось отправить заявку. Проверьте соединение')
+        alert('Не удалось отправить заявку. Проверьте соединение')
       }
     } finally {
       setSubmitting(false)
@@ -140,8 +141,8 @@ export default function Peregorodki() {
                 </table>
 
                 <div className="peregorodki-card__delivery">
-                  <span>🚚 Доставка по Казахстану</span>
-                  <span>📍 Самовывоз: г. Астана, ул. Домалак-ана 26</span>
+                  <span><Icon.Truck width="16" height="16" /> Доставка по Казахстану</span>
+                  <span><Icon.MapPin width="16" height="16" /> Самовывоз: г. Астана, ул. Домалак-ана 26</span>
                 </div>
 
                 {/* Кнопки В корзину + В избранное */}
@@ -152,14 +153,14 @@ export default function Peregorodki() {
                     disabled={addedId === p.id}
                     type="button"
                   >
-                    {addedId === p.id ? '✓ Добавлено!' : '🛒 В корзину'}
+                    {addedId === p.id ? <><Icon.Check width="16" height="16" /> Добавлено!</> : <><Icon.ShoppingCart width="16" height="16" /> В корзину</>}
                   </button>
                   <button
                     className={`perego-btn-fav ${isFavorite(p.id) ? 'active' : ''}`}
                     onClick={() => toggleFavorite(p)}
                     type="button"
                   >
-                    {isFavorite(p.id) ? '❤️ В избранном' : '🤍 В избранное'}
+                    {isFavorite(p.id) ? <><Icon.HeartFilled width="16" height="16" /> В избранном</> : <><Icon.Heart width="16" height="16" /> В избранное</>}
                   </button>
                 </div>
 
@@ -169,12 +170,12 @@ export default function Peregorodki() {
                   onClick={() => handleOpenModal(p)}
                   type="button"
                 >
-                  📝 Оставить заявку
+                  <Icon.FileText width="16" height="16" /> Оставить заявку
                 </button>
 
                 <div className="peregorodki-card__share">
-                  <button type="button">↗ Поделиться</button>
-                  <button type="button">⚖ Сравнить</button>
+                  <button type="button"><Icon.Share2 width="14" height="14" style={{display:'inline',verticalAlign:'middle',marginRight:4}} />Поделиться</button>
+                  <button type="button"><Icon.Scale width="14" height="14" style={{display:'inline',verticalAlign:'middle',marginRight:4}} />Сравнить</button>
                 </div>
               </div>
 
@@ -187,16 +188,16 @@ export default function Peregorodki() {
       {showModal && (
         <div className="modal-overlay" onClick={handleCloseModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={handleCloseModal} type="button">×</button>
+            <button className="modal-close" onClick={handleCloseModal} type="button"><Icon.X width="16" height="16" /></button>
 
-            <h2 className="modal-title">📝 Оставить заявку</h2>
+            <h2 className="modal-title"><Icon.FileText width="20" height="20" /> Оставить заявку</h2>
             <p className="modal-subtitle">
               Товар: <strong>{formData.productName}</strong>
             </p>
 
             {submitSuccess ? (
               <div className="success-message">
-                <div className="success-icon">✅</div>
+                <div className="success-icon"><Icon.CheckCircle width="40" height="40" /></div>
                 <h3>Заявка отправлена!</h3>
                 <p>Наш менеджер свяжется с вами в ближайшее время.</p>
               </div>
@@ -238,10 +239,10 @@ export default function Peregorodki() {
                   />
                 </div>
                 <button type="submit" className="btn-submit" disabled={submitting}>
-                  {submitting ? '⏳ Отправка...' : '📤 Отправить заявку'}
+                  {submitting ? 'Отправка...' : <><Icon.Send width="16" height="16" /> Отправить заявку</>}
                 </button>
                 <p className="form-note">
-                  🔒 Ваши данные защищены. Мы не передаём их третьим лицам.
+                  <Icon.Lock width="14" height="14" /> Ваши данные защищены. Мы не передаём их третьим лицам.
                 </p>
               </form>
             )}

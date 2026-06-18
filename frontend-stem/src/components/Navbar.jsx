@@ -4,6 +4,7 @@ import { useLang } from '../i18n/LanguageContext'
 import { useCart } from '../context/CartContext'
 import { useFavorites } from '../context/FavoritesContext'
 import { useAuth } from '../context/AuthContext'
+import Icon from './Icons'
 import './Navbar.css'
 
 function CallbackModal({ onClose }) {
@@ -26,10 +27,10 @@ function CallbackModal({ onClose }) {
   return (
     <div className="callback-overlay" onClick={onClose}>
       <div className="callback-modal" onClick={e => e.stopPropagation()}>
-        <button className="callback-close" onClick={onClose}>✕</button>
+        <button className="callback-close" onClick={onClose}><Icon.X width="16" height="16" /></button>
         {sent ? (
           <div className="callback-success">
-            <div className="callback-success-icon">✓</div>
+            <div className="callback-success-icon"><Icon.Check width="32" height="32" /></div>
             <h3>{t.callback_success}</h3>
           </div>
         ) : (
@@ -143,7 +144,7 @@ export default function Navbar() {
               onClick={() => setCityOpen(!cityOpen)}
               type="button"
             >
-              📍 {selectedCity === 'almaty' ? t.city_almaty : t.city_astana} <span className="city-arrow">{cityOpen ? '▲' : '▼'}</span>
+              <Icon.MapPin width="14" height="14" style={{display:'inline'}} /> {selectedCity === 'almaty' ? t.city_almaty : t.city_astana} <span className="city-arrow">{cityOpen ? '▲' : '▼'}</span>
             </button>
             {cityOpen && (
               <div className="city-dropdown">
@@ -161,7 +162,7 @@ export default function Navbar() {
             )}
           </div>
           <div className="topbar-right">
-            <span className="topbar-phone">📞 {t.phone}</span>
+            <span className="topbar-phone"><Icon.Phone width="14" height="14" /> {t.phone}</span>
             <button
               className="topbar-callback-btn"
               onClick={() => setCallbackOpen(true)}
@@ -221,7 +222,7 @@ export default function Navbar() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
-            <button type="submit">🔍</button>
+            <button type="submit"><Icon.Search width="16" height="16" /></button>
           </form>
 
           <div className="navbar-icons">
@@ -314,7 +315,7 @@ export default function Navbar() {
                 value={query}
                 onChange={e => setQuery(e.target.value)}
               />
-              <button type="submit">🔍</button>
+              <button type="submit"><Icon.Search width="16" height="16" /></button>
             </form>
             <div className="mobile-nav-links">
               <span className="mobile-nav-section">{t.catalog}</span>

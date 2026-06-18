@@ -3,6 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom'
 import { useInView } from 'react-intersection-observer'
 import { getProducts } from '../api/api'
 import { useLang } from '../i18n/LanguageContext'
+import Icon from '../components/Icons'
 import './SearchPage.css'
 
 
@@ -116,7 +117,7 @@ export default function SearchPage() {
         <p className="search-loading">Загрузка товаров...</p>
       ) : results.length === 0 ? (
         <div className="search-empty">
-          <p>😔 Ничего не найдено по запросу "{query}"</p>
+          <p><Icon.Frown width="20" height="20" style={{display:'inline',verticalAlign:'middle',marginRight:6}} />Ничего не найдено по запросу "{query}"</p>
           <Link to="/" className="btn-back">← Вернуться на главную</Link>
         </div>
       ) : (

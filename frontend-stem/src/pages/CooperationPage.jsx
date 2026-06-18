@@ -3,11 +3,10 @@ import { useLang } from '../i18n/LanguageContext'
 import './InfoPage.css'
 
 const SEGMENTS = [
-  { icon: '🏢', titleKey: 'cooperation_wholesale_title', textKey: 'cooperation_wholesale_text' },
-  { icon: '🎓', titleKey: 'cooperation_org_title',       textKey: 'cooperation_org_text' },
-  { icon: '🤝', titleKey: 'cooperation_partner_title',   textKey: 'cooperation_partner_text' },
+  { titleKey: 'cooperation_wholesale_title', textKey: 'cooperation_wholesale_text' },
+  { titleKey: 'cooperation_org_title',       textKey: 'cooperation_org_text' },
+  { titleKey: 'cooperation_partner_title',   textKey: 'cooperation_partner_text' },
   {
-    icon: '📐',
     titleKey: null,
     textKey: null,
     title: 'Для проектных организаций',
@@ -35,7 +34,6 @@ export default function CooperationPage() {
           <div className="cooperation-cards">
             {SEGMENTS.map((seg, i) => (
               <div key={i} className="cooperation-card">
-                <div className="cooperation-card__icon">{seg.icon}</div>
                 <h3>{seg.titleKey ? t[seg.titleKey] : seg.title}</h3>
                 <p>{seg.textKey ? t[seg.textKey] : seg.text}</p>
               </div>

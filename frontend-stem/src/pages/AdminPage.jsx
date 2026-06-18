@@ -24,12 +24,12 @@ import './AdminPage.css'
 // ─── Small reusable components ────────────────────────────────────────────────
 
 function Spinner() {
-  return <div className="admin-loading">⏳ Загрузка...</div>
+  return <div className="admin-loading">Загрузка...</div>
 }
 
 function ErrorBox({ message }) {
   if (!message) return null
-  return <div className="admin-error">⚠️ {message}</div>
+  return <div className="admin-error">{message}</div>
 }
 
 // ─── Product Form Modal ───────────────────────────────────────────────────────
@@ -165,7 +165,7 @@ function ProductModal({ product, categories, onClose, onSaved }) {
                 />
               )}
               <label className="admin-img-upload__btn" htmlFor="product-img-file">
-                {uploading ? '⏳ Загрузка...' : imgPreview ? '🔄 Заменить фото' : '📷 Загрузить фото'}
+                {uploading ? 'Загрузка...' : imgPreview ? 'Заменить фото' : 'Загрузить фото'}
               </label>
               <input
                 id="product-img-file"
@@ -352,13 +352,13 @@ function ProductsTab() {
                         className="admin-btn admin-btn--secondary admin-btn--sm"
                         onClick={() => setModal(p)}
                       >
-                        ✏️ Изменить
+                        Изменить
                       </button>
                       <button
                         className="admin-btn admin-btn--danger admin-btn--sm"
                         onClick={() => setConfirmDelete({ id: p.id, title: p.title })}
                       >
-                        🗑️ Удалить
+                        Удалить
                       </button>
                     </div>
                   </td>
@@ -475,7 +475,7 @@ function ApplicationsTab() {
           disabled={refreshing}
           title="Обновить данные и синхронизировать статусы из Bitrix24"
         >
-          {refreshing ? '⏳ Обновление...' : '🔄 Обновить'}
+          {refreshing ? 'Обновление...' : 'Обновить'}
         </button>
       </div>
 
@@ -549,7 +549,7 @@ function ApplicationsTab() {
                         className="admin-btn admin-btn--danger admin-btn--sm"
                         onClick={() => setConfirmDelete({ id: a.id, name: a.name })}
                       >
-                        🗑️ Удалить
+                        Удалить
                       </button>
                     </td>
                   </tr>
@@ -759,13 +759,13 @@ function CategoriesTab() {
                         className="admin-btn admin-btn--secondary admin-btn--sm"
                         onClick={() => setModal(c)}
                       >
-                        ✏️ Изменить
+                        Изменить
                       </button>
                       <button
                         className="admin-btn admin-btn--danger admin-btn--sm"
                         onClick={() => setConfirmDelete({ id: c.id, title: c.title_ru })}
                       >
-                        🗑️ Удалить
+                        Удалить
                       </button>
                     </div>
                   </td>
@@ -927,7 +927,7 @@ function BlogPostModal({ post, onClose, onSaved }) {
                 />
               )}
               <label className="admin-img-upload__btn" htmlFor="blog-img-file">
-                {uploading ? '⏳ Загрузка...' : imgPreview ? '🔄 Заменить фото' : '📷 Загрузить фото'}
+                {uploading ? 'Загрузка...' : imgPreview ? 'Заменить фото' : 'Загрузить фото'}
               </label>
               <input
                 id="blog-img-file"
@@ -1097,13 +1097,13 @@ function BlogTab() {
                         className="admin-btn admin-btn--secondary admin-btn--sm"
                         onClick={() => setModal(p)}
                       >
-                        ✏️ Изменить
+                        Изменить
                       </button>
                       <button
                         className="admin-btn admin-btn--danger admin-btn--sm"
                         onClick={() => setConfirmDelete({ id: p.id, title: p.title })}
                       >
-                        🗑️ Удалить
+                        Удалить
                       </button>
                     </div>
                   </td>
@@ -1189,7 +1189,7 @@ function UsersTab() {
                     <td style={{ fontSize: 13, color: '#888' }}>{u.phone || '—'}</td>
                     <td>
                       <span className={`badge ${u.is_admin ? 'badge--blue' : 'badge--green'}`}>
-                        {u.is_admin ? '👑 Админ' : 'Пользователь'}
+                        {u.is_admin ? 'Админ' : 'Пользователь'}
                       </span>
                     </td>
                     <td style={{ fontSize: 13, textAlign: 'center' }}>
@@ -1277,11 +1277,11 @@ function UsersTab() {
 // ─── Main Admin Page ──────────────────────────────────────────────────────────
 
 const TABS = [
-  { id: 'products',     label: '📦 Товары' },
-  { id: 'categories',   label: '📁 Категории' },
-  { id: 'blog',         label: '📝 Блог' },
-  { id: 'applications', label: '📋 Заявки' },
-  { id: 'users',        label: '👤 Пользователи' },
+  { id: 'products',     label: 'Товары' },
+  { id: 'categories',   label: 'Категории' },
+  { id: 'blog',         label: 'Блог' },
+  { id: 'applications', label: 'Заявки' },
+  { id: 'users',        label: 'Пользователи' },
 ]
 
 export default function AdminPage() {
@@ -1291,7 +1291,7 @@ export default function AdminPage() {
 
   // Wait for AuthContext to finish loading before making access decision
   if (loading) {
-    return <div className="admin-denied"><div className="admin-loading">⏳ Проверка доступа...</div></div>
+    return <div className="admin-denied"><div className="admin-loading">Проверка доступа...</div></div>
   }
 
   // Not logged in
@@ -1328,7 +1328,7 @@ export default function AdminPage() {
           <span>STEM</span>Academia — Панель администратора
         </div>
         <div className="admin-header__meta">
-          <span>👤 {user.name}</span>
+          <span>{user.name}</span>
           <button
             className="admin-header__logout"
             onClick={() => { logout(); navigate('/') }}

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useLang } from '../i18n/LanguageContext'
 import { sendContactMessage } from '../api/api'
+import Icon from '../components/Icons'
 import './Contacts.css'
 
 export default function Contacts() {
@@ -78,8 +79,8 @@ export default function Contacts() {
           {/* Адрес */}
           <div className="contacts-col">
             <h3 className="contacts-col__title">{t.contacts_address}</h3>
-            <p className="contacts-col__text">📍 г. Астана, Домалак-ана 26</p>
-            <p className="contacts-col__text">📍 г. Алматы, пр. Аль-Фараби 77/2</p>
+            <p className="contacts-col__text"><Icon.MapPin width="16" height="16" style={{display:'inline'}} /> г. Астана, Домалак-ана 26</p>
+            <p className="contacts-col__text"><Icon.MapPin width="16" height="16" style={{display:'inline'}} /> г. Алматы, пр. Аль-Фараби 77/2</p>
             <h3 className="contacts-col__title" style={{marginTop:'16px'}}>{t.contacts_schedule}</h3>
             <p className="contacts-col__text">Пн–Пт: 9:00 – 18:00</p>
             <p className="contacts-col__text">Сб–Вс: выходной</p>
@@ -123,7 +124,7 @@ export default function Contacts() {
           <h2 className="contacts-form-title">{t.contacts_form_title}</h2>
           {sent ? (
             <div className="contacts-form-success">
-              <div className="contacts-success-icon">✓</div>
+              <div className="contacts-success-icon"><Icon.Check width="24" height="24" /></div>
               <p>{t.contacts_form_success}</p>
             </div>
           ) : (

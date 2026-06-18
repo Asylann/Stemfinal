@@ -2,6 +2,7 @@ import { useState, memo } from 'react'
 import { Link } from 'react-router-dom'
 import { useFavorites } from '../context/FavoritesContext'
 import { useCart } from '../context/CartContext'
+import Icon from '../components/Icons'
 import './FavoritesPage.css'
 
 
@@ -46,7 +47,7 @@ const FavCard = memo(function FavCard({ item }) {
         aria-label={`Убрать ${name} из избранного`}
         type="button"
       >
-        ×
+        <Icon.X width="16" height="16" />
       </button>
 
       <div className="fav-card__image-wrapper">
@@ -59,7 +60,7 @@ const FavCard = memo(function FavCard({ item }) {
         />
         {imgError && (
           <div style={{ color: '#999', textAlign: 'center', position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: '40px' }}>📦</span>
+            <span style={{ fontSize: '40px' }}><Icon.Package width="40" height="40" /></span>
             <p>Нет фото</p>
           </div>
         )}
@@ -76,7 +77,7 @@ const FavCard = memo(function FavCard({ item }) {
             disabled={added}
             type="button"
           >
-            {added ? '✓ Добавлено!' : '🛒 В корзину'}
+            {added ? <><Icon.Check width="16" height="16" /> Добавлено!</> : <><Icon.ShoppingCart width="16" height="16" /> В корзину</>}
           </button>
 
           <a
@@ -85,7 +86,7 @@ const FavCard = memo(function FavCard({ item }) {
             rel="noreferrer noopener"
             className="fav-btn-order"
           >
-            📋 Оставить заявку
+            <Icon.FileText width="16" height="16" /> Оставить заявку
           </a>
         </div>
       </div>
@@ -100,9 +101,9 @@ export default function FavoritesPage() {
   if (!favorites || favorites.length === 0) {
     return (
       <div className="fav-empty">
-        <span style={{ fontSize: '50px', display: 'block', marginBottom: '10px' }}>♡</span>
+        <span style={{ display: 'block', marginBottom: '10px' }}><Icon.Heart width="50" height="50" /></span>
         <h2>Список пуст</h2>
-        <p>Нажмите ❤ на товаре, чтобы добавить его сюда</p>
+        <p>Нажмите <Icon.Heart width="16" height="16" style={{display:'inline',verticalAlign:'middle'}} /> на товаре, чтобы добавить его сюда</p>
         <Link to="/catalog" className="fav-login-btn">Перейти в каталог</Link>
       </div>
     )

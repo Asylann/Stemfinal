@@ -1,3 +1,5 @@
+import Icon from './Icons'
+
 export default function TelegramButton() {
   return (
     <a
@@ -17,7 +19,7 @@ export default function TelegramButton() {
         fontSize: "15px"
       }}
     >
-      💬 Задать вопрос менеджеру
+      <Icon.MessageCircle width="18" height="18" /> Задать вопрос менеджеру
     </a>
   );
 }

@@ -1,17 +1,18 @@
 import { useLang } from '../../i18n/LanguageContext'
 import { Link } from 'react-router-dom'
+import Icon from '../../components/Icons'
 import './InteractivePanels.css'
 
 const specs = [
-  { icon: '⛶', label_ru: 'Диагональ/дюйм',       label_kz: 'Диагональ/дюйм',         value: "65' 75' 85'",                  highlight: true  },
-  { icon: '⊞', label_ru: 'Разрешение',             label_kz: 'Ажыратымдылық',           value: '3840x2160',                   highlight: true  },
-  { icon: '🛡', label_ru: 'Поверхность экрана',     label_kz: 'Экран беті',              value: 'Антибликовая Антивандальная', highlight: false },
-  { icon: '💻', label_ru: 'Операционные системы',   label_kz: 'Операциялық жүйелер',     value: 'Android 11 Windows 11',       highlight: true  },
-  { icon: '📡', label_ru: 'Применяемая технология', label_kz: 'Қолданылатын технология', value: 'инфракрасная сенсорная',      highlight: true  },
-  { icon: '💾', label_ru: 'Тип оперативной памяти', label_kz: 'Жедел жад түрі',          value: 'DDR4',                        highlight: true  },
-  { icon: '🔊', label_ru: 'Встроенные динамики',    label_kz: 'Кірістірілген динамиктер',value: '2x15 Вт',                     highlight: true  },
-  { icon: '📋', label_ru: 'Оперативная память',     label_kz: 'Жедел жад',               value: '8Gb',                         highlight: true  },
-  { icon: '🔆', label_ru: 'Контрастность',          label_kz: 'Контрасттылық',           value: '1200:1',                      highlight: false },
+  { icon: 'Maximize', label_ru: 'Диагональ/дюйм',       label_kz: 'Диагональ/дюйм',         value: "65' 75' 85'",                  highlight: true  },
+  { icon: 'Grid', label_ru: 'Разрешение',             label_kz: 'Ажыратымдылық',           value: '3840x2160',                   highlight: true  },
+  { icon: 'Shield', label_ru: 'Поверхность экрана',     label_kz: 'Экран беті',              value: 'Антибликовая Антивандальная', highlight: false },
+  { icon: 'Laptop', label_ru: 'Операционные системы',   label_kz: 'Операциялық жүйелер',     value: 'Android 11 Windows 11',       highlight: true  },
+  { icon: 'Radio', label_ru: 'Применяемая технология', label_kz: 'Қолданылатын технология', value: 'инфракрасная сенсорная',      highlight: true  },
+  { icon: 'Folder', label_ru: 'Тип оперативной памяти', label_kz: 'Жедел жад түрі',          value: 'DDR4',                        highlight: true  },
+  { icon: 'Volume2', label_ru: 'Встроенные динамики',    label_kz: 'Кірістірілген динамиктер',value: '2x15 Вт',                     highlight: true  },
+  { icon: 'ClipboardList', label_ru: 'Оперативная память',     label_kz: 'Жедел жад',               value: '8Gb',                         highlight: true  },
+  { icon: 'Sun', label_ru: 'Контрастность',          label_kz: 'Контрасттылық',           value: '1200:1',                      highlight: false },
   { icon: 'R',  label_ru: 'Встроенная ПО',          label_kz: 'Кірістірілген БҚ',        value: 'ROQED SCIENCE',               highlight: true, orange: true },
 ]
 
@@ -54,13 +55,16 @@ export default function InteractivePanels() {
 
           <h3 className="interactive-card__section-title">{t.interactive_specs_title}</h3>
           <div className="interactive-card__specs">
-            {specs.map((s, i) => (
-              <div key={i} className={`spec-item ${s.orange ? 'spec-item--orange' : ''}`}>
-                <div className="spec-item__icon">{s.icon}</div>
+            {specs.map((s, i) => {
+              const IconComp = Icon[s.icon]
+              return (
+                <div key={i} className={`spec-item ${s.orange ? 'spec-item--orange' : ''}`}>
+                  <div className="spec-item__icon">{s.icon === 'R' ? 'R' : IconComp ? <IconComp width="20" height="20" /> : ''}</div>
                 <div className="spec-item__label">{lang === 'kz' ? s.label_kz : s.label_ru}</div>
                 <div className={`spec-item__value ${s.highlight ? 'spec-item__value--bold' : ''}`}>{s.value}</div>
               </div>
-            ))}
+            )
+            })}
           </div>
 
           <p className="interactive-card__article">{t.article_label}: L.Me-DI.UN.2500</p>

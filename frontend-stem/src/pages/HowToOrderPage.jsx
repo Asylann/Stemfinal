@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useLang } from '../i18n/LanguageContext'
+import Icon from '../components/Icons'
 import './InfoPage.css'
 
 export default function HowToOrderPage() {
@@ -44,11 +45,11 @@ export default function HowToOrderPage() {
           <h2>Условия оплаты и доставки</h2>
           <div className="info-two-cols">
             <div className="info-box">
-              <h3>💳 {t.how_to_order_payment_title}</h3>
+              <h3><Icon.CreditCard width="18" height="18" style={{display:'inline',verticalAlign:'middle',marginRight:6}} />{t.how_to_order_payment_title}</h3>
               <p>{t.how_to_order_payment_text}</p>
             </div>
             <div className="info-box">
-              <h3>🚚 {t.how_to_order_delivery_title}</h3>
+              <h3><Icon.Truck width="18" height="18" style={{display:'inline',verticalAlign:'middle',marginRight:6}} />{t.how_to_order_delivery_title}</h3>
               <p>{t.how_to_order_delivery_text}</p>
             </div>
           </div>
