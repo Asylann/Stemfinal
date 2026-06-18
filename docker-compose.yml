@@ -40,6 +40,7 @@ services:
     volumes:
       - uploads_data:/app/uploads
       - ./backend-stem:/app
+      - ./frontend-stem/public:/frontend-public:ro
     command: >
       sh -c "alembic upgrade head && python seed_db.py && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
     networks:

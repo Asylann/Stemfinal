@@ -13,6 +13,17 @@
 import { useState, useEffect } from 'react'
 import { getProducts } from '../api/api'
 
+function hasImage(p) {
+  if (p.img) return true
+  if (Array.isArray(p.imgs) && p.imgs.length > 0) return true
+  if (Array.isArray(p.colors) && p.colors.some(c => c.img)) return true
+  return false
+}
+
+function sortProductsByImage(list) {
+  return [...list].sort((a, b) => (hasImage(b) ? 1 : 0) - (hasImage(a) ? 1 : 0))
+}
+
 export function useCategoryProducts(slug, fallback = []) {
   const [products, setProducts] = useState(fallback)
   const [loading, setLoading] = useState(true)
@@ -33,9 +44,9 @@ export function useCategoryProducts(slug, fallback = []) {
         if (cancelled) return
         // If API returns products — use them; otherwise keep the fallback
         if (Array.isArray(data) && data.length > 0) {
-          setProducts(data)
+          setProducts(sortProductsByImage(data))
         } else if (fallback.length > 0) {
-          setProducts(fallback)
+          setProducts(sortProductsByImage(fallback))
         } else {
           setProducts([])
         }
@@ -45,7 +56,7 @@ export function useCategoryProducts(slug, fallback = []) {
         console.warn(`useCategoryProducts(${slug}): API error, using fallback.`, err)
         setError(err.message)
         // Keep the fallback so the page still shows something
-        setProducts(fallback)
+        setProducts(sortProductsByImage(fallback))
       })
       .finally(() => {
         if (!cancelled) setLoading(false)

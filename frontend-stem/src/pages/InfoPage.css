@@ -255,6 +255,28 @@
   margin-top: 10px;
 }
 
+/* Instruction detail page */
+.instruction-detail-section {
+  margin-bottom: 28px;
+}
+
+.instruction-detail-section h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a4731;
+  margin-bottom: 10px;
+  padding-left: 14px;
+  border-left: 3px solid #2d6a4f;
+}
+
+.instruction-detail-section p {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.8;
+  margin-bottom: 8px;
+  white-space: pre-line;
+}
+
 /* Блог - карточки */
 .blog-grid {
   display: grid;

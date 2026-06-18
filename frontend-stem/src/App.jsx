@@ -118,6 +118,7 @@ export default function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/cooperation" element={<CooperationPage />} />
         <Route path="/instructions" element={<InstructionsPage />} />
+        <Route path="/instructions/:slug" element={<InstructionsPage />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/blog/:id" element={<BlogPostDetail />} />
         <Route path="/how-to-order" element={<HowToOrderPage />} />

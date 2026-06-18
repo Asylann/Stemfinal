@@ -376,10 +376,23 @@ function ProductCard({ product }) {
 }
 
 
+function hasProductImage(p) {
+  if (p.img) return true
+  if (Array.isArray(p.imgs) && p.imgs.length > 0) return true
+  if (Array.isArray(p.colors) && p.colors.some(c => c.img)) return true
+  return false
+}
+
 export default function ProductList({ products, title, backPath, backLabel }) {
   const { t } = useLang()
 
-  if (!products || products.length === 0) {
+  // Sort: products with images first, without images last
+  const sortedProducts = useMemo(() => {
+    if (!products || products.length === 0) return []
+    return [...products].sort((a, b) => (hasProductImage(b) ? 1 : 0) - (hasProductImage(a) ? 1 : 0))
+  }, [products])
+
+  if (!sortedProducts || sortedProducts.length === 0) {
     return (
       <div className="divany-page">
         <div className="empty-state">
@@ -410,10 +423,10 @@ export default function ProductList({ products, title, backPath, backLabel }) {
         <span>{title}</span>
       </div>
       <h1 className="divany-title">
-        {title} <span>{products.length} товаров</span>
+        {title} <span>{sortedProducts.length} товаров</span>
       </h1>
       <div className="divany-list">
-        {products.map((product) => (
+        {sortedProducts.map((product) => (
           <ProductCard key={product.id || product.article} product={product} />
         ))}
       </div>
