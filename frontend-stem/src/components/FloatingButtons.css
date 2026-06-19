@@ -173,6 +173,33 @@
   font-style: italic;
 }
 
+.grok-chat-img {
+  display: block;
+  width: 100%;
+  max-height: 180px;
+  border-radius: 10px;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.grok-chat-img:hover {
+  transform: scale(1.03);
+}
+
+.grok-chat-img-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.grok-chat-img-grid .grok-chat-img {
+  flex: 1 1 calc(50% - 4px);
+  min-width: 0;
+  max-height: 160px;
+}
+
 .grok-chat-composer {
   border-top: 1px solid rgba(148, 163, 184, 0.18);
   padding: 14px;

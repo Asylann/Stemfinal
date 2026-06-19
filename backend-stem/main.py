@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import httpx
 from pathlib import Path
@@ -22,6 +23,7 @@ app.router.redirect_slashes = False
 
 # ── Product catalog cache for the AI chatbot ──────────────────────────────────
 PRODUCT_CATALOG_TEXT = ""  # populated on startup
+PRODUCT_IMAGE_MAP = {}  # {lowercase_title: [{title, url}, ...]} — for post-processing
 
 
 def _build_product_catalog() -> str:
@@ -33,6 +35,9 @@ def _build_product_catalog() -> str:
 
         cat_map = {c.slug: c.title_ru for c in all_categories}
 
+        global PRODUCT_IMAGE_MAP
+        PRODUCT_IMAGE_MAP = {}
+
         # Group products by category
         grouped: dict[str, list[str]] = {}
         for p in all_products:
@@ -42,7 +47,40 @@ def _build_product_catalog() -> str:
                 entry += f" (арт. {p.article})"
             if p.size:
                 entry += f", {p.size}"
+
+            # Parse color variants for catalog text
+            colors = []
+            color_imgs = []
+            if p.colors_json:
+                try:
+                    color_list = json.loads(p.colors_json)
+                    for c in color_list:
+                        cname = c.get("name", "")
+                        if cname:
+                            colors.append(cname)
+                        cimg = c.get("img", "")
+                        if cimg:
+                            color_imgs.append({"title": f"{p.title} ({cname})", "url": cimg})
+                except (json.JSONDecodeError, TypeError):
+                    pass
+
+            if colors:
+                entry += f" | Цвета: {', '.join(colors)}"
+
+            # Flag if product has photos (without showing paths)
+            has_photo = bool(p.img) or bool(color_imgs)
+            if has_photo:
+                entry += " [есть фото]"
+
             grouped.setdefault(cat_name, []).append(entry)
+
+            # Build image map: title -> list of images (main + color variants)
+            images_for_product = []
+            if p.img:
+                images_for_product.append({"title": p.title, "url": p.img})
+            images_for_product.extend(color_imgs)
+            if images_for_product:
+                PRODUCT_IMAGE_MAP[p.title.lower()] = images_for_product
 
         lines = ["КАТАЛОГ ТОВАРОВ (актуальный список из базы данных):"]
         for cat_name, items in grouped.items():
@@ -145,6 +183,13 @@ Email: info@stem-academia.kz
 8. Рекомендуй подходящие товары из каталога когда просят помочь с выбором.
 
 • на любую другую тему не отвечай, строго информация из нашей компании (stem-academia.kz)
+
+═══ ФОТО ТОВАРОВ ═══
+
+9. ЗАПРЕЩЕНО использовать markdown-формат изображений ![...](...)  в ответах. Никогда не указывай пути к файлам или URL изображений.
+10. Когда клиент просит фото — просто назови товар и перечисли доступные цвета. Фотографии будут прикреплены к ответу автоматически.
+11. Если клиент спрашивает конкретный цвет — упомяни этот цвет в ответе.
+12. Упоминай максимум 3 товара за один ответ.
 """
 
 
@@ -178,6 +223,24 @@ def build_chat_messages(body: dict) -> list[dict[str, str]]:
             messages.append({"role": "user", "content": user_message.strip()[:4000]})
 
     return messages
+
+
+def _resolve_images(reply: str) -> list[dict]:
+    """Scan AI reply for product name mentions and return matching images (including color variants)."""
+    if not PRODUCT_IMAGE_MAP:
+        return []
+    found = []
+    seen_urls = set()
+    reply_lower = reply.lower()
+    for title_lower, images in PRODUCT_IMAGE_MAP.items():
+        if title_lower in reply_lower:
+            for img in images:
+                if img["url"] not in seen_urls:
+                    found.append(img)
+                    seen_urls.add(img["url"])
+            if len(found) >= 6:
+                break
+    return found[:6]
 
 
 @app.post("/api/ai/chat")
@@ -228,7 +291,10 @@ async def ai_chat(request: Request):
             if response.status_code == 200:
                 result = response.json()
                 reply = result["choices"][0]["message"]["content"].strip()
-                return {"reply": reply}
+                # Strip any markdown images the AI may have sneaked in
+                reply = re.sub(r'!\[[^\]]*\]\([^)]*\)\s*', '', reply).strip()
+                images = _resolve_images(reply)
+                return {"reply": reply, "images": images}
             else:
                 err = response.json() if response.headers.get("content-type","").startswith("application/json") else {}
                 print(f"❌ AI API error {response.status_code}: {err.get('error', {}).get('message', response.text[:200])}")
