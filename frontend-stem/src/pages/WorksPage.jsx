@@ -23,6 +23,8 @@ function LazyVideo({ src, className }) {
         if (entry.isIntersecting) {
           setShouldLoad(true)
           observer.disconnect()
+        } else if (shouldLoad) {
+          el.pause()
         }
       },
       { rootMargin: '200px' }
@@ -30,7 +32,7 @@ function LazyVideo({ src, className }) {
 
     observer.observe(el)
     return () => observer.disconnect()
-  }, [])
+  }, [shouldLoad])
 
   useEffect(() => {
     const v = videoRef.current
@@ -49,7 +51,7 @@ function LazyVideo({ src, className }) {
       loop
       muted
       playsInline
-      preload="none"
+      preload={shouldLoad ? 'auto' : 'none'}
     />
   )
 }
