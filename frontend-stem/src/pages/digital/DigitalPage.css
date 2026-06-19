@@ -46,6 +46,10 @@
   grid-template-columns: repeat(2, 1fr);
 }
 
+.digital-row--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
 
 .digital-card {
   border-radius: 16px;
@@ -131,6 +135,7 @@
 @media (max-width: 768px) {
   .digital-page { padding: 0 16px 40px; }
   .digital-row--2 { grid-template-columns: 1fr; }
+  .digital-row--3 { grid-template-columns: 1fr; }
   .digital-card--img { height: 220px; }
   .digital-card--text { flex-direction: column; height: auto; }
   .digital-card--text .digital-card__img-wrap { width: 100%; height: 160px; }

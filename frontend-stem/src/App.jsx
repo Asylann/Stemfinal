@@ -35,6 +35,7 @@ import AdminGuard from './components/AdminGuard'
 
 
 import RoqedPage from './pages/digital/RoqedPage'
+import RoqedAiPage from './pages/digital/RoqedAiPage'
 import StemPlatformPage from './pages/digital/StemPlatformPage'
 import InfoStendPage from './pages/digital/InfoStendPage'
 import SteamBookPage from './pages/digital/SteamBookPage'
@@ -110,6 +111,7 @@ export default function App() {
         <Route path="/digital" element={<DigitalPage />} />
         <Route path="/digital/stemplatform" element={<StemPlatformPage />} />
         <Route path="/digital/roqed" element={<RoqedPage />} />
+        <Route path="/digital/roqed-ai" element={<RoqedAiPage />} />
         <Route path="/digital/infostend" element={<InfoStendPage />} />
         <Route path="/digital/steambook" element={<SteamBookPage />} />
         <Route path="/visualize" element={<VisualizePage />} />
