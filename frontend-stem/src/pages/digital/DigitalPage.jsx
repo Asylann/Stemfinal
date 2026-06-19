@@ -3,6 +3,7 @@ import './DigitalPage.css'
 
 const row1 = [
   { title: 'ROQED SCIENCE',  img: '/img/pagedigital/roqed.jpg',         path: '/digital/roqed' },
+  { title: 'ROQED AI',       img: '/img/pagedigital/roqed-ai-logo.png', path: '/digital/roqed-ai' },
   { title: 'STEM PLATFORM',  img: '/img/pagedigital/stem-platform.jpg', path: '/digital/stemplatform' },
 ]
 
@@ -40,7 +41,7 @@ export default function DigitalPage() {
 
       <main className="digital-main">
 
-        <div className="digital-row digital-row--2">
+        <div className="digital-row digital-row--3">
           {row1.map((item, i) => (
             <Link key={i} to={item.path} className="digital-card digital-card--img">
               <span className="digital-card__title">{item.title}</span>
