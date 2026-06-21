@@ -1,5 +1,6 @@
 import { useLang } from '../../i18n/LanguageContext'
 import { Link } from 'react-router-dom'
+import ProductActions from '../../components/ProductActions'
 import './Printers3D.css'
 
 export default function Printers3D() {
@@ -68,6 +69,8 @@ export default function Printers3D() {
           </div>
 
           <p className="printers3d-right__article">{t.article_label}: M.Ee-3DP.FL.5M</p>
+
+          <ProductActions product={{ title: t.electro_printers || '3D Принтер', article: 'M.Ee-3DP.FL.5M', img: '/img/pagethird/printers3d/item3.png' }} />
         </div>
 
       </main>

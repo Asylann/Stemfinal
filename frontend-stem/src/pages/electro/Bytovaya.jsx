@@ -1,6 +1,7 @@
 import { useLang } from '../../i18n/LanguageContext'
 import { Link } from 'react-router-dom'
 import Icon from '../../components/Icons'
+import ProductActions from '../../components/ProductActions'
 import './Bytovaya.css'
 
 export default function Bytovaya() {
@@ -46,6 +47,8 @@ export default function Bytovaya() {
 
           <div className="bytovaya-card__divider" />
           <p className="bytovaya-card__article">{t.article_label}: S.Ee-INK.DDS.K</p>
+
+          <ProductActions product={{ title: t.electro_bytovaya || 'Бытовая техника', article: 'S.Ee-BYT.GEN', img: '/img/pagethird/bytovaya/item1.png' }} />
         </div>
 
         <div className="bytovaya-image">

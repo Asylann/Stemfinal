@@ -1,6 +1,7 @@
 import { useLang } from '../../i18n/LanguageContext'
 import { Link } from 'react-router-dom'
 import Icon from '../../components/Icons'
+import ProductActions from '../../components/ProductActions'
 import './InteractivePanels.css'
 
 const specs = [
@@ -68,6 +69,8 @@ export default function InteractivePanels() {
           </div>
 
           <p className="interactive-card__article">{t.article_label}: L.Me-DI.UN.2500</p>
+
+          <ProductActions product={{ title: t.electro_panels || 'Интерактивная панель', article: 'M.Ee-IP.Rq.75', img: '/img/pagethird/interactive/item2.png' }} />
         </div>
 
         <div className="interactive-card--image">

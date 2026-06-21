@@ -1,4 +1,5 @@
 import Icon from '../../components/Icons'
+import ProductActions from '../../components/ProductActions'
 import './EquipmentDetail.css'
 
 export default function Labdisc() {
@@ -94,6 +95,8 @@ export default function Labdisc() {
           </div>
 
           <p className="detail-article">Артикул: S.Ee-INK.DDS.K</p>
+
+          <ProductActions product={{ title: 'Цифровая лаборатория ЛабДиск', article: 'S.Ee-INK.DDS.K', img: '/img/equipment/labdisc.png' }} />
         </div>
 
         {/* ПРАВАЯ ЧАСТЬ */}

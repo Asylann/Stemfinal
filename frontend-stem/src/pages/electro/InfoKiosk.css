@@ -3,8 +3,6 @@
   grid-template-columns: 3fr 2fr;
   gap: 16px;
   padding: 12px 32px;
-  height: calc(100vh - 100px);
-  overflow: hidden;
   align-items: stretch;
 }
 
