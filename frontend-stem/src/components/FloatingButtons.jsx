@@ -3,6 +3,37 @@ import './FloatingButtons.css'
 import { chatWithGrok } from '../api/api'
 import Icon from './Icons'
 
+// Strip any markdown image syntax from text (safety net)
+function cleanMarkdownImages(text) {
+  return text.replace(/!\[[^\]]*\]\([^)]*\)\s*/g, '').trim()
+}
+
+// Render chat bubble with optional product images
+function ChatBubble({ content, role, images }) {
+  const clean = role === 'assistant' ? cleanMarkdownImages(content) : content
+
+  if (role !== 'assistant' || !images || images.length === 0) {
+    return <div className={`grok-chat-bubble grok-chat-bubble--${role}`}>{clean}</div>
+  }
+
+  return (
+    <div className={`grok-chat-bubble grok-chat-bubble--${role}`}>
+      <span>{clean}</span>
+      <div className="grok-chat-img-grid">
+        {images.map((img, i) => (
+          <img
+            key={i}
+            src={img.url}
+            alt={img.title}
+            className="grok-chat-img"
+            loading="lazy"
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function FloatingButtons() {
   const phoneNumber = '77770016786'
   const message = 'Здравствуйте! Интересует ваш товар'
@@ -80,12 +111,14 @@ export default function FloatingButtons() {
     try {
       const response = await chatWithGrok(text, nextMessages)
       const reply = response?.reply?.trim()
+      const images = response?.images || []
 
       setChatMessages(current => [
         ...current,
         {
           role: 'assistant',
-          content: reply || 'Не удалось получить ответ. Попробуйте ещё раз.'
+          content: reply || 'Не удалось получить ответ. Попробуйте ещё раз.',
+          images
         }
       ])
     } catch {
@@ -167,9 +200,7 @@ export default function FloatingButtons() {
 
             <div className="grok-chat-body">
               {chatMessages.map((item, index) => (
-                <div key={`${item.role}-${index}`} className={`grok-chat-bubble grok-chat-bubble--${item.role}`}>
-                  {item.content}
-                </div>
+                <ChatBubble key={`${item.role}-${index}`} content={item.content} role={item.role} images={item.images} />
               ))}
               {chatLoading && (
                 <div className="grok-chat-bubble grok-chat-bubble--assistant grok-chat-bubble--loading">
