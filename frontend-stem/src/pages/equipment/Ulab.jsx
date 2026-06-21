@@ -1,4 +1,5 @@
 import Icon from '../../components/Icons'
+import ProductActions from '../../components/ProductActions'
 import './EquipmentDetail.css'
 
 export default function Ulab() {
@@ -75,6 +76,8 @@ export default function Ulab() {
           </div>
 
           <p className="detail-article">Артикул: S.Ee-INK.DD5.K</p>
+
+          <ProductActions product={{ title: 'Набор ULABS', article: 'S.Ee-INK.DD5.K', img: '/img/equipment/ulab.png' }} />
         </div>
 
         {/* ПРАВАЯ ЧАСТЬ */}

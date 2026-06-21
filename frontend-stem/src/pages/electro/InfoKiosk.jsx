@@ -1,6 +1,7 @@
 import { useLang } from '../../i18n/LanguageContext'
 import { Link } from 'react-router-dom'
 import Icon from '../../components/Icons'
+import ProductActions from '../../components/ProductActions'
 import './InfoKiosk.css'
 
 const specs = [
@@ -72,6 +73,8 @@ export default function InfoKiosk() {
           </div>
 
           <p className="infokiosk-card__article">{t.article_label}: S.Ee-INK.DDS.K</p>
+
+          <ProductActions product={{ title: t.kiosk_title || 'Инфокиоск', article: 'S.Ee-INK.DDS.K', img: '/img/pagethird/infokiosk/item1.png' }} />
         </div>
 
         <div className="infokiosk-image">

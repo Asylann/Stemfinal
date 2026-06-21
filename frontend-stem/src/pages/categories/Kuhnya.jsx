@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import ProductActions from '../../components/ProductActions'
 import './Kuhnya.css'
 
 const features = [
@@ -61,6 +62,8 @@ export default function Kuhnya() {
             </div>
 
             <div className="kuhnya-article">Артикул: L.Me-KUHN.2500</div>
+
+            <ProductActions product={{ title: 'Мебель для кухни', article: 'L.Me-KUHN.2500', img: '/img/pagesecond/kuhnya/item1.jpg' }} />
           </div>
         </div>
 

@@ -1,6 +1,7 @@
 import { useLang } from '../../i18n/LanguageContext'
 import { Link } from 'react-router-dom'
 import Icon from '../../components/Icons'
+import ProductActions from '../../components/ProductActions'
 import './Computers.css'
 
 const specs1 = [
@@ -103,6 +104,8 @@ export default function Computers() {
             </div>
 
             <p className="computer-card__article">{t.article_label}: {c.article}</p>
+
+            <ProductActions product={{ title: `${c.type} — ${c.brand}`, article: c.article, img: c.img }} />
           </div>
         ))}
       </main>

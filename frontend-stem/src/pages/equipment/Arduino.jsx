@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import Icon from '../../components/Icons'
+import ProductActions from '../../components/ProductActions'
 import './EquipmentDetail.css'
 
 export default function Arduino() {
@@ -84,6 +85,8 @@ export default function Arduino() {
           </div>
 
           <p className="detail-article">Артикул: S.Eq-ARD.UnoR3</p>
+
+          <ProductActions product={{ title: 'Arduino Uno', article: 'S.Eq-ARD.UnoR3', img: '/img/equipment/arduino.png' }} />
         </div>
 
         {/* ПРАВАЯ ЧАСТЬ */}

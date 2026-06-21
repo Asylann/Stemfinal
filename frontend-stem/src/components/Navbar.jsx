@@ -4,6 +4,7 @@ import { useLang } from '../i18n/LanguageContext'
 import { useCart } from '../context/CartContext'
 import { useFavorites } from '../context/FavoritesContext'
 import { useAuth } from '../context/AuthContext'
+import { createApplication } from '../api/api'
 import Icon from './Icons'
 import './Navbar.css'
 
@@ -14,14 +15,26 @@ function CallbackModal({ onClose }) {
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     if (!name.trim() || !phone.trim()) return
     setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
+    try {
+      await createApplication({
+        name: name.trim(),
+        phone: phone.trim(),
+        comment: 'Обратный звонок',
+        product_name: 'Обратный звонок',
+        article: '',
+        product_url: window.location.href,
+      })
       setSent(true)
-    }, 800)
+    } catch (err) {
+      console.error('Callback error:', err)
+      alert('Не удалось отправить заявку. Попробуйте позже.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

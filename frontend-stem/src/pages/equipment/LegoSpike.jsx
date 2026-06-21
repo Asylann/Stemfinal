@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import Icon from '../../components/Icons'
+import ProductActions from '../../components/ProductActions'
 import './EquipmentDetail.css'
 
 export default function LegoSpike() {
@@ -85,6 +86,8 @@ export default function LegoSpike() {
           </div>
 
           <p className="detail-article">Артикул: S.Eq-LEGO.SpikePrime</p>
+
+          <ProductActions product={{ title: 'LEGO Education SPIKE Prime', article: 'S.Eq-LEGO.SpikePrime', img: '/img/equipment/legospike.png' }} />
         </div>
 
         {/* ПРАВАЯ ЧАСТЬ */}
