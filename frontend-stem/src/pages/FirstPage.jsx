@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
+import { useEffect, useRef } from 'react'
 import './FirstPage.css'
 import HeroSlider from '../components/HeroSlider'
 import CategoryGrid from '../components/CategoryGrid'
@@ -49,6 +50,22 @@ const INSTRUCTIONS = [
 
 export default function FirstPage() {
   const { t } = useLang()
+  const packagesRef = useRef(null)
+
+  const scrollToPackages = () => {
+    packagesRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+  const location = useLocation()
+
+  // Scroll to anchor if URL has a hash (e.g. /#packages)
+  useEffect(() => {
+    if (location.hash) {
+      const el = document.getElementById(location.hash.slice(1))
+      if (el) {
+        setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 100)
+      }
+    }
+  }, [location])
 
   return (
     <div className="page">
@@ -73,7 +90,7 @@ export default function FirstPage() {
       <div className="breadcrumb">{t.design_breadcrumb}</div>
 
       {/* Пакеты дизайна */}
-      <main className="packages">
+      <main className="packages" id="packages" ref={packagesRef}>
         {/* STANDARD */}
         <div className="package package--s">
           <div className="package__content">
@@ -192,11 +209,17 @@ export default function FirstPage() {
         <div className="dream__left">
           <h2 className="dream__title">Инновационное решение для нашего будущего</h2>
           <p className="dream__desc">{t.dream_desc}</p>
-          <a href="#" className="dream__btn">{t.dream_btn}</a>
+          <button type="button" className="dream__btn" onClick={scrollToPackages}>{t.dream_btn}</button>
         </div>
 
         <div className="dream__right">
-          <img src="/img/pagefirst/room.png" alt="Комната" className="dream__room" />
+          <img
+            src="/img/pagefirst/room.png"
+            alt={t.design_breadcrumb || 'Дизайн интерьера'}
+            className="dream__room dream__room--clickable"
+            onClick={scrollToPackages}
+            style={{ cursor: 'pointer' }}
+          />
         </div>
       </section>
     </div>
