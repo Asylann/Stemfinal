@@ -41,6 +41,7 @@ class Product(Base):
     in_stock = Column(Boolean, default=True)
     category_slug = Column(String, ForeignKey("categories.slug"))
     colors_json = Column(Text, nullable=True)
+    specs_json = Column(Text, nullable=True)
 
     category = relationship("Category", back_populates="products")
 

@@ -1,22 +1,37 @@
 import { useLang } from '../../i18n/LanguageContext'
 import { Link } from 'react-router-dom'
+import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import Icon from '../../components/Icons'
 import ProductActions from '../../components/ProductActions'
 import './InfoKiosk.css'
 
-const specs = [
-  { icon: 'Cpu', label_ru: 'Серия процессора',         label_kz: 'Процессор сериясы',      value: 'Intel Core i3 GEN6' },
-  { icon: 'Grid', label_ru: 'Разрешение дисплея',         label_kz: 'Дисплей ажыратымдылығы', value: 'FullHD' },
-  { icon: 'Folder', label_ru: 'Объём оперативной памяти',   label_kz: 'Жедел жад көлемі',       value: '8Gb' },
-  { icon: 'Settings', label_ru: 'Тип оперативной памяти',     label_kz: 'Жедел жад түрі',         value: 'DDR3' },
-  { icon: 'Disc', label_ru: 'Тип накопителя',             label_kz: 'Жинақтауыш түрі',        value: 'SSD 128Gb' },
-  { icon: 'Grid', label_ru: 'Операционная система',        label_kz: 'Операциялық жүйе',       value: 'Windows 10' },
-  { icon: 'Maximize', label_ru: 'Диагональ',                  label_kz: 'Диагональ',              value: '49"' },
-  { icon: 'MousePointer', label_ru: 'Количество касаний',         label_kz: 'Тию саны',               value: '10' },
-]
+const SPEC_ICONS = {
+  'серия процессора': 'Cpu', 'процессор': 'Cpu',
+  'разрешение дисплея': 'Grid', 'дисплей': 'Grid',
+  'объём оперативной памяти': 'Folder', 'оперативная память': 'Settings',
+  'тип оперативной памяти': 'Settings',
+  'тип накопителя': 'Disc', 'накопитель': 'Disc',
+  'операционная система': 'Grid',
+  'диагональ': 'Maximize',
+  'количество касаний': 'MousePointer', 'касания': 'MousePointer',
+}
+
+function getSpecIcon(label) {
+  const lower = (label || '').toLowerCase()
+  for (const [key, icon] of Object.entries(SPEC_ICONS)) {
+    if (lower.includes(key)) return icon
+  }
+  return 'Info'
+}
 
 export default function InfoKiosk() {
   const { t, lang } = useLang()
+  const { products } = useCategoryProducts('infokiosk')
+  const main = products[0] || null
+  const extras = products.slice(1)
+  const img = main?.img || '/img/pagethird/infokiosk/item1.png'
+  const title = main?.title || t.kiosk_title || 'Инфокиоск'
+  const article = main?.article || 'S.Ee-INK.DDS.K'
 
   return (
     <div className="page">
@@ -56,30 +71,51 @@ export default function InfoKiosk() {
             </div>
           </div>
 
-          <div className="infokiosk-card__specs-section">
-            <h3 className="infokiosk-card__specs-title">{t.computers_specs}</h3>
-            <div className="infokiosk-card__specs">
-              {specs.map((s, i) => {
-                const IconComp = Icon[s.icon]
-                return (
-                  <div key={i} className="kiosk-spec">
-                    <div className="kiosk-spec__icon">{IconComp ? <IconComp width="20" height="20" /> : ''}</div>
-                    <div className="kiosk-spec__label">{lang === 'kz' ? s.label_kz : s.label_ru}</div>
-                    <div className="kiosk-spec__value">{s.value}</div>
-                  </div>
-                )
-              })}
+          {main?.specs && main.specs.length > 0 && (
+            <div className="infokiosk-card__specs-section">
+              <h3 className="infokiosk-card__specs-title">{t.computers_specs}</h3>
+              <div className="infokiosk-card__specs">
+                {main.specs.map((s, i) => {
+                  const iconName = getSpecIcon(s.label)
+                  const IconComp = Icon[iconName]
+                  return (
+                    <div key={i} className="kiosk-spec">
+                      <div className="kiosk-spec__icon">{IconComp ? <IconComp width="20" height="20" /> : ''}</div>
+                      <div className="kiosk-spec__label">{s.label}</div>
+                      <div className="kiosk-spec__value">{s.value}</div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
-          <p className="infokiosk-card__article">{t.article_label}: S.Ee-INK.DDS.K</p>
+          <p className="infokiosk-card__article">{t.article_label}: {article}</p>
 
-          <ProductActions product={{ title: t.kiosk_title || 'Инфокиоск', article: 'S.Ee-INK.DDS.K', img: '/img/pagethird/infokiosk/item1.png' }} />
+          <ProductActions product={{ id: main?.id, title, article, img }} />
         </div>
 
         <div className="infokiosk-image">
-          <img src="/img/pagethird/infokiosk/item1.png" alt="Инфокиоск" className="infokiosk-image__img" />
+          <img src={img} alt={title} className="infokiosk-image__img" />
         </div>
+
+        {extras.map((p) => (
+          <div key={p.id} className="infokiosk-card" style={{ marginTop: '32px' }}>
+            <h2 className="infokiosk-card__title">{p.title}</h2>
+            <p className="infokiosk-card__desc">
+              {Array.isArray(p.description)
+                ? p.description.join(' ')
+                : (lang === 'kz' ? p.description_kz : p.description_ru) || p.description}
+            </p>
+            {p.img && (
+              <div className="infokiosk-card__img-wrap" style={{ maxWidth: 400, margin: '16px 0' }}>
+                <img src={p.img} alt={p.title} style={{ width: '100%', borderRadius: '8px' }} />
+              </div>
+            )}
+            {p.article && <p className="infokiosk-card__article">{t.article_label}: {p.article}</p>}
+            <ProductActions product={{ id: p.id, title: p.title, article: p.article, img: p.img }} />
+          </div>
+        ))}
 
       </main>
     </div>

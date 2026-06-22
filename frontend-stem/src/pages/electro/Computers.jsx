@@ -1,56 +1,40 @@
 import { useLang } from '../../i18n/LanguageContext'
 import { Link } from 'react-router-dom'
+import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import Icon from '../../components/Icons'
 import ProductActions from '../../components/ProductActions'
 import './Computers.css'
 
-const specs1 = [
-  { icon: 'Cpu', label_ru: 'Серия процессора',          label_kz: 'Процессор сериясы',       value: 'Intel Core i3 10100' },
-  { icon: 'Grid', label_ru: 'Разрешение дисплея',         label_kz: 'Дисплей ажыратымдылығы',  value: 'FullHD' },
-  { icon: 'Folder', label_ru: 'Объём оперативной памяти',   label_kz: 'Жедел жад көлемі',        value: '8Gb' },
-  { icon: 'Camera', label_ru: 'Встроенная веб-камера',      label_kz: 'Кірістірілген веб-камера', value: '720p' },
-  { icon: 'Disc', label_ru: 'Тип накопителя',             label_kz: 'Жинақтауыш түрі',         value: 'HDD+SSD' },
-  { icon: 'Grid', label_ru: 'Операционная система',        label_kz: 'Операциялық жүйе',        value: 'Windows 10 pro' },
-  { icon: 'Maximize', label_ru: 'Диагональ, дюйм',            label_kz: 'Диагональ, дюйм',         value: '23.8' },
-  { icon: 'Settings', label_ru: 'Тип оперативной памяти',     label_kz: 'Жедел жад түрі',          value: 'DDR4' },
-]
+// Generic spec icon mapping
+const SPEC_ICONS = {
+  'серия процессора': 'Cpu',
+  'процессор': 'Cpu',
+  'разрешение дисплея': 'Grid',
+  'дисплей': 'Grid',
+  'объём оперативной памяти': 'Folder',
+  'оперативная память': 'Settings',
+  'тип оперативной памяти': 'Settings',
+  'веб-камера': 'Camera',
+  'камера': 'Camera',
+  'тип накопителя': 'Disc',
+  'накопитель': 'Disc',
+  'операционная система': 'Grid',
+  'диагональ': 'Maximize',
+  'матрица': 'Monitor',
+  'экран': 'Monitor',
+}
 
-const specs2 = [
-  { icon: 'Cpu', label_ru: 'Серия процессора',          label_kz: 'Процессор сериясы',       value: 'Intel Core i3 10100' },
-  { icon: 'Grid', label_ru: 'Разрешение дисплея',         label_kz: 'Дисплей ажыратымдылығы',  value: 'FullHD' },
-  { icon: 'Folder', label_ru: 'Объём оперативной памяти',   label_kz: 'Жедел жад көлемі',        value: '8Gb' },
-  { icon: 'Camera', label_ru: 'Встроенная веб-камера',      label_kz: 'Кірістірілген веб-камера', value: '720p' },
-  { icon: 'Disc', label_ru: 'Тип накопителя',             label_kz: 'Жинақтауыш түрі',         value: 'SSD' },
-  { icon: 'Grid', label_ru: 'Операционная система',        label_kz: 'Операциялық жүйе',        value: 'Windows 11 pro' },
-  { icon: 'Maximize', label_ru: 'Диагональ, дюйм',            label_kz: 'Диагональ, дюйм',         value: '14.0' },
-  { icon: 'Monitor', label_ru: 'Тип матрицы экрана',         label_kz: 'Экран матрицасының түрі', value: 'IPS' },
-]
+function getSpecIcon(label) {
+  const lower = (label || '').toLowerCase()
+  for (const [key, icon] of Object.entries(SPEC_ICONS)) {
+    if (lower.includes(key)) return icon
+  }
+  return 'Info'
+}
 
 export default function Computers() {
   const { t, lang } = useLang()
-
-  const computers = [
-    {
-      id: 1,
-      type: t.pc1_type,
-      brand: 'AVTECH PRO',
-      description: t.pc1_desc,
-      included: t.pc1_included,
-      img: '/img/pagethird/computers/item1.png',
-      specs: specs1,
-      article: 'S.Ee-PC.MB.AVT.Pro',
-    },
-    {
-      id: 2,
-      type: t.pc2_type,
-      brand: 'AVTECH PRO',
-      description: t.pc2_desc,
-      ports: t.pc2_ports,
-      img: '/img/pagethird/computers/item2.png',
-      specs: specs2,
-      article: 'S.Ee-PC.NB.AVT.Pro',
-    },
-  ]
+  const { products } = useCategoryProducts('computers')
 
   return (
     <div className="page">
@@ -63,51 +47,54 @@ export default function Computers() {
       </div>
 
       <main className="computers-layout">
-        {computers.map((c) => (
-          <div key={c.id} className="computer-card">
+        {products.map((c) => {
+          const img = c.img || ''
+          const productSpecs = c.specs || []
 
-            <div className="computer-card__top">
-              <div className="computer-card__top-left">
-                <h2 className="computer-card__type">{c.type}</h2>
-                <p className="computer-card__brand">{c.brand}</p>
-                <p className="computer-card__desc">{c.description}</p>
-                {c.included && (
-                  <p className="computer-card__included">
-                    <strong>{t.computers_included}:</strong> {c.included}
-                  </p>
-                )}
-                {c.ports && (
-                  <p className="computer-card__included">
-                    <strong>{t.computers_ports}:</strong> {c.ports}
-                  </p>
-                )}
-              </div>
-              <div className="computer-card__img-wrap">
-                <img src={c.img} alt={c.type} className="computer-card__img" />
-              </div>
-            </div>
+          return (
+            <div key={c.id} className="computer-card">
 
-            <div className="computer-card__specs-section">
-              <h3 className="computer-card__specs-title">{t.computers_specs}</h3>
-              <div className="computer-card__specs">
-                {c.specs.map((s, i) => {
-                const IconComp = Icon[s.icon]
-                return (
-                  <div key={i} className="comp-spec">
-                    <div className="comp-spec__icon">{IconComp ? <IconComp width="20" height="20" /> : ''}</div>
-                    <div className="comp-spec__label">{lang === 'kz' ? s.label_kz : s.label_ru}</div>
-                    <div className="comp-spec__value">{s.value}</div>
+              <div className="computer-card__top">
+                <div className="computer-card__top-left">
+                  <h2 className="computer-card__type">{c.title}</h2>
+                  <p className="computer-card__desc">
+                    {Array.isArray(c.description)
+                      ? c.description.join(' ')
+                      : (lang === 'kz' ? c.description_kz : c.description_ru) || c.description}
+                  </p>
+                </div>
+                <div className="computer-card__img-wrap">
+                  {img && <img src={img} alt={c.title} className="computer-card__img" />}
+                </div>
+              </div>
+
+              {productSpecs.length > 0 && (
+                <div className="computer-card__specs-section">
+                  <h3 className="computer-card__specs-title">{t.computers_specs}</h3>
+                  <div className="computer-card__specs">
+                    {productSpecs.map((s, i) => {
+                      const iconName = getSpecIcon(s.label)
+                      const IconComp = Icon[iconName]
+                      return (
+                        <div key={i} className="comp-spec">
+                          <div className="comp-spec__icon">{IconComp ? <IconComp width="20" height="20" /> : ''}</div>
+                          <div className="comp-spec__label">{s.label}</div>
+                          <div className="comp-spec__value">{s.value}</div>
+                        </div>
+                      )
+                    })}
                   </div>
-                )
-                })}
-              </div>
+                </div>
+              )}
+
+              {c.article && (
+                <p className="computer-card__article">{t.article_label}: {c.article}</p>
+              )}
+
+              <ProductActions product={{ id: c.id, title: c.title, article: c.article, img }} />
             </div>
-
-            <p className="computer-card__article">{t.article_label}: {c.article}</p>
-
-            <ProductActions product={{ title: `${c.type} — ${c.brand}`, article: c.article, img: c.img }} />
-          </div>
-        ))}
+          )
+        })}
       </main>
     </div>
   )

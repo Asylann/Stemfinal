@@ -1,110 +1,132 @@
+import { Link } from 'react-router-dom'
+import { useLang } from '../../i18n/LanguageContext'
+import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import Icon from '../../components/Icons'
 import ProductActions from '../../components/ProductActions'
 import './EquipmentDetail.css'
 
+const SPEC_ICONS = {
+  'аккумулятор': 'Battery', 'батаре': 'Battery',
+  'экран': 'Monitor', 'дисплей': 'Monitor',
+  'датчик ph': 'Droplets', 'датчик кислорода': 'Droplets', 'датчик': 'Droplets',
+  'интерфейс': 'Link2', 'подключ': 'Link2',
+  'температур': 'Zap', 'работает при': 'Zap',
+  'скорость измерения': 'Zap',
+  'беспроводное': 'Radio', 'bluetooth': 'Radio',
+  'светового': 'Lightbulb',
+  'платформ': 'Laptop', 'совместимость': 'Laptop',
+  'память': 'Folder',
+}
+
+function getSpecIcon(label) {
+  const lower = (label || '').toLowerCase()
+  for (const [key, icon] of Object.entries(SPEC_ICONS)) {
+    if (lower.includes(key)) return icon
+  }
+  return 'Info'
+}
+
 export default function Labdisc() {
+  const { t, lang } = useLang()
+  const { products } = useCategoryProducts('labdisc')
+  const product = products[0] || null
+  const extras = products.slice(1)
+  const img = product?.img || '/img/equipment/labdisc.png'
+  const title = product?.title || 'ЦИФРОВАЯ ЛАБОРАТОРИЯ LABDISC'
+  const article = product?.article || 'S.Ee-INK.DDS.K'
+  const desc = product
+    ? (Array.isArray(product.description)
+        ? product.description.join(' ')
+        : (lang === 'kz' ? product.description_kz : product.description_ru) || product.description)
+    : null
+
   return (
     <div className="page">
-      <div className="breadcrumb">ОБОРУДОВАНИЕ | LABDISC</div>
+      <div className="breadcrumb">
+        <Link to="/" style={{ color: '#888', textDecoration: 'none' }}>{t.home}</Link>
+        {' / '}
+        <Link to="/equipment" style={{ color: '#888', textDecoration: 'none' }}>{t.equipment}</Link>
+        {' / LABDISC'}
+      </div>
 
       <main className="detail-layout">
 
-        {/* ЛЕВАЯ ЧАСТЬ */}
         <div className="detail-left">
 
           <div className="detail-info-block">
-            <h2 className="detail-title">ЦИФРОВАЯ ЛАБОРАТОРИЯ LABDISC</h2>
-            <p className="detail-desc">
-              Регистратор данных ЛабДиск специально разработан для изучения Физики в начальной
-              и средней школе. Благодаря своей универсальности и портативности, а также наличию
-              встроенных датчиков, использовать устройства довольно просто и удобно.
-            </p>
-            <p className="detail-desc">
-              Для проведения регистрации данных в полевых условиях ЛабДиск имеет аккумулятор на
-              150 часов работы, графический дисплей, кнопочную клавиатуру. В классе ЛабДиск может
-              взаимодействовать с компьютером через USB-кабель или беспроводное соединение Bluetooth.
-              Регистратор может использоваться в широком диапазоне научных экспериментов, обеспечивая
-              12-битное разрешение измерений.
-            </p>
+            <h2 className="detail-title">{title}</h2>
+            {desc && <p className="detail-desc">{desc}</p>}
           </div>
 
-          <div className="detail-chars">
-            <h3 className="detail-chars__title">Характеристики</h3>
-            <div className="detail-chars__grid">
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Battery width="18" height="18" /></span>
-                <span className="char-card__label">Внутренний аккумулятор</span>
-                <span className="char-card__value">LiPO 3.6B</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Monitor width="18" height="18" /></span>
-                <span className="char-card__label">Экран Графический жк 64 x 128 пикселей</span>
-                <span className="char-card__value">Экран</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Droplets width="18" height="18" /></span>
-                <span className="char-card__label">Датчик pH</span>
-                <span className="char-card__value">От 0 до 14 pH</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Link2 width="18" height="18" /></span>
-                <span className="char-card__label">Интерфейс</span>
-                <span className="char-card__value">USB V2.0</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Zap width="18" height="18" /></span>
-                <span className="char-card__label">Работает при температуре</span>
-                <span className="char-card__value">От -10 до 50 °C</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Zap width="18" height="18" /></span>
-                <span className="char-card__label">Максимальная скорость измерения</span>
-                <span className="char-card__value">1000/сек</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Battery width="18" height="18" /></span>
-                <span className="char-card__label">Максимальный срок службы аккумулятора</span>
-                <span className="char-card__value">150 часов</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Radio width="18" height="18" /></span>
-                <span className="char-card__label">Беспроводное соединение</span>
-                <span className="char-card__value">Bluetooth V2.0</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Droplets width="18" height="18" /></span>
-                <span className="char-card__label">Датчик кислорода</span>
-                <span className="char-card__value">От 0 до 14 Мг/л (от 0 до 25 %)</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Lightbulb width="18" height="18" /></span>
-                <span className="char-card__label">Диапазон светового датчика, люкс</span>
-                <span className="char-card__value">От 0 до 55 000</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Laptop width="18" height="18" /></span>
-                <span className="char-card__label">Поддерживаемые платформы</span>
-                <span className="char-card__value">PC, MAC, Chromebook, iPad Linux, Android</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Folder width="18" height="18" /></span>
-                <span className="char-card__label">Внутренняя память сохранения данных</span>
-                <span className="char-card__value">128,000 измерений</span>
+          {product?.specs && product.specs.length > 0 && (
+            <div className="detail-chars">
+              <h3 className="detail-chars__title">{t.computers_specs}</h3>
+              <div className="detail-chars__grid">
+                {product.specs.map((s, i) => {
+                  const iconName = getSpecIcon(s.label)
+                  const IconComp = Icon[iconName]
+                  return (
+                    <div key={i} className="char-card">
+                      <span className="char-card__icon">{IconComp ? <IconComp width="18" height="18" /> : ''}</span>
+                      <span className="char-card__label">{s.label}</span>
+                      <span className="char-card__value">{s.value}</span>
+                    </div>
+                  )
+                })}
               </div>
             </div>
-          </div>
+          )}
 
-          <p className="detail-article">Артикул: S.Ee-INK.DDS.K</p>
+          <p className="detail-article">{t.article_label}: {article}</p>
 
-          <ProductActions product={{ title: 'Цифровая лаборатория ЛабДиск', article: 'S.Ee-INK.DDS.K', img: '/img/equipment/labdisc.png' }} />
+          <ProductActions product={{ id: product?.id, title, article, img }} />
         </div>
 
-        {/* ПРАВАЯ ЧАСТЬ */}
         <div className="detail-right">
-          <img src="/img/equipment/labdisc.png" alt="LABDISC" className="detail-img" />
+          <img src={img} alt={title} className="detail-img" />
         </div>
 
       </main>
+
+      {extras.map((p) => {
+        const pImg = p.img || ''
+        const pDesc = Array.isArray(p.description)
+          ? p.description.join(' ')
+          : (lang === 'kz' ? p.description_kz : p.description_ru) || p.description
+        return (
+          <div key={p.id} className="detail-extra-card">
+            <div className="detail-extra-card__left">
+              <h3 className="detail-extra-card__title">{p.title}</h3>
+              {pDesc && <p className="detail-extra-card__desc">{pDesc}</p>}
+              {p.specs && p.specs.length > 0 && (
+                <div className="detail-chars">
+                  <h4 className="detail-chars__title">{t.computers_specs}</h4>
+                  <div className="detail-chars__grid">
+                    {p.specs.map((s, i) => {
+                      const iconName = getSpecIcon(s.label)
+                      const IconComp = Icon[iconName]
+                      return (
+                        <div key={i} className="char-card">
+                          <span className="char-card__icon">{IconComp ? <IconComp width="18" height="18" /> : ''}</span>
+                          <span className="char-card__label">{s.label}</span>
+                          <span className="char-card__value">{s.value}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+              {p.article && <p className="detail-article">{t.article_label}: {p.article}</p>}
+              <ProductActions product={{ id: p.id, title: p.title, article: p.article, img: pImg }} />
+            </div>
+            {pImg && (
+              <div className="detail-extra-card__right">
+                <img src={pImg} alt={p.title} className="detail-extra-card__img" />
+              </div>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }

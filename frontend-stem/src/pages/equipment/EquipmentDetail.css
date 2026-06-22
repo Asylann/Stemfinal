@@ -101,3 +101,46 @@
   color: #555;
   margin-top: 8px;
 }
+
+/* ─── Extra product cards (additional products in category) ─── */
+.detail-extra-card {
+  display: flex;
+  gap: 40px;
+  padding: 30px 40px;
+  align-items: flex-start;
+  border-top: 1px solid #e0e0e0;
+  margin-top: 0;
+}
+
+.detail-extra-card__left {
+  flex: 1;
+  max-width: 600px;
+}
+
+.detail-extra-card__right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.detail-extra-card__img {
+  width: 100%;
+  max-width: 400px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.detail-extra-card__title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #111;
+}
+
+.detail-extra-card__desc {
+  font-size: 13px;
+  color: #444;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}

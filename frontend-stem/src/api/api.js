@@ -90,7 +90,7 @@ export async function getCategories() {
 
 export async function createOrder(data) {
   try {
-    const response = await apiClient.post('/api/orders', data)
+    const response = await apiClient.post('/api/orders', withSelectedLocation(data))
     return response.data
   } catch (error) {
     const errorMessage = error.response?.data?.detail || error.response?.statusText || error.message
@@ -100,7 +100,7 @@ export async function createOrder(data) {
 
 export async function createApplication(data) {
   try {
-    const response = await apiClient.post('/api/applications', data)
+    const response = await apiClient.post('/api/applications', withSelectedLocation(data))
     return response.data
   } catch (error) {
     const errorMessage = error.response?.data?.detail || error.response?.statusText || error.message
@@ -157,6 +157,31 @@ export function normalizePhone(phone) {
   return phone.trim()
 }
 
+const LOCATION_DATA = {
+  astana: {
+    city: 'Астана',
+    address: 'г. Астана, ул. Домалак-ана 26',
+  },
+  almaty: {
+    city: 'Алматы',
+    address: 'г. Алматы, пр. Аль-Фараби 77/2',
+  },
+}
+
+function getSelectedLocation() {
+  const cityKey = localStorage.getItem('stem_city') || 'astana'
+  return LOCATION_DATA[cityKey] || LOCATION_DATA.astana
+}
+
+function withSelectedLocation(data) {
+  const location = getSelectedLocation()
+  return {
+    ...data,
+    location_city: data.location_city || location.city,
+    location_address: data.location_address || location.address,
+  }
+}
+
 export async function updateUser(data) {
   const response = await apiClient.patch('/auth/me', data)
   return response.data
@@ -187,7 +212,7 @@ export async function getMyApplications() {
 
 export async function sendContactMessage(data) {
   try {
-    const response = await apiClient.post('/api/applications/contact', data)
+    const response = await apiClient.post('/api/applications/contact', withSelectedLocation(data))
     return response.data
   } catch (error) {
     console.error('sendContactMessage error:', error.response?.status, error.response?.data)

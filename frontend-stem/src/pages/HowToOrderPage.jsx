@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom'
 import { useLang } from '../i18n/LanguageContext'
+import { useUserLocation } from '../context/locationContext'
 import Icon from '../components/Icons'
 import './InfoPage.css'
 
 export default function HowToOrderPage() {
   const { t } = useLang()
+  const { selectedCity } = useUserLocation()
 
   const steps = [
     { key: 'step1' },
@@ -34,7 +36,7 @@ export default function HowToOrderPage() {
                 <div className="step-number">{i + 1}</div>
                 <div className="step-content">
                   <h3>{t[`how_to_order_${step.key}_title`]}</h3>
-                  <p>{t[`how_to_order_${step.key}_text`]}</p>
+                  <p>{step.key === 'step5' ? selectedCity.dispatchText : t[`how_to_order_${step.key}_text`]}</p>
                 </div>
               </div>
             ))}
@@ -50,7 +52,7 @@ export default function HowToOrderPage() {
             </div>
             <div className="info-box">
               <h3><Icon.Truck width="18" height="18" style={{display:'inline',verticalAlign:'middle',marginRight:6}} />{t.how_to_order_delivery_title}</h3>
-              <p>{t.how_to_order_delivery_text}</p>
+              <p>{selectedCity.deliveryText}</p>
             </div>
           </div>
         </section>
@@ -70,7 +72,7 @@ export default function HowToOrderPage() {
 
         <div className="info-cta-block">
           <h2>{t.how_to_order_cta}</h2>
-          <p>Пн–Пт: 9:00 – 18:00 по времени Астаны</p>
+          <p>{selectedCity.workTimeText}</p>
           <Link to="/contacts" className="info-cta-btn">Связаться с нами</Link>
         </div>
       </div>

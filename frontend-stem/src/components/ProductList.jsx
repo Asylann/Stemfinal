@@ -4,7 +4,7 @@ import { useLang } from '../i18n/LanguageContext'
 import { useFavorites } from '../context/FavoritesContext'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
-import { apiClient } from '../api/api'
+import { createApplication } from '../api/api'
 import Icon from './Icons'
 import './ProductList.css'
 
@@ -108,7 +108,7 @@ function ApplicationModal({ product, onClose }) {
       : form.comment.trim()
 
     try {
-      await apiClient.post('/api/applications/', {
+      await createApplication({
         name: cleanName,
         phone: cleanPhone,
         username: form.username.trim(),

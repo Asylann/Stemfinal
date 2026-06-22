@@ -4,6 +4,7 @@ import { useLang } from '../i18n/LanguageContext'
 import { useCart } from '../context/CartContext'
 import { useFavorites } from '../context/FavoritesContext'
 import { useAuth } from '../context/AuthContext'
+import { useUserLocation } from '../context/locationContext'
 import { createApplication } from '../api/api'
 import Icon from './Icons'
 import './Navbar.css'
@@ -82,10 +83,8 @@ export default function Navbar() {
   const [callbackOpen, setCallbackOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [cityOpen, setCityOpen] = useState(false)
-  const [selectedCity, setSelectedCity] = useState(
-    () => localStorage.getItem('stem_city') || 'astana'
-  )
   const { lang, setLang, t } = useLang()
+  const { cityKey, cities, selectedCity, setSelectedCity } = useUserLocation()
   const navigate = useNavigate()
   const catalogRef = useRef(null)
   const cityRef = useRef(null)
@@ -94,14 +93,8 @@ export default function Navbar() {
   const { favorites } = useFavorites()
   const { user, isAuthenticated, openModal, logout } = useAuth()
 
-  const cities = [
-    { key: 'astana', label: t.city_astana },
-    { key: 'almaty', label: t.city_almaty },
-  ]
-
   function handleCityChange(key) {
     setSelectedCity(key)
-    localStorage.setItem('stem_city', key)
     setCityOpen(false)
   }
 
@@ -157,14 +150,14 @@ export default function Navbar() {
               onClick={() => setCityOpen(!cityOpen)}
               type="button"
             >
-              <Icon.MapPin width="14" height="14" style={{display:'inline'}} /> {selectedCity === 'almaty' ? t.city_almaty : t.city_astana} <span className="city-arrow">{cityOpen ? '▲' : '▼'}</span>
+              <Icon.MapPin width="14" height="14" style={{display:'inline'}} /> {selectedCity.name} <span className="city-arrow">{cityOpen ? '▲' : '▼'}</span>
             </button>
             {cityOpen && (
               <div className="city-dropdown">
                 {cities.map(c => (
                   <button
                     key={c.key}
-                    className={`city-dropdown-item ${selectedCity === c.key ? 'active' : ''}`}
+                    className={`city-dropdown-item ${cityKey === c.key ? 'active' : ''}`}
                     onClick={() => handleCityChange(c.key)}
                     type="button"
                   >

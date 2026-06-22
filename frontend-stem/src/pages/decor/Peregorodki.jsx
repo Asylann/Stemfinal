@@ -4,6 +4,7 @@ import { createApplication } from '../../api/api'
 import { useCart } from '../../context/CartContext'
 import { useFavorites } from '../../context/FavoritesContext'
 import { useAuth } from '../../context/AuthContext'
+import { useUserLocation } from '../../context/locationContext'
 import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import Icon from '../../components/Icons'
 import './Peregorodki.css'
@@ -27,10 +28,11 @@ function CardImage({ src, alt }) {
 
 
 export default function Peregorodki() {
-  const { products, loading } = useCategoryProducts('peregorodki')
+  const { products } = useCategoryProducts('peregorodki')
   const { addToCart } = useCart()
   const { toggleFavorite, isFavorite } = useFavorites()
   const { user } = useAuth()
+  const { selectedCity } = useUserLocation()
   const [showModal, setShowModal] = useState(false)
   const [formData, setFormData] = useState({ name: '', phone: '', comment: '', productName: '', article: '' })
   const [submitting, setSubmitting] = useState(false)
@@ -142,7 +144,7 @@ export default function Peregorodki() {
 
                 <div className="peregorodki-card__delivery">
                   <span><Icon.Truck width="16" height="16" /> Доставка по Казахстану</span>
-                  <span><Icon.MapPin width="16" height="16" /> Самовывоз: г. Астана, ул. Домалак-ана 26</span>
+                  <span><Icon.MapPin width="16" height="16" /> {selectedCity.pickup}</span>
                 </div>
 
                 {/* Кнопки В корзину + В избранное */}

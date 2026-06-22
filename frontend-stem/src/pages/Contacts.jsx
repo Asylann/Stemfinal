@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useLang } from '../i18n/LanguageContext'
+import { useUserLocation } from '../context/locationContext'
 import { sendContactMessage } from '../api/api'
 import Icon from '../components/Icons'
 import './Contacts.css'
 
 export default function Contacts() {
   const { t } = useLang()
+  const { selectedCity } = useUserLocation()
   const [form, setForm] = useState({ name: '', phone: '', message: '' })
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -79,8 +81,7 @@ export default function Contacts() {
           {/* Адрес */}
           <div className="contacts-col">
             <h3 className="contacts-col__title">{t.contacts_address}</h3>
-            <p className="contacts-col__text"><Icon.MapPin width="16" height="16" style={{display:'inline'}} /> г. Астана, Домалак-ана 26</p>
-            <p className="contacts-col__text"><Icon.MapPin width="16" height="16" style={{display:'inline'}} /> г. Алматы, пр. Аль-Фараби 77/2</p>
+            <p className="contacts-col__text"><Icon.MapPin width="16" height="16" style={{display:'inline'}} /> {selectedCity.address}</p>
             <h3 className="contacts-col__title" style={{marginTop:'16px'}}>{t.contacts_schedule}</h3>
             <p className="contacts-col__text">Пн–Пт: 9:00 – 18:00</p>
             <p className="contacts-col__text">Сб–Вс: выходной</p>
@@ -179,8 +180,8 @@ export default function Contacts() {
           <h2 className="contacts-map-title">{t.contacts_map_title}</h2>
           <div className="contacts-map">
             <iframe
-              title="Карта STEM Academia"
-              src="https://maps.google.com/maps?q=Домалак-ана+26,+Астана,+Казахстан&t=&z=16&ie=UTF8&iwloc=&output=embed"
+              title={`Карта STEM Academia - ${selectedCity.name}`}
+              src={selectedCity.mapSrc}
               width="100%"
               height="100%"
               style={{ border: 0 }}

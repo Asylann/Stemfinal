@@ -107,6 +107,8 @@ CATEGORIES = [
     # ── Equipment subcategories ─────────────────────────────────────────────
     {"slug": "labdisc",      "title_ru": "Цифровая лаборатория",     "title_kz": "Цифрлық зертхана",       "img": "/img/equipment/labdisc.png",  "path": "/equipment/labdisc",  "parent_slug": "equipment"},
     {"slug": "ulab",         "title_ru": "Набор ULABS",              "title_kz": "ULABS жинағы",           "img": "/img/equipment/ulab.png",     "path": "/equipment/ulab",     "parent_slug": "equipment"},
+    {"slug": "arduino",      "title_ru": "Arduino",                  "title_kz": "Arduino",                "img": "/img/equipment/arduino.png", "path": "/equipment/arduino", "parent_slug": "equipment"},
+    {"slug": "legospike",    "title_ru": "LEGO SPIKE",               "title_kz": "LEGO SPIKE",             "img": "/img/equipment/legospike.png","path": "/equipment/legospike","parent_slug": "equipment"},
 ]
 
 inserted_cats = 0
@@ -137,6 +139,11 @@ print(f"✅ Categories: {inserted_cats} inserted (rest updated)")
 def _c(colors):
     """Serialize color list to JSON string for DB storage."""
     return json.dumps(colors, ensure_ascii=False) if colors else None
+
+
+def _s(specs):
+    """Serialize specs list to JSON string for DB storage."""
+    return json.dumps(specs, ensure_ascii=False) if specs else None
 
 
 PRODUCTS = [
@@ -814,24 +821,58 @@ PRODUCTS = [
     # ══════════════════════════════════════════════════════════════════════════
     {"title": "AVTECH PRO (ПК)", "img": "/img/pagethird/computers/item1.png",
      "description_ru": "Персональный компьютер AVTECH PRO. Intel Core i3 10100, 8Gb DDR4, FullHD 23.8', Windows 10 pro.",
-     "material_ru": "Металл, пластик", "article": "S.Ee-PC.MB.AVT.Pro", "in_stock": True, "category_slug": "computers"},
+     "material_ru": "Металл, пластик", "article": "S.Ee-PC.MB.AVT.Pro", "in_stock": True, "category_slug": "computers",
+     "specs_json": _s([
+         {"label": "Серия процессора", "value": "Intel Core i3 10100"},
+         {"label": "Разрешение дисплея", "value": "FullHD"},
+         {"label": "Объём оперативной памяти", "value": "8Gb DDR4"},
+         {"label": "Тип накопителя", "value": "SSD 256Gb"},
+         {"label": "Операционная система", "value": "Windows 10 Pro"},
+         {"label": "Диагональ", "value": "23.8'"},
+     ])},
     {"title": "AVTECH PRO (Ноутбук)", "img": "/img/pagethird/computers/item2.png",
      "description_ru": "Ноутбук AVTECH PRO. Intel Core i3 10100, 8Gb DDR4, FullHD 14.0' IPS, Windows 11 pro.",
-     "material_ru": "Металл, пластик", "article": "S.Ee-PC.NB.AVT.Pro", "in_stock": True, "category_slug": "computers"},
+     "material_ru": "Металл, пластик", "article": "S.Ee-PC.NB.AVT.Pro", "in_stock": True, "category_slug": "computers",
+     "specs_json": _s([
+         {"label": "Серия процессора", "value": "Intel Core i3 10100"},
+         {"label": "Разрешение дисплея", "value": "FullHD IPS"},
+         {"label": "Объём оперативной памяти", "value": "8Gb DDR4"},
+         {"label": "Тип накопителя", "value": "SSD 256Gb"},
+         {"label": "Операционная система", "value": "Windows 11 Pro"},
+         {"label": "Диагональ", "value": "14.0'"},
+     ])},
 
     # ══════════════════════════════════════════════════════════════════════════
     # ИНТЕРАКТИВНЫЕ ПАНЕЛИ
     # ══════════════════════════════════════════════════════════════════════════
     {"title": "Интерактивная панель ROQED SCIENCE", "img": "/img/pagethird/interactive/item2.png",
      "description_ru": "Интерактивная панель 65'/75'/85', 3840x2160, антибликовая антивандальная поверхность. Android 11 / Windows 11.",
-     "material_ru": "Алюминий, стекло", "size": "65'-85'", "article": "L.Me-DI.UN.2500", "in_stock": True, "category_slug": "interactive"},
+     "material_ru": "Алюминий, стекло", "size": "65'-85'", "article": "L.Me-DI.UN.2500", "in_stock": True, "category_slug": "interactive",
+     "specs_json": _s([
+         {"label": "Разрешение дисплея", "value": "3840×2160 (4K UHD)"},
+         {"label": "Диагональ", "value": "65'/75'/85'"},
+         {"label": "Операционная система", "value": "Android 11 / Windows 11"},
+         {"label": "Количество касаний", "value": "20 точек"},
+         {"label": "Тип матрицы", "value": "IPS, антибликовая"},
+         {"label": "Объём оперативной памяти", "value": "8Gb"},
+     ])},
 
     # ══════════════════════════════════════════════════════════════════════════
     # ИНФОКИОСКИ
     # ══════════════════════════════════════════════════════════════════════════
     {"title": "Инфокиоск STEM", "img": "/img/pagethird/infokiosk/item1.png",
      "description_ru": "Информационный киоск с сенсорным экраном 49'. Intel Core i3 GEN6, 8Gb DDR3, SSD 128Gb, Windows 10.",
-     "material_ru": "Металл, стекло", "size": "49 дюймов", "article": "S.Ee-INK.DDS.K", "in_stock": True, "category_slug": "infokiosk"},
+     "material_ru": "Металл, стекло", "size": "49 дюймов", "article": "S.Ee-INK.DDS.K", "in_stock": True, "category_slug": "infokiosk",
+     "specs_json": _s([
+         {"label": "Серия процессора", "value": "Intel Core i3 GEN6"},
+         {"label": "Разрешение дисплея", "value": "FullHD"},
+         {"label": "Объём оперативной памяти", "value": "8Gb"},
+         {"label": "Тип оперативной памяти", "value": "DDR3"},
+         {"label": "Тип накопителя", "value": "SSD 128Gb"},
+         {"label": "Операционная система", "value": "Windows 10"},
+         {"label": "Диагональ", "value": "49'"},
+         {"label": "Количество касаний", "value": "10"},
+     ])},
 
     # ══════════════════════════════════════════════════════════════════════════
     # БЫТОВАЯ ТЕХНИКА
@@ -852,14 +893,72 @@ PRODUCTS = [
     # ══════════════════════════════════════════════════════════════════════════
     {"title": "ЦИФРОВАЯ ЛАБОРАТОРИЯ LABDISC", "img": "/img/equipment/labdisc.png",
      "description_ru": "Регистратор данных ЛабДиск для изучения Физики. Аккумулятор 150 часов, графический дисплей, Bluetooth.",
-     "material_ru": "Пластик, электроника", "article": "S.Ee-INK.DDS.K", "in_stock": True, "category_slug": "labdisc"},
+     "description_kz": "Физиканы зерттеуге арналған LabDisc деректер тіркеушісі. 150 сағат аккумулятор, графикалық дисплей, Bluetooth.",
+     "material_ru": "Пластик, электроника", "article": "S.Ee-INK.DDS.K", "in_stock": True, "category_slug": "labdisc",
+     "specs_json": _s([
+         {"label": "Внутренний аккумулятор", "value": "LiPO 3.6B"},
+         {"label": "Экран", "value": "Графический ЖК 64×128 пикселей"},
+         {"label": "Датчик pH", "value": "От 0 до 14 pH"},
+         {"label": "Интерфейс", "value": "USB V2.0"},
+         {"label": "Рабочая температура", "value": "От -10 до 50 °C"},
+         {"label": "Максимальная скорость измерения", "value": "1000/сек"},
+         {"label": "Срок службы аккумулятора", "value": "150 часов"},
+         {"label": "Беспроводное соединение", "value": "Bluetooth V2.0"},
+         {"label": "Датчик кислорода", "value": "От 0 до 14 Мг/л"},
+         {"label": "Диапазон светового датчика", "value": "От 0 до 55 000 люкс"},
+         {"label": "Поддерживаемые платформы", "value": "PC, MAC, Chromebook, iPad, Linux, Android"},
+         {"label": "Внутренняя память", "value": "128 000 измерений"},
+     ])},
 
     # ══════════════════════════════════════════════════════════════════════════
     # ULAB
     # ══════════════════════════════════════════════════════════════════════════
     {"title": "НАБОР ULABS (Лабораторный комплект)", "img": "/img/equipment/ulab.png",
      "description_ru": "Набор ULABS для обучения по программе К-12. Для лабораторных и практических работ по биологии.",
-     "material_ru": "Стекло, пластик, металл", "article": "S.Ee-INK.DD5.K", "in_stock": True, "category_slug": "ulab"},
+     "description_kz": "К-12 бағдарламасы бойынша оқытуға арналған ULABS жинағы. Биология бойынша зертханалық және практикалық жұмыстар үшін.",
+     "material_ru": "Стекло, пластик, металл", "article": "S.Ee-INK.DD5.K", "in_stock": True, "category_slug": "ulab",
+     "specs_json": _s([
+         {"label": "Назначение", "value": "Биология, К-12"},
+         {"label": "Тип", "value": "Лабораторный комплект"},
+         {"label": "Материалы", "value": "Стекло, пластик, металл"},
+         {"label": "Применение", "value": "Демонстрационные и лабораторные работы"},
+     ])},
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # ARDUINO
+    # ══════════════════════════════════════════════════════════════════════════
+    {"title": "ARDUINO UNO", "img": "/img/equipment/arduino.png",
+     "description_ru": "Arduino Uno — микроконтроллерная плата для обучения основам электроники, программирования и робототехники в STEM-лабораториях.",
+     "description_kz": "Arduino Uno — STEM-зертханаларда электроника, бағдарламалау және робототехника негіздерін оқытуға арналған микроконтроллер платасы.",
+     "material_ru": "Пластик, электроника", "article": "S.Eq-ARD.UnoR3", "in_stock": True, "category_slug": "arduino",
+     "specs_json": _s([
+         {"label": "Микроконтроллер", "value": "ATmega328P"},
+         {"label": "Напряжение питания", "value": "7–12 В"},
+         {"label": "Цифровые входы/выходы", "value": "14 шт."},
+         {"label": "Аналоговые входы", "value": "6 шт."},
+         {"label": "Flash-память", "value": "32 КБ"},
+         {"label": "Тактовая частота", "value": "16 МГц"},
+         {"label": "Интерфейс", "value": "USB Type-B"},
+         {"label": "Размеры", "value": "68,6 × 53,4 мм"},
+     ])},
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # LEGO SPIKE
+    # ══════════════════════════════════════════════════════════════════════════
+    {"title": "LEGO EDUCATION SPIKE PRIME", "img": "/img/equipment/legospike.png",
+     "description_ru": "LEGO Education SPIKE Prime — образовательный робототехнический набор для учащихся средних классов. Программируемый хаб, моторы и датчики.",
+     "description_kz": "LEGO Education SPIKE Prime — орта сынып оқушыларына арналған білім беру робототехника жинағы. Бағдарламаланатын хаб, моторлар және сенсорлар.",
+     "material_ru": "Пластик, электроника", "article": "S.Eq-LEGO.SpikePrime", "in_stock": True, "category_slug": "legospike",
+     "specs_json": _s([
+         {"label": "Количество деталей", "value": "528 элементов"},
+         {"label": "Программируемый хаб", "value": "6 портов ввода/вывода"},
+         {"label": "Моторы", "value": "4 шт. (2 больших, 2 средних)"},
+         {"label": "Датчики", "value": "Цвет, расстояние, усилие"},
+         {"label": "Аккумулятор", "value": "Li-Ion, перезаряжаемый"},
+         {"label": "Подключение", "value": "Bluetooth + USB"},
+         {"label": "Совместимость", "value": "Scratch, Python"},
+         {"label": "Платформы", "value": "Win, Mac, iOS, Android"},
+     ])},
 ]
 
 inserted_prods = 0
