@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom'
 import { useLang } from '../i18n/LanguageContext'
+import { useUserLocation } from '../context/locationContext'
 import Icon from './Icons'
 import './Footer.css'
 
 export default function Footer() {
   const { t } = useLang()
+  const { selectedCity } = useUserLocation()
 
   const phoneNumber = '+77778703206'
   const whatsappLink = `https://wa.me/${phoneNumber}`
@@ -67,7 +69,7 @@ export default function Footer() {
         <div className="footer-col">
           <h4 className="footer-col__title">{t.nav_contacts}</h4>
           <ul className="footer-col__list footer-col__list--contacts">
-            <li><Icon.MapPin width="14" height="14" style={{display:'inline',verticalAlign:'middle',marginRight:4}} /> г. Астана, ул. Домалак-ана 26</li>
+            <li><Icon.MapPin width="14" height="14" style={{display:'inline',verticalAlign:'middle',marginRight:4}} /> {selectedCity.address}</li>
             <li><Icon.Phone width="14" height="14" style={{display:'inline',verticalAlign:'middle',marginRight:4}} /> <a href="tel:+77778703206">+7 777 870 32 06</a></li>
             <li><Icon.Mail width="14" height="14" style={{display:'inline',verticalAlign:'middle',marginRight:4}} /> <a href="mailto:info@stemacademia.kz">info@stemacademia.kz</a></li>
             <li><Icon.Clock width="14" height="14" style={{display:'inline',verticalAlign:'middle',marginRight:4}} /> {t.footer_schedule}</li>

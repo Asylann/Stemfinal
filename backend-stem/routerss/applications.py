@@ -40,6 +40,8 @@ class ApplicationCreate(BaseModel):
     phone: str
     username: Optional[str] = None
     comment: Optional[str] = None
+    location_city: Optional[str] = None
+    location_address: Optional[str] = None
     product_name: Optional[str] = None
     article: Optional[str] = None
     product_url: Optional[str] = None
@@ -89,6 +91,22 @@ def format_products(products: Optional[List[Dict]]) -> Tuple[str, str]:
     return short, ""
 
 
+def format_location(data: Dict) -> str:
+    city = (data.get("location_city") or "").strip()
+    address = (data.get("location_address") or "").strip()
+    if city and address:
+        return f"{city}, {address}"
+    return city or address or "—"
+
+
+def build_admin_comment(comment: Optional[str], location_text: str) -> str:
+    parts = []
+    if comment and comment.strip():
+        parts.append(comment.strip())
+    parts.append(f"Город/самовывоз: {location_text}")
+    return "\n\n".join(parts)
+
+
 async def send_to_telegram(data: Dict, app_id: str) -> None:
     if not BOT_TOKEN or not GROUP_CHAT_ID:
         return
@@ -114,6 +132,7 @@ async def send_to_telegram(data: Dict, app_id: str) -> None:
         f"📦 <b>Товары ({products_count} шт.):</b>\n{products_text}\n\n"
         f"👤 <b>Имя:</b> {data.get('name')}\n"
         f"📞 <b>Телефон:</b> {data.get('phone')}\n"
+        f"📍 <b>Город/самовывоз:</b> {format_location(data)}\n"
         f"💬 <b>Комментарий:</b> {data.get('comment') or '—'}"
     )
 
@@ -173,7 +192,7 @@ async def send_to_bitrix(data: Dict, db_id: int) -> None:
             "TITLE":     f"Заявка с сайта: {data.get('name', 'Клиент')}",
             "NAME":      data.get("name"),
             "PHONE":     [{"VALUE": data.get("phone"), "VALUE_TYPE": "WORK"}],
-            "COMMENTS":  f"📦 Товары:\n{product_details}\n\n💬 Комментарий: {data.get('comment') or '—'}",
+            "COMMENTS":  f"📦 Товары:\n{product_details}\n\n📍 Город/самовывоз: {format_location(data)}\n\n💬 Комментарий: {data.get('comment') or '—'}",
             "SOURCE_ID": "WEB",
             "STAGE_ID":  initial_stage,
             "OPENED":    "Y",
@@ -206,6 +225,8 @@ class ContactMessage(BaseModel):
     name: str
     phone: str
     message: Optional[str] = None
+    location_city: Optional[str] = None
+    location_address: Optional[str] = None
 
 
 async def send_contact_to_telegram(data: Dict) -> None:
@@ -218,6 +239,7 @@ async def send_contact_to_telegram(data: Dict) -> None:
         f"🕒 <b>Время:</b> {now}\n"
         f"👤 <b>Имя:</b> {data.get('name')}\n"
         f"📞 <b>Телефон:</b> {data.get('phone')}\n"
+        f"📍 <b>Город/самовывоз:</b> {format_location(data)}\n"
         f"💬 <b>Сообщение:</b> {data.get('message') or '—'}"
     )
     async with httpx.AsyncClient(timeout=10) as client:
@@ -237,6 +259,8 @@ async def contact_message(data: ContactMessage, background_tasks: BackgroundTask
         "name": data.name.strip(),
         "phone": normalized_phone,
         "message": data.message.strip() if data.message else None,
+        "location_city": data.location_city,
+        "location_address": data.location_address,
     }
     background_tasks.add_task(send_contact_to_telegram, app_data)
     return {"status": "ok"}
@@ -260,8 +284,11 @@ async def create_application(
         "name": data.name.strip(),
         "phone": normalized_phone,
         "comment": data.comment,
+        "location_city": data.location_city,
+        "location_address": data.location_address,
         "products_list": products_list,
     }
+    admin_comment = build_admin_comment(data.comment, format_location(app_data))
 
     # Try to extract user_id from JWT token (optional — anonymous orders still work)
     user_id = None
@@ -279,7 +306,7 @@ async def create_application(
     new_application = Application(
         name=app_data["name"],
         phone=app_data["phone"],
-        comment=app_data["comment"],
+        comment=admin_comment,
         product_name=short_name,
         status="new",
         user_id=user_id

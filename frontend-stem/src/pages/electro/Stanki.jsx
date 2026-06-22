@@ -4,17 +4,19 @@ import { createApplication } from '../../api/api'
 import { useCart } from '../../context/CartContext'
 import { useFavorites } from '../../context/FavoritesContext'
 import { useAuth } from '../../context/AuthContext'
+import { useUserLocation } from '../../context/locationContext'
 import { useLang } from '../../i18n/LanguageContext'
 import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import Icon from '../../components/Icons'
 import './Stanki.css'
 
 export default function Stanki() {
-  const { products, loading } = useCategoryProducts('stanki')
+  const { products } = useCategoryProducts('stanki')
   const { addToCart } = useCart()
   const { toggleFavorite, isFavorite } = useFavorites()
   const { user } = useAuth()
   const { lang } = useLang()
+  const { selectedCity } = useUserLocation()
   const [showModal, setShowModal] = useState(false)
   const [formData, setFormData] = useState({ name: '', phone: '', comment: '', productName: '' })
   const [submitting, setSubmitting] = useState(false)
@@ -110,7 +112,7 @@ export default function Stanki() {
 
               <div className="stanki-card__delivery">
                 <p><Icon.Truck width="16" height="16" /> Доставка по Казахстану</p>
-                <p><Icon.MapPin width="16" height="16" /> Самовывоз: г. Астана, ул. Домалак-ана 26</p>
+                <p><Icon.MapPin width="16" height="16" /> {selectedCity.pickup}</p>
               </div>
 
               <div className="stanki-card__actions">
