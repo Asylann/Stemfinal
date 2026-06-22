@@ -347,6 +347,15 @@
   display: block;
 }
 
+.dream__room--clickable {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dream__room--clickable:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
 .dream__key {
   position: absolute;
   height: auto;

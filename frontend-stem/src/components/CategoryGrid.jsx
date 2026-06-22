@@ -6,12 +6,12 @@ export default function CategoryGrid() {
   const { t } = useLang()
 
   const categories = [
-    { title: t.nav_design,    path: '/',           img: '/img/pagefirst/room.png' },
+    { title: t.nav_design,    path: '/#packages', img: '/img/pagefirst/room.png' },
     { title: t.nav_furniture, path: '/secondpage', img: '/img/pagefirst/F5.png' },
     { title: t.nav_electro,   path: '/electro',    img: '/img/pagethird/comp.png' },
     { title: t.nav_decor,     path: '/decor',      img: '/img/pagefirst/plant.png' },
     { title: t.nav_equipment, path: '/equipment',  img: '/img/equipment/arduino.png' },
-    { title: t.nav_digital,   path: '/digital',    img: '/img/pagefirst/Слой1.png' },
+    { title: t.nav_digital,   path: '/digital',    img: '/img/pagefirst/RoqedAITOmainpage.jpeg' },
   ]
 
   return (
