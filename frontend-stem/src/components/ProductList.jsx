@@ -116,6 +116,13 @@ function ApplicationModal({ product, onClose }) {
         product_name: product.title,
         article: product.article,
         product_url: window.location.href,
+        products: [{
+          name: product.title,
+          article: product.article,
+          quantity: 1,
+          url: window.location.href,
+          color: product.selectedColor || null,
+        }],
       })
       setSent(true)
     } catch {

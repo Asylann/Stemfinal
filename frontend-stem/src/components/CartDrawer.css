@@ -97,6 +97,16 @@
   margin-bottom: 4px;
 }
 
+.cart-item__color {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 2px;
+}
+
+.cart-item__color strong {
+  color: #2f6f55;
+}
+
 .cart-item__price {
   font-size: 14px;
   color: #1d6f42;
