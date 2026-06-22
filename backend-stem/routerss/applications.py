@@ -84,7 +84,14 @@ def normalize_phone(phone: str) -> str:
 def format_products(products: Optional[List[Dict]]) -> Tuple[str, str]:
     if not products:
         return "Не указан", "—"
-    names = [p.get("name", "Товар") for p in products if p.get("name")]
+    names = []
+    for p in products:
+        name = p.get("name", "Товар")
+        qty = p.get("quantity", 1)
+        if qty > 1:
+            names.append(f"{name} x{qty}")
+        elif name:
+            names.append(name)
     if not names:
         return "Не указан", "—"
     short = names[0] if len(names) == 1 else f"{names[0]} и др."
@@ -116,10 +123,13 @@ async def send_to_telegram(data: Dict, app_id: str) -> None:
 
     # Format products list
     products = data.get("products_list", [])
-    products_count = len(products) if products else 0
+    total_qty = sum(p.get("quantity", 1) for p in products) if products else 0
     products_lines = []
     for p in products:
+        qty = p.get("quantity", 1)
         parts = [f"• {p.get('name', 'Товар')}"]
+        if qty > 1:
+            parts.append(f"x{qty}")
         if p.get('color'):    parts.append(f"Цвет: {p.get('color')}")
         if p.get('article'):  parts.append(f"Арт: {p.get('article')}")
         products_lines.append(" | ".join(parts))
@@ -129,7 +139,7 @@ async def send_to_telegram(data: Dict, app_id: str) -> None:
         "📥 <b>Новая заявка с сайта</b>\n\n"
         f"🆔 <b>ID:</b> #{app_id}\n"
         f"🕒 <b>Время:</b> {now}\n\n"
-        f"📦 <b>Товары ({products_count} шт.):</b>\n{products_text}\n\n"
+        f"📦 <b>Товары ({total_qty} шт.):</b>\n{products_text}\n\n"
         f"👤 <b>Имя:</b> {data.get('name')}\n"
         f"📞 <b>Телефон:</b> {data.get('phone')}\n"
         f"📍 <b>Город/самовывоз:</b> {format_location(data)}\n"
@@ -178,7 +188,10 @@ async def send_to_bitrix(data: Dict, db_id: int) -> None:
     products = data.get("products_list", [])
     product_lines = []
     for p in products:
+        qty = p.get("quantity", 1)
         parts = [f"• {p.get('name', 'Товар')}"]
+        if qty > 1:
+            parts.append(f"x{qty}")
         if p.get('color'):   parts.append(f"Цвет: {p.get('color')}")
         if p.get('article'): parts.append(f"Арт: {p.get('article')}")
         product_lines.append(" | ".join(parts))
