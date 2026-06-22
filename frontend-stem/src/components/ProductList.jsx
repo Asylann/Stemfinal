@@ -394,10 +394,21 @@ function hasProductImage(p) {
 export default function ProductList({ products, title, backPath, backLabel }) {
   const { t } = useLang()
 
-  // Sort: products with images first, without images last
+  // Sort: products with images first, without images last.
+  // Then ensure a specific product (`ДИВАН 1`) is shown at the very top.
   const sortedProducts = useMemo(() => {
     if (!products || products.length === 0) return []
-    return [...products].sort((a, b) => (hasProductImage(b) ? 1 : 0) - (hasProductImage(a) ? 1 : 0))
+    const arr = [...products].sort((a, b) => (hasProductImage(b) ? 1 : 0) - (hasProductImage(a) ? 1 : 0))
+    // Find index of exact product title 'ДИВАН 1' (case-insensitive)
+    const targetIdx = arr.findIndex((p) => {
+      if (!p || !p.title) return false
+      return p.title.toString().trim().toLowerCase() === 'диван 1'
+    })
+    if (targetIdx > 0) {
+      const [item] = arr.splice(targetIdx, 1)
+      arr.unshift(item)
+    }
+    return arr
   }, [products])
 
   if (!sortedProducts || sortedProducts.length === 0) {

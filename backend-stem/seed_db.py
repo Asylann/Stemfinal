@@ -149,9 +149,9 @@ PRODUCTS = [
      "in_stock": True, "category_slug": "divany",
      "colors_json": _c([
          {"name": "Светло серый", "hex": "#D3D3D3", "img": "/img/pagesecond/divany/divan1/divan1_light_gray_fabric.png"},
-         {"name": "Бежевый", "hex": "#B89A72", "img": "/img/pagesecond/divany/divan1/divan1_beige.jpeg"},
-         {"name": "Темно зеленый", "hex": "#1E3B2F", "img": "/img/pagesecond/divany/divan1/divan1_dark_green.jpeg"},
-         {"name": "Теплый, жженый оранжевый", "hex": "#A94F2B", "img": "/img/pagesecond/divany/divan1/divan1_warm_burnt_orange.jpeg"},
+         {"name": "Бежевый", "hex": "#B89A72", "img": "/img/pagesecond/divany/divan1/divan1_beige (2).jpeg"},
+         {"name": "Темно зеленый", "hex": "#1E3B2F", "img": "/img/pagesecond/divany/divan1/divan1_dark_green (2).jpeg"},
+         {"name": "Теплый, жженый оранжевый", "hex": "#A94F2B", "img": "/img/pagesecond/divany/divan1/divan1_orange.jpeg"},
      ])},
     {"title": "ДИВАН 2", "img": "/img/pagesecond/divany/divan2/divan2_deep_teal_blue.png",
      "description_ru": "Каркас: брус, фанера, дсп. Наполнение: ППУ синтепон. Ткань: велюр, микро велюр, рогожка, экокожа, кожзам.",
