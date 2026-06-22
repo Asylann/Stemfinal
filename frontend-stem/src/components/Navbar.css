@@ -306,7 +306,10 @@
 
 @media (max-width: 480px) {
   .navbar-topbar { padding: 5px 12px; font-size: 12px; }
-  .topbar-city { display: none; }
+  .topbar-city { display: flex; }
+  .topbar-right { gap: 8px; }
+  .topbar-auth-btn { padding: 4px 10px; }
+  .topbar-auth-btn--signup { display: none; }
   .navbar-main { padding: 8px 12px; gap: 8px; }
   .logo-stem { font-size: 18px; }
   .navbar-logo-img { height: 36px; }
@@ -596,7 +599,10 @@
 
 @media (max-width: 480px) {
   .navbar-topbar { padding: 5px 12px; font-size: 12px; }
-  .topbar-city { display: none; }
+  .topbar-city { display: flex; }
+  .topbar-right { gap: 8px; }
+  .topbar-auth-btn { padding: 4px 10px; }
+  .topbar-auth-btn--signup { display: none; }
   .navbar-main { padding: 8px 12px; gap: 8px; }
   .logo-stem { font-size: 18px; }
   .navbar-search { flex: 1; }

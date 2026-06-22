@@ -4,6 +4,7 @@ import { useLang } from '../i18n/LanguageContext'
 import { useCart } from '../context/CartContext'
 import { useFavorites } from '../context/FavoritesContext'
 import { useAuth } from '../context/AuthContext'
+import { useUserLocation } from '../context/locationContext'
 import { createApplication, apiClient } from '../api/api'
 import Icon from '../components/Icons'
 import './ProductDetail.css'
@@ -19,7 +20,7 @@ function validatePhone(phone) {
 function validateName(name) {
   const cleaned = name.trim()
   if (cleaned.length < 2 || cleaned.length > 50) return false
-  return /^[A-Za-zА-Яа-яӘәҒғҚқҢңӨөҰұҮүҺһІіЁё\s\-]+$/.test(cleaned)
+  return /^[A-Za-zА-Яа-яӘәҒғҚқҢңӨөҰұҮүҺһІіЁё\s-]+$/.test(cleaned)
 }
 
 export default function ProductDetail() {
@@ -28,6 +29,7 @@ export default function ProductDetail() {
   const { addToCart } = useCart()
   const { user } = useAuth()
   const { toggleFavorite, isFavorite } = useFavorites()
+  const { selectedCity } = useUserLocation()
   
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -203,7 +205,7 @@ export default function ProductDetail() {
 
             <div className="product-delivery">
               <div className="delivery-item"><Icon.Truck width="16" height="16" /> Доставка по Казахстану</div>
-              <div className="delivery-item"><Icon.MapPin width="16" height="16" /> Самовывоз: Астана, Домалак-ана 26</div>
+              <div className="delivery-item"><Icon.MapPin width="16" height="16" /> {selectedCity.pickupShort}</div>
             </div>
 
             <div className="product-actions">

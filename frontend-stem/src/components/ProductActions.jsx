@@ -8,6 +8,7 @@ import { createApplication } from '../api/api'
 import { useCart } from '../context/CartContext'
 import { useFavorites } from '../context/FavoritesContext'
 import { useAuth } from '../context/AuthContext'
+import { useUserLocation } from '../context/locationContext'
 import Icon from './Icons'
 import './ProductActions.css'
 
@@ -15,6 +16,7 @@ export default function ProductActions({ product }) {
   const { addToCart } = useCart()
   const { toggleFavorite, isFavorite } = useFavorites()
   const { user } = useAuth()
+  const { selectedCity } = useUserLocation()
   const [showModal, setShowModal] = useState(false)
   const [formData, setFormData] = useState({ name: '', phone: '', comment: '' })
   const [submitting, setSubmitting] = useState(false)
@@ -112,7 +114,7 @@ export default function ProductActions({ product }) {
         </button>
         <div className="product-actions__delivery">
           <span><Icon.Truck width="14" height="14" /> Доставка по Казахстану</span>
-          <span><Icon.MapPin width="14" height="14" /> Самовывоз: г. Астана, ул. Домалак-ана 26</span>
+          <span><Icon.MapPin width="14" height="14" /> {selectedCity.pickup}</span>
         </div>
       </div>
 

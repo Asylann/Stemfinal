@@ -40,6 +40,8 @@ class ApplicationCreate(BaseModel):
     phone: str
     username: Optional[str] = None
     comment: Optional[str] = None
+    location_city: Optional[str] = None
+    location_address: Optional[str] = None
     product_name: Optional[str] = None
     article: Optional[str] = None
     product_url: Optional[str] = None
@@ -82,11 +84,34 @@ def normalize_phone(phone: str) -> str:
 def format_products(products: Optional[List[Dict]]) -> Tuple[str, str]:
     if not products:
         return "Не указан", "—"
-    names = [p.get("name", "Товар") for p in products if p.get("name")]
+    names = []
+    for p in products:
+        name = p.get("name", "Товар")
+        qty = p.get("quantity", 1)
+        if qty > 1:
+            names.append(f"{name} x{qty}")
+        elif name:
+            names.append(name)
     if not names:
         return "Не указан", "—"
     short = names[0] if len(names) == 1 else f"{names[0]} и др."
     return short, ""
+
+
+def format_location(data: Dict) -> str:
+    city = (data.get("location_city") or "").strip()
+    address = (data.get("location_address") or "").strip()
+    if city and address:
+        return f"{city}, {address}"
+    return city or address or "—"
+
+
+def build_admin_comment(comment: Optional[str], location_text: str) -> str:
+    parts = []
+    if comment and comment.strip():
+        parts.append(comment.strip())
+    parts.append(f"Город/самовывоз: {location_text}")
+    return "\n\n".join(parts)
 
 
 async def send_to_telegram(data: Dict, app_id: str) -> None:
@@ -98,10 +123,13 @@ async def send_to_telegram(data: Dict, app_id: str) -> None:
 
     # Format products list
     products = data.get("products_list", [])
-    products_count = len(products) if products else 0
+    total_qty = sum(p.get("quantity", 1) for p in products) if products else 0
     products_lines = []
     for p in products:
+        qty = p.get("quantity", 1)
         parts = [f"• {p.get('name', 'Товар')}"]
+        if qty > 1:
+            parts.append(f"x{qty}")
         if p.get('color'):    parts.append(f"Цвет: {p.get('color')}")
         if p.get('article'):  parts.append(f"Арт: {p.get('article')}")
         products_lines.append(" | ".join(parts))
@@ -111,9 +139,10 @@ async def send_to_telegram(data: Dict, app_id: str) -> None:
         "📥 <b>Новая заявка с сайта</b>\n\n"
         f"🆔 <b>ID:</b> #{app_id}\n"
         f"🕒 <b>Время:</b> {now}\n\n"
-        f"📦 <b>Товары ({products_count} шт.):</b>\n{products_text}\n\n"
+        f"📦 <b>Товары ({total_qty} шт.):</b>\n{products_text}\n\n"
         f"👤 <b>Имя:</b> {data.get('name')}\n"
         f"📞 <b>Телефон:</b> {data.get('phone')}\n"
+        f"📍 <b>Город/самовывоз:</b> {format_location(data)}\n"
         f"💬 <b>Комментарий:</b> {data.get('comment') or '—'}"
     )
 
@@ -124,6 +153,8 @@ async def send_to_telegram(data: Dict, app_id: str) -> None:
         )
         if response.status_code == 200:
             print(f"✅ Telegram: Заявка #{app_id} успешно отправлена")
+        else:
+            print(f"❌ Telegram: Ошибка отправки заявки #{app_id} — {response.status_code}: {response.text}")
 
 
 # ─── Bitrix24 deal stage mapping ─────────────────────────────────────────────────
@@ -157,7 +188,10 @@ async def send_to_bitrix(data: Dict, db_id: int) -> None:
     products = data.get("products_list", [])
     product_lines = []
     for p in products:
+        qty = p.get("quantity", 1)
         parts = [f"• {p.get('name', 'Товар')}"]
+        if qty > 1:
+            parts.append(f"x{qty}")
         if p.get('color'):   parts.append(f"Цвет: {p.get('color')}")
         if p.get('article'): parts.append(f"Арт: {p.get('article')}")
         product_lines.append(" | ".join(parts))
@@ -173,7 +207,7 @@ async def send_to_bitrix(data: Dict, db_id: int) -> None:
             "TITLE":     f"Заявка с сайта: {data.get('name', 'Клиент')}",
             "NAME":      data.get("name"),
             "PHONE":     [{"VALUE": data.get("phone"), "VALUE_TYPE": "WORK"}],
-            "COMMENTS":  f"📦 Товары:\n{product_details}\n\n💬 Комментарий: {data.get('comment') or '—'}",
+            "COMMENTS":  f"📦 Товары:\n{product_details}\n\n📍 Город/самовывоз: {format_location(data)}\n\n💬 Комментарий: {data.get('comment') or '—'}",
             "SOURCE_ID": "WEB",
             "STAGE_ID":  initial_stage,
             "OPENED":    "Y",
@@ -206,6 +240,8 @@ class ContactMessage(BaseModel):
     name: str
     phone: str
     message: Optional[str] = None
+    location_city: Optional[str] = None
+    location_address: Optional[str] = None
 
 
 async def send_contact_to_telegram(data: Dict) -> None:
@@ -218,6 +254,7 @@ async def send_contact_to_telegram(data: Dict) -> None:
         f"🕒 <b>Время:</b> {now}\n"
         f"👤 <b>Имя:</b> {data.get('name')}\n"
         f"📞 <b>Телефон:</b> {data.get('phone')}\n"
+        f"📍 <b>Город/самовывоз:</b> {format_location(data)}\n"
         f"💬 <b>Сообщение:</b> {data.get('message') or '—'}"
     )
     async with httpx.AsyncClient(timeout=10) as client:
@@ -227,6 +264,8 @@ async def send_contact_to_telegram(data: Dict) -> None:
         )
         if response.status_code == 200:
             print(f"✅ Telegram: Контактное сообщение отправлено")
+        else:
+            print(f"❌ Telegram: Ошибка отправки контактного сообщения — {response.status_code}: {response.text}")
 
 
 @router.post("/contact")
@@ -237,6 +276,8 @@ async def contact_message(data: ContactMessage, background_tasks: BackgroundTask
         "name": data.name.strip(),
         "phone": normalized_phone,
         "message": data.message.strip() if data.message else None,
+        "location_city": data.location_city,
+        "location_address": data.location_address,
     }
     background_tasks.add_task(send_contact_to_telegram, app_data)
     return {"status": "ok"}
@@ -260,8 +301,11 @@ async def create_application(
         "name": data.name.strip(),
         "phone": normalized_phone,
         "comment": data.comment,
+        "location_city": data.location_city,
+        "location_address": data.location_address,
         "products_list": products_list,
     }
+    admin_comment = build_admin_comment(data.comment, format_location(app_data))
 
     # Try to extract user_id from JWT token (optional — anonymous orders still work)
     user_id = None
@@ -279,7 +323,7 @@ async def create_application(
     new_application = Application(
         name=app_data["name"],
         phone=app_data["phone"],
-        comment=app_data["comment"],
+        comment=admin_comment,
         product_name=short_name,
         status="new",
         user_id=user_id
