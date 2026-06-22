@@ -22,6 +22,7 @@ export default function ProductActions({ product }) {
   const [addedToCart, setAddedToCart] = useState(false)
 
   const productId = product.id || product.article || product.title
+  const productColor = product.color || null
   const inFavorite = isFavorite(productId)
 
   const handleAddToCart = () => {
@@ -31,6 +32,7 @@ export default function ProductActions({ product }) {
       article: product.article || '',
       img: product.img || '',
       name: product.title,
+      color: productColor,
     })
     setAddedToCart(true)
     setTimeout(() => setAddedToCart(false), 2000)
@@ -56,7 +58,7 @@ export default function ProductActions({ product }) {
       await createApplication({
         name: formData.name,
         phone: formData.phone,
-        comment: formData.comment,
+        comment: productColor ? `Выбранный цвет: ${productColor}\n${formData.comment}`.trim() : formData.comment,
         product_name: product.title,
         article: product.article || '',
         product_url: window.location.href,

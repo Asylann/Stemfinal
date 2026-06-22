@@ -23,35 +23,38 @@ export function CartProvider({ children }) {
     const normalizedProduct = {
       ...product,
       name: product.name || product.title,
-      img: product.img || product.image || product.photo,
+      img: product.image || product.img || product.photo,
     }
+    const cartKey = `${normalizedProduct.id}__${normalizedProduct.color || ''}`
     setCartItems(prev => {
-      const existing = prev.find(item => item.id === normalizedProduct.id)
+      const existing = prev.find(item => `${item.id}__${item.color || ''}` === cartKey)
       if (existing) {
         return prev.map(item =>
-          item.id === normalizedProduct.id
+          `${item.id}__${item.color || ''}` === cartKey
             ? { ...item, quantity: item.quantity + 1 }
             : item
         )
       }
-      return [...prev, { ...normalizedProduct, quantity: 1 }]
+      return [...prev, { ...normalizedProduct, quantity: 1, _cartKey: cartKey }]
     })
   }
 
-  const removeFromCart = (id) => setCartItems(prev => prev.filter(item => item.id !== id))
+  const getItemKey = (item) => item._cartKey || `${item.id}__${item.color || ''}`
 
-  const increaseQty = (id) => {
+  const removeFromCart = (cartKey) => setCartItems(prev => prev.filter(item => getItemKey(item) !== cartKey))
+
+  const increaseQty = (cartKey) => {
     setCartItems(prev =>
       prev.map(item =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+        getItemKey(item) === cartKey ? { ...item, quantity: item.quantity + 1 } : item
       )
     )
   }
 
-  const decreaseQty = (id) => {
+  const decreaseQty = (cartKey) => {
     setCartItems(prev =>
       prev.map(item =>
-        item.id === id ? { ...item, quantity: Math.max(1, item.quantity - 1) } : item
+        getItemKey(item) === cartKey ? { ...item, quantity: Math.max(1, item.quantity - 1) } : item
       )
     )
   }

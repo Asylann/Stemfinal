@@ -56,7 +56,8 @@ export default function CartDrawer() {
         name: item.name || item.title || 'Товар',
         article: item.article || null,
         quantity: item.quantity || 1,
-        url: item.url || window.location.href
+        url: item.url || window.location.href,
+        color: item.color || null
       }))
 
       const applicationData = {
@@ -129,9 +130,10 @@ export default function CartDrawer() {
             <div className="cart-drawer__items">
               {cartItems.map((item) => {
                 const itemQty = item.quantity || 1
+                const cartKey = item._cartKey || `${item.id}__${item.color || ''}`
 
                 return (
-                  <div key={item.id} className="cart-item">
+                  <div key={cartKey} className="cart-item">
                     <img
                       className="cart-item__img"
                       src={item.img}
@@ -140,16 +142,21 @@ export default function CartDrawer() {
 
                     <div className="cart-item__info">
                       <p className="cart-item__name">{item.name || item.title || 'Товар'}</p>
+                      {item.color && (
+                        <p className="cart-item__color">
+                          Цвет: <strong>{item.color}</strong>
+                        </p>
+                      )}
                       <p className="cart-item__article">
                         Арт: {item.article || '—'}
                       </p>
 
                       <div className="cart-item__qty">
-                        <button onClick={() => decreaseQty(item.id)} type="button">
+                        <button onClick={() => decreaseQty(cartKey)} type="button">
                           −
                         </button>
                         <span>{itemQty}</span>
-                        <button onClick={() => increaseQty(item.id)} type="button">
+                        <button onClick={() => increaseQty(cartKey)} type="button">
                           +
                         </button>
                       </div>
@@ -157,7 +164,7 @@ export default function CartDrawer() {
 
                     <button
                       className="cart-item__remove"
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => removeFromCart(cartKey)}
                       type="button"
                     >
                       <Icon.X width="14" height="14" />
