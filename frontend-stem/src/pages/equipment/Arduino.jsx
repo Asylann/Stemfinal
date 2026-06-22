@@ -1,100 +1,143 @@
 import { Link } from 'react-router-dom'
+import { useLang } from '../../i18n/LanguageContext'
+import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import Icon from '../../components/Icons'
 import ProductActions from '../../components/ProductActions'
 import './EquipmentDetail.css'
 
+const SPEC_ICONS = {
+  'микроконтроллер': 'Cpu', 'процессор': 'Cpu',
+  'напряжение': 'Zap', 'питание': 'Zap',
+  'цифровые': 'Zap', 'входы': 'Zap', 'выходы': 'Zap',
+  'аналоговые': 'Battery',
+  'flash': 'Folder', 'память': 'Folder',
+  'тактовая': 'Clock', 'частота': 'Clock',
+  'интерфейс': 'Link2', 'подключ': 'Link2',
+  'размер': 'Ruler', 'габарит': 'Ruler',
+  'аккумулятор': 'Battery', 'батаре': 'Battery',
+  'экран': 'Monitor', 'дисплей': 'Monitor',
+  'датчик': 'Droplets', 'сенсор': 'Droplets',
+  'беспроводное': 'Radio', 'bluetooth': 'Radio',
+  'платформ': 'Laptop', 'совместимость': 'Laptop',
+  'количество деталей': 'Puzzle', 'деталей': 'Puzzle',
+  'моторы': 'Zap', 'мотор': 'Zap',
+}
+
+function getSpecIcon(label) {
+  const lower = (label || '').toLowerCase()
+  for (const [key, icon] of Object.entries(SPEC_ICONS)) {
+    if (lower.includes(key)) return icon
+  }
+  return 'Info'
+}
+
 export default function Arduino() {
+  const { t, lang } = useLang()
+  const { products } = useCategoryProducts('arduino')
+  const product = products[0] || null
+  const extras = products.slice(1)
+  const img = product?.img || '/img/equipment/arduino.png'
+  const title = product?.title || 'ARDUINO UNO'
+  const article = product?.article || 'S.Eq-ARD.UnoR3'
+  const desc = product
+    ? (Array.isArray(product.description)
+        ? product.description.join(' ')
+        : (lang === 'kz' ? product.description_kz : product.description_ru) || product.description)
+    : null
+
   return (
     <div className="page">
       <div className="breadcrumb">
-        <Link to="/" style={{ color: '#888', textDecoration: 'none' }}>Главная</Link>
+        <Link to="/" style={{ color: '#888', textDecoration: 'none' }}>{t.home}</Link>
         {' / '}
-        <Link to="/equipment" style={{ color: '#888', textDecoration: 'none' }}>Оборудование</Link>
+        <Link to="/equipment" style={{ color: '#888', textDecoration: 'none' }}>{t.equipment}</Link>
         {' / ARDUINO'}
       </div>
 
       <main className="detail-layout">
 
-        {/* ЛЕВАЯ ЧАСТЬ */}
         <div className="detail-left">
 
           <div className="detail-info-block">
-            <h2 className="detail-title">ARDUINO UNO</h2>
-            <p className="detail-desc">
-              Arduino Uno — микроконтроллерная плата, предназначенная для обучения основам
-              электроники, программирования и робототехники в учебных кабинетах и STEM-лабораториях.
-              Платформа позволяет ученикам создавать интерактивные проекты: от простых светодиодных
-              схем до сложных робототехнических комплексов с датчиками и моторами.
-            </p>
-            <p className="detail-desc">
-              Arduino Uno — идеальный инструмент для изучения основ физики, информатики и инженерии.
-              Плата совместима с тысячами датчиков, модулей и библиотек, что делает её универсальной
-              платформой для проектной деятельности в школе и колледже.
-            </p>
+            <h2 className="detail-title">{title}</h2>
+            {desc && <p className="detail-desc">{desc}</p>}
 
-            <p className="detail-order">
-              <strong>pcb-arduino-01</strong><br />
-              Микроконтроллерная плата Arduino Uno R3 для STEM-лабораторий
-            </p>
+            {product?.article && (
+              <p className="detail-order">
+                <strong>{product.article}</strong>
+              </p>
+            )}
           </div>
 
-          <div className="detail-chars">
-            <h3 className="detail-chars__title">Характеристики</h3>
-            <div className="detail-chars__grid">
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Cpu width="18" height="18" /></span>
-                <span className="char-card__label">Микроконтроллер</span>
-                <span className="char-card__value">ATmega328P</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Zap width="18" height="18" /></span>
-                <span className="char-card__label">Напряжение питания</span>
-                <span className="char-card__value">7–12 В</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Zap width="18" height="18" /></span>
-                <span className="char-card__label">Цифровые входы/выходы</span>
-                <span className="char-card__value">14 шт.</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Battery width="18" height="18" /></span>
-                <span className="char-card__label">Аналоговые входы</span>
-                <span className="char-card__value">6 шт.</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Folder width="18" height="18" /></span>
-                <span className="char-card__label">Flash-память</span>
-                <span className="char-card__value">32 КБ</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Clock width="18" height="18" /></span>
-                <span className="char-card__label">Тактовая частота</span>
-                <span className="char-card__value">16 МГц</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Link2 width="18" height="18" /></span>
-                <span className="char-card__label">Интерфейс</span>
-                <span className="char-card__value">USB Type-B</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Ruler width="18" height="18" /></span>
-                <span className="char-card__label">Размеры</span>
-                <span className="char-card__value">68,6 × 53,4 мм</span>
+          {product?.specs && product.specs.length > 0 && (
+            <div className="detail-chars">
+              <h3 className="detail-chars__title">{t.computers_specs}</h3>
+              <div className="detail-chars__grid">
+                {product.specs.map((s, i) => {
+                  const iconName = getSpecIcon(s.label)
+                  const IconComp = Icon[iconName]
+                  return (
+                    <div key={i} className="char-card">
+                      <span className="char-card__icon">{IconComp ? <IconComp width="18" height="18" /> : ''}</span>
+                      <span className="char-card__label">{s.label}</span>
+                      <span className="char-card__value">{s.value}</span>
+                    </div>
+                  )
+                })}
               </div>
             </div>
-          </div>
+          )}
 
-          <p className="detail-article">Артикул: S.Eq-ARD.UnoR3</p>
+          <p className="detail-article">{t.article_label}: {article}</p>
 
-          <ProductActions product={{ title: 'Arduino Uno', article: 'S.Eq-ARD.UnoR3', img: '/img/equipment/arduino.png' }} />
+          <ProductActions product={{ id: product?.id, title, article, img }} />
         </div>
 
-        {/* ПРАВАЯ ЧАСТЬ */}
         <div className="detail-right">
-          <img src="/img/equipment/arduino.png" alt="ARDUINO" className="detail-img" />
+          <img src={img} alt={title} className="detail-img" />
         </div>
 
       </main>
+
+      {extras.map((p) => {
+        const pImg = p.img || ''
+        const pDesc = Array.isArray(p.description)
+          ? p.description.join(' ')
+          : (lang === 'kz' ? p.description_kz : p.description_ru) || p.description
+        return (
+          <div key={p.id} className="detail-extra-card">
+            <div className="detail-extra-card__left">
+              <h3 className="detail-extra-card__title">{p.title}</h3>
+              {pDesc && <p className="detail-extra-card__desc">{pDesc}</p>}
+              {p.specs && p.specs.length > 0 && (
+                <div className="detail-chars">
+                  <h4 className="detail-chars__title">{t.computers_specs}</h4>
+                  <div className="detail-chars__grid">
+                    {p.specs.map((s, i) => {
+                      const iconName = getSpecIcon(s.label)
+                      const IconComp = Icon[iconName]
+                      return (
+                        <div key={i} className="char-card">
+                          <span className="char-card__icon">{IconComp ? <IconComp width="18" height="18" /> : ''}</span>
+                          <span className="char-card__label">{s.label}</span>
+                          <span className="char-card__value">{s.value}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+              {p.article && <p className="detail-article">{t.article_label}: {p.article}</p>}
+              <ProductActions product={{ id: p.id, title: p.title, article: p.article, img: pImg }} />
+            </div>
+            {pImg && (
+              <div className="detail-extra-card__right">
+                <img src={pImg} alt={p.title} className="detail-extra-card__img" />
+              </div>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }

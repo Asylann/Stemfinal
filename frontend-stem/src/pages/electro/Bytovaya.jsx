@@ -1,11 +1,18 @@
 import { useLang } from '../../i18n/LanguageContext'
 import { Link } from 'react-router-dom'
+import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import Icon from '../../components/Icons'
 import ProductActions from '../../components/ProductActions'
 import './Bytovaya.css'
 
 export default function Bytovaya() {
-  const { t } = useLang()
+  const { t, lang } = useLang()
+  const { products } = useCategoryProducts('bytovaya')
+  const main = products[0] || null
+  const extras = products.slice(1)
+  const img = main?.img || '/img/pagethird/bytovaya/item1.png'
+  const title = main?.title || t.electro_bytovaya || 'Бытовая техника'
+  const article = main?.article || 'S.Ee-BYT.GEN'
 
   return (
     <div className="page">
@@ -45,15 +52,47 @@ export default function Bytovaya() {
             })}
           </div>
 
-          <div className="bytovaya-card__divider" />
-          <p className="bytovaya-card__article">{t.article_label}: S.Ee-INK.DDS.K</p>
+          {main?.specs && main.specs.length > 0 && (
+            <>
+              <p className="bytovaya-card__section-title">{t.computers_specs}</p>
+              <div className="bytovaya-card__specs">
+                {main.specs.map((s, i) => (
+                  <div key={i} className="bytovaya-card__spec">
+                    <span className="bytovaya-card__spec-label">{s.label}</span>
+                    <span className="bytovaya-card__spec-value">{s.value}</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
 
-          <ProductActions product={{ title: t.electro_bytovaya || 'Бытовая техника', article: 'S.Ee-BYT.GEN', img: '/img/pagethird/bytovaya/item1.png' }} />
+          <div className="bytovaya-card__divider" />
+          <p className="bytovaya-card__article">{t.article_label}: {article}</p>
+
+          <ProductActions product={{ id: main?.id, title, article, img }} />
         </div>
 
         <div className="bytovaya-image">
-          <img src="/img/pagethird/bytovaya/item1.png" alt="Бытовая техника" className="bytovaya-image__img" />
+          <img src={img} alt={title} className="bytovaya-image__img" />
         </div>
+
+        {extras.map((p) => (
+          <div key={p.id} className="bytovaya-card" style={{ marginTop: '32px' }}>
+            <h2 className="bytovaya-card__title">{p.title}</h2>
+            <p className="bytovaya-card__desc">
+              {Array.isArray(p.description)
+                ? p.description.join(' ')
+                : (lang === 'kz' ? p.description_kz : p.description_ru) || p.description}
+            </p>
+            {p.img && (
+              <div style={{ maxWidth: 400, margin: '16px 0' }}>
+                <img src={p.img} alt={p.title} style={{ width: '100%', borderRadius: '8px' }} />
+              </div>
+            )}
+            {p.article && <p className="bytovaya-card__article">{t.article_label}: {p.article}</p>}
+            <ProductActions product={{ id: p.id, title: p.title, article: p.article, img: p.img }} />
+          </div>
+        ))}
 
       </main>
     </div>

@@ -18,6 +18,18 @@ def _parse_colors(colors_json):
         return []
 
 
+def _parse_specs(specs_json):
+    if not specs_json:
+        return []
+    try:
+        data = json.loads(specs_json)
+        if isinstance(data, list):
+            return [s for s in data if isinstance(s, dict) and s.get('label') and s.get('value')]
+        return []
+    except (json.JSONDecodeError, TypeError):
+        return []
+
+
 # Resolve project root for verifying static image paths
 _PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Docker: /frontend-public  |  Local dev: ../frontend-stem/public
@@ -52,6 +64,7 @@ def _verify_img(img_path):
 def _product_out(p: Product) -> dict:
     cat = p.category
     colors = _parse_colors(p.colors_json)
+    specs = _parse_specs(p.specs_json)
     img = _verify_img(p.img)
     # Filter out broken image URLs from imgs list
     valid_imgs = [c["img"] for c in colors if c.get("img") and _verify_img(c["img"])]
@@ -79,6 +92,7 @@ def _product_out(p: Product) -> dict:
         "article": p.article,
         "in_stock": p.in_stock,
         "colors": valid_colors,
+        "specs": specs,
         "category_slug": p.category_slug,
         "category": {
             "slug": cat.slug,

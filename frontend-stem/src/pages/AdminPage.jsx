@@ -34,8 +34,88 @@ function ErrorBox({ message }) {
 
 // ─── Product Form Modal ───────────────────────────────────────────────────────
 
+// Categories that typically have specs
+const SPECS_CATEGORIES = [
+  'computers', 'interactive', 'infokiosk', 'bytovaya', 'printers3d',
+  'stanki', 'labdisc', 'ulab', 'arduino', 'legospike',
+]
+
+// Predefined spec labels per category — admin only fills in the values
+const SPECS_TEMPLATES = {
+  computers: [
+    'Серия процессора', 'Разрешение дисплея', 'Объём оперативной памяти',
+    'Тип оперативной памяти', 'Тип накопителя', 'Операционная система', 'Диагональ',
+  ],
+  interactive: [
+    'Разрешение дисплея', 'Диагональ', 'Операционная система',
+    'Количество касаний', 'Тип матрицы', 'Объём оперативной памяти',
+  ],
+  infokiosk: [
+    'Серия процессора', 'Разрешение дисплея', 'Объём оперативной памяти',
+    'Тип оперативной памяти', 'Тип накопителя', 'Операционная система',
+    'Диагональ', 'Количество касаний',
+  ],
+  bytovaya: ['Мощность', 'Напряжение', 'Вес', 'Габариты', 'Гарантия'],
+  printers3d: [
+    'Область печати', 'Технология печати', 'Скорость печати',
+    'Толщина слоя', 'Материалы печати', 'Подключение',
+  ],
+  stanki: [
+    'Рабочая область', 'Шпиндель', 'Скорость вращения',
+    'Точность', 'Тип управления', 'Габариты',
+  ],
+  labdisc: [
+    'Внутренний аккумулятор', 'Экран', 'Датчик pH', 'Интерфейс',
+    'Рабочая температура', 'Максимальная скорость измерения',
+    'Срок службы аккумулятора', 'Беспроводное соединение',
+    'Датчик кислорода', 'Диапазон светового датчика',
+    'Поддерживаемые платформы', 'Внутренняя память',
+  ],
+  ulab: ['Назначение', 'Тип', 'Материалы', 'Применение'],
+  arduino: [
+    'Микроконтроллер', 'Напряжение питания', 'Цифровые входы/выходы',
+    'Аналоговые входы', 'Flash-память', 'Тактовая частота',
+    'Интерфейс', 'Размеры',
+  ],
+  legospike: [
+    'Количество деталей', 'Программируемый хаб', 'Моторы',
+    'Датчики', 'Аккумулятор', 'Подключение', 'Совместимость', 'Платформы',
+  ],
+}
+
 function ProductModal({ product, categories, onClose, onSaved }) {
   const isEdit = !!product
+
+  // Parse specs from JSON
+  let initialSpecs = []
+  if (product?.specs_json) {
+    try {
+      const parsed = JSON.parse(product.specs_json)
+      if (Array.isArray(parsed)) initialSpecs = parsed
+    } catch { /* ignore */ }
+  }
+
+  // Build initial specs: merge existing specs with template labels
+  function buildInitialSpecs(catSlug, existingSpecs) {
+    const template = SPECS_TEMPLATES[catSlug]
+    if (!template) return existingSpecs.length > 0 ? existingSpecs : []
+    if (existingSpecs.length === 0) {
+      return template.map(label => ({ label, value: '' }))
+    }
+    // Merge: keep existing specs (with values), add missing template labels
+    const existingLabels = new Set(existingSpecs.map(s => (s.label || '').toLowerCase()))
+    const merged = [...existingSpecs]
+    template.forEach(label => {
+      if (!existingLabels.has(label.toLowerCase())) {
+        merged.push({ label, value: '' })
+      }
+    })
+    return merged
+  }
+
+  const initCat = product?.category_slug ?? ''
+  const mergedInitialSpecs = buildInitialSpecs(initCat, initialSpecs)
+
   const [form, setForm] = useState({
     title: product?.title ?? '',
     img: product?.img ?? '',
@@ -48,6 +128,7 @@ function ProductModal({ product, categories, onClose, onSaved }) {
     in_stock: product?.in_stock ?? true,
     category_slug: product?.category_slug ?? '',
   })
+  const [specs, setSpecs] = useState(mergedInitialSpecs)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [uploading, setUploading] = useState(false)
@@ -58,6 +139,20 @@ function ProductModal({ product, categories, onClose, onSaved }) {
       ...prev,
       [field]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
     }))
+  }
+
+  // When category changes, reset specs to match the new category template
+  function handleCategoryChange(e) {
+    const newSlug = e.target.value
+    setForm((prev) => ({ ...prev, category_slug: newSlug }))
+    if (SPECS_CATEGORIES.includes(newSlug)) {
+      const currentFilled = specs.filter(s => s.value.trim())
+      if (currentFilled.length === 0 || !isEdit) {
+        setSpecs(buildInitialSpecs(newSlug, []))
+      } else {
+        setSpecs(buildInitialSpecs(newSlug, currentFilled))
+      }
+    }
   }
 
   // Handle file picker → upload → store returned URL
@@ -97,6 +192,10 @@ function ProductModal({ product, categories, onClose, onSaved }) {
     setSaving(true)
     setError('')
     try {
+      // Serialize specs to JSON
+      const validSpecs = specs.filter(s => s.label.trim() && s.value.trim())
+      const specsJson = validSpecs.length > 0 ? JSON.stringify(validSpecs) : null
+
       const payload = {
         ...form,
         img: form.img || null,
@@ -107,6 +206,7 @@ function ProductModal({ product, categories, onClose, onSaved }) {
         size: form.size || null,
         article: form.article || null,
         category_slug: form.category_slug || null,
+        specs_json: specsJson,
       }
       if (isEdit) {
         await adminUpdateProduct(product.id, payload)
@@ -141,7 +241,7 @@ function ProductModal({ product, categories, onClose, onSaved }) {
             </div>
             <div className="admin-form__field">
               <label>Категория</label>
-              <select value={form.category_slug} onChange={set('category_slug')}>
+              <select value={form.category_slug} onChange={handleCategoryChange}>
                 <option value="">— Без категории —</option>
                 {categories.map((c) => (
                   <option key={c.slug} value={c.slug}>
@@ -221,6 +321,64 @@ function ProductModal({ product, categories, onClose, onSaved }) {
               В наличии
             </label>
           </div>
+
+          {/* ─── Dynamic Specs Editor ─── */}
+          {SPECS_CATEGORIES.includes(form.category_slug) && (
+            <div className="admin-form__field">
+              <label>Характеристики (спецификации)</label>
+              <div className="admin-specs">
+                {specs.map((spec, i) => {
+                  const template = SPECS_TEMPLATES[form.category_slug] || []
+                  const isTemplateLabel = template.some(
+                    (tl) => tl.toLowerCase() === (spec.label || '').toLowerCase() && spec.label.trim() !== ''
+                  )
+                  return (
+                    <div key={i} className="admin-specs__row">
+                      {isTemplateLabel ? (
+                        <span className="admin-specs__label">{spec.label}</span>
+                      ) : (
+                        <input
+                          className="admin-specs__input"
+                          placeholder="Название (напр. Серия процессора)"
+                          value={spec.label}
+                          onChange={(e) => {
+                            const updated = [...specs]
+                            updated[i] = { ...updated[i], label: e.target.value }
+                            setSpecs(updated)
+                          }}
+                        />
+                      )}
+                      <input
+                        className="admin-specs__input"
+                        placeholder="Значение (напр. Intel Core i3)"
+                        value={spec.value}
+                        onChange={(e) => {
+                          const updated = [...specs]
+                          updated[i] = { ...updated[i], value: e.target.value }
+                          setSpecs(updated)
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="admin-specs__remove"
+                        onClick={() => setSpecs(specs.filter((_, idx) => idx !== i))}
+                        title="Удалить"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )
+                })}
+                <button
+                  type="button"
+                  className="admin-specs__add"
+                  onClick={() => setSpecs([...specs, { label: '', value: '' }])}
+                >
+                  + Добавить характеристику
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="admin-form__actions">
             <button type="button" className="admin-btn admin-btn--secondary" onClick={onClose}>

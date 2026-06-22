@@ -397,6 +397,84 @@
   gap: 9px;
 }
 
+/* ── Specs Editor ──────────────────────────────────────────────────────────── */
+.admin-specs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-specs__row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.admin-specs__input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.admin-specs__label {
+  flex: 1;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a2e;
+  background: #f0f0f5;
+  border: 1px solid #e0e0ea;
+  border-radius: 6px;
+  line-height: 1.4;
+}
+
+.admin-specs__input:focus {
+  border-color: #2d6a4f;
+  box-shadow: 0 0 0 2px rgba(45, 106, 79, 0.1);
+}
+
+.admin-specs__remove {
+  background: #fee2e2;
+  border: none;
+  color: #b91c1c;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.admin-specs__remove:hover {
+  background: #fecaca;
+}
+
+.admin-specs__add {
+  background: #dbeafe;
+  border: 1px dashed #3b82f6;
+  color: #1d4ed8;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.15s;
+  align-self: flex-start;
+}
+
+.admin-specs__add:hover {
+  background: #bfdbfe;
+}
+
 .admin-form__actions {
   display: flex;
   gap: 10px;

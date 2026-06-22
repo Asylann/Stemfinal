@@ -1,91 +1,139 @@
+import { Link } from 'react-router-dom'
+import { useLang } from '../../i18n/LanguageContext'
+import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import Icon from '../../components/Icons'
 import ProductActions from '../../components/ProductActions'
 import './EquipmentDetail.css'
 
+const SPEC_ICONS = {
+  'назначение': 'Info', 'тип': 'Settings',
+  'материалы': 'Folder', 'материал': 'Folder',
+  'применение': 'Zap', 'использование': 'Zap',
+  'серия процессора': 'Cpu', 'процессор': 'Cpu',
+  'разрешение дисплея': 'Grid', 'дисплей': 'Grid',
+  'объём оперативной памяти': 'Folder', 'оперативная память': 'Settings',
+  'тип оперативной памяти': 'Settings',
+  'тип накопителя': 'Disc', 'накопитель': 'Disc',
+  'операционная система': 'Grid',
+  'диагональ': 'Maximize',
+  'количество касаний': 'Smartphone', 'касания': 'Smartphone',
+}
+
+function getSpecIcon(label) {
+  const lower = (label || '').toLowerCase()
+  for (const [key, icon] of Object.entries(SPEC_ICONS)) {
+    if (lower.includes(key)) return icon
+  }
+  return 'Info'
+}
+
 export default function Ulab() {
+  const { t, lang } = useLang()
+  const { products } = useCategoryProducts('ulab')
+  const product = products[0] || null
+  const extras = products.slice(1)
+  const img = product?.img || '/img/equipment/ulab.png'
+  const title = product?.title || 'НАБОР ULABS'
+  const article = product?.article || 'S.Ee-INK.DD5.K'
+  const desc = product
+    ? (Array.isArray(product.description)
+        ? product.description.join(' ')
+        : (lang === 'kz' ? product.description_kz : product.description_ru) || product.description)
+    : null
+
   return (
     <div className="page">
-      <div className="breadcrumb">ОБОРУДОВАНИЕ | ULABS</div>
+      <div className="breadcrumb">
+        <Link to="/" style={{ color: '#888', textDecoration: 'none' }}>{t.home}</Link>
+        {' / '}
+        <Link to="/equipment" style={{ color: '#888', textDecoration: 'none' }}>{t.equipment}</Link>
+        {' / ULABS'}
+      </div>
 
       <main className="detail-layout">
 
-        {/* ЛЕВАЯ ЧАСТЬ */}
         <div className="detail-left">
 
           <div className="detail-info-block">
-            <h2 className="detail-title">НАБОР ULABS</h2>
-            <p className="detail-desc">
-              Набор ULABS «Лабораторный комплект» предназначен для обучения по программе К-12.
-              Используется учителем во время демонстрационных, лабораторных и практических работ
-              по биологии. Позволяет ознакомить учеников с морфологическим и анатомическим
-              строением растений, животных, особенностями биохимических и физиологических
-              процессов живых организмов. Элементы набора используются в работах с
-              цифровыми измерительными комплексами.
-            </p>
+            <h2 className="detail-title">{title}</h2>
+            {desc && <p className="detail-desc">{desc}</p>}
 
-            <p className="detail-order">
-              <strong>pcb-ulabs-01 Приказ №70, номер - 1628</strong><br />
-              Набор посуды и принадлежностей для демонстрационных опытов и лабораторных работ
-            </p>
+            {product?.article && (
+              <p className="detail-order">
+                <strong>{product.article}</strong>
+              </p>
+            )}
           </div>
 
-          <div className="detail-chars">
-            <h3 className="detail-chars__title">Характеристики</h3>
-            <div className="detail-chars__grid">
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Cpu width="18" height="18" /></span>
-                <span className="char-card__label">Серия процессора</span>
-                <span className="char-card__value">Intel Core i3 GEN6</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Monitor width="18" height="18" /></span>
-                <span className="char-card__label">Разрешение дисплея</span>
-                <span className="char-card__value">FullHD</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Folder width="18" height="18" /></span>
-                <span className="char-card__label">Объём оперативной памяти</span>
-                <span className="char-card__value">8Gb</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Zap width="18" height="18" /></span>
-                <span className="char-card__label">Тип оперативной памяти</span>
-                <span className="char-card__value">DDR3</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Folder width="18" height="18" /></span>
-                <span className="char-card__label">Тип накопителя</span>
-                <span className="char-card__value">SSD 128Gb</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Monitor width="18" height="18" /></span>
-                <span className="char-card__label">Операционная система</span>
-                <span className="char-card__value">Windows 10</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Ruler width="18" height="18" /></span>
-                <span className="char-card__label">Диагональ</span>
-                <span className="char-card__value">49"</span>
-              </div>
-              <div className="char-card">
-                <span className="char-card__icon"><Icon.Smartphone width="18" height="18" /></span>
-                <span className="char-card__label">Количество касаний</span>
-                <span className="char-card__value">10 касаний</span>
+          {product?.specs && product.specs.length > 0 && (
+            <div className="detail-chars">
+              <h3 className="detail-chars__title">{t.computers_specs}</h3>
+              <div className="detail-chars__grid">
+                {product.specs.map((s, i) => {
+                  const iconName = getSpecIcon(s.label)
+                  const IconComp = Icon[iconName]
+                  return (
+                    <div key={i} className="char-card">
+                      <span className="char-card__icon">{IconComp ? <IconComp width="18" height="18" /> : ''}</span>
+                      <span className="char-card__label">{s.label}</span>
+                      <span className="char-card__value">{s.value}</span>
+                    </div>
+                  )
+                })}
               </div>
             </div>
-          </div>
+          )}
 
-          <p className="detail-article">Артикул: S.Ee-INK.DD5.K</p>
+          <p className="detail-article">{t.article_label}: {article}</p>
 
-          <ProductActions product={{ title: 'Набор ULABS', article: 'S.Ee-INK.DD5.K', img: '/img/equipment/ulab.png' }} />
+          <ProductActions product={{ id: product?.id, title, article, img }} />
         </div>
 
-        {/* ПРАВАЯ ЧАСТЬ */}
         <div className="detail-right">
-          <img src="/img/equipment/ulab.png" alt="ULABS" className="detail-img" />
+          <img src={img} alt={title} className="detail-img" />
         </div>
 
       </main>
+
+      {extras.map((p) => {
+        const pImg = p.img || ''
+        const pDesc = Array.isArray(p.description)
+          ? p.description.join(' ')
+          : (lang === 'kz' ? p.description_kz : p.description_ru) || p.description
+        return (
+          <div key={p.id} className="detail-extra-card">
+            <div className="detail-extra-card__left">
+              <h3 className="detail-extra-card__title">{p.title}</h3>
+              {pDesc && <p className="detail-extra-card__desc">{pDesc}</p>}
+              {p.specs && p.specs.length > 0 && (
+                <div className="detail-chars">
+                  <h4 className="detail-chars__title">{t.computers_specs}</h4>
+                  <div className="detail-chars__grid">
+                    {p.specs.map((s, i) => {
+                      const iconName = getSpecIcon(s.label)
+                      const IconComp = Icon[iconName]
+                      return (
+                        <div key={i} className="char-card">
+                          <span className="char-card__icon">{IconComp ? <IconComp width="18" height="18" /> : ''}</span>
+                          <span className="char-card__label">{s.label}</span>
+                          <span className="char-card__value">{s.value}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+              {p.article && <p className="detail-article">{t.article_label}: {p.article}</p>}
+              <ProductActions product={{ id: p.id, title: p.title, article: p.article, img: pImg }} />
+            </div>
+            {pImg && (
+              <div className="detail-extra-card__right">
+                <img src={pImg} alt={p.title} className="detail-extra-card__img" />
+              </div>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }

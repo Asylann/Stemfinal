@@ -1,10 +1,17 @@
 import { useLang } from '../../i18n/LanguageContext'
 import { Link } from 'react-router-dom'
+import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import ProductActions from '../../components/ProductActions'
 import './Printers3D.css'
 
 export default function Printers3D() {
-  const { t } = useLang()
+  const { t, lang } = useLang()
+  const { products } = useCategoryProducts('printers3d')
+  const main = products[0] || null
+  const extras = products.slice(1)
+  const img = main?.img || '/img/pagethird/printers3d/item3.png'
+  const title = main?.title || t.electro_printers || '3D Принтер'
+  const article = main?.article || 'M.Ee-3DP.FL.5M'
 
   return (
     <div className="page">
@@ -68,10 +75,42 @@ export default function Printers3D() {
             <img src="/img/pagethird/printers3d/item3.png" alt="Принтер" className="printers3d-right__img" />
           </div>
 
-          <p className="printers3d-right__article">{t.article_label}: M.Ee-3DP.FL.5M</p>
+          {main?.specs && main.specs.length > 0 && (
+            <div className="printers3d-right__specs">
+              <h4 className="printers3d-right__specs-title">{t.computers_specs}</h4>
+              <div className="printers3d-right__specs-grid">
+                {main.specs.map((s, i) => (
+                  <div key={i} className="printers3d-spec">
+                    <span className="printers3d-spec__label">{s.label}</span>
+                    <span className="printers3d-spec__value">{s.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-          <ProductActions product={{ title: t.electro_printers || '3D Принтер', article: 'M.Ee-3DP.FL.5M', img: '/img/pagethird/printers3d/item3.png' }} />
+          <p className="printers3d-right__article">{t.article_label}: {article}</p>
+
+          <ProductActions product={{ id: main?.id, title, article, img }} />
         </div>
+
+        {extras.map((p) => (
+          <div key={p.id} className="printers3d-card" style={{ marginTop: '32px' }}>
+            <h3 className="printers3d-block__title">{p.title}</h3>
+            <p className="printers3d-block__text">
+              {Array.isArray(p.description)
+                ? p.description.join(' ')
+                : (lang === 'kz' ? p.description_kz : p.description_ru) || p.description}
+            </p>
+            {p.img && (
+              <div style={{ maxWidth: 400, margin: '16px 0' }}>
+                <img src={p.img} alt={p.title} style={{ width: '100%', borderRadius: '8px' }} />
+              </div>
+            )}
+            {p.article && <p className="printers3d-right__article">{t.article_label}: {p.article}</p>}
+            <ProductActions product={{ id: p.id, title: p.title, article: p.article, img: p.img }} />
+          </div>
+        ))}
 
       </main>
     </div>
