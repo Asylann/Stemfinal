@@ -143,6 +143,8 @@ async def send_to_telegram(data: Dict, app_id: str) -> None:
         )
         if response.status_code == 200:
             print(f"✅ Telegram: Заявка #{app_id} успешно отправлена")
+        else:
+            print(f"❌ Telegram: Ошибка отправки заявки #{app_id} — {response.status_code}: {response.text}")
 
 
 # ─── Bitrix24 deal stage mapping ─────────────────────────────────────────────────
@@ -249,6 +251,8 @@ async def send_contact_to_telegram(data: Dict) -> None:
         )
         if response.status_code == 200:
             print(f"✅ Telegram: Контактное сообщение отправлено")
+        else:
+            print(f"❌ Telegram: Ошибка отправки контактного сообщения — {response.status_code}: {response.text}")
 
 
 @router.post("/contact")
