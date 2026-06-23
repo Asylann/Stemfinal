@@ -175,10 +175,6 @@ export default function Peregorodki() {
                   <Icon.FileText width="16" height="16" /> Оставить заявку
                 </button>
 
-                <div className="peregorodki-card__share">
-                  <button type="button"><Icon.Share2 width="14" height="14" style={{display:'inline',verticalAlign:'middle',marginRight:4}} />Поделиться</button>
-                  <button type="button"><Icon.Scale width="14" height="14" style={{display:'inline',verticalAlign:'middle',marginRight:4}} />Сравнить</button>
-                </div>
               </div>
 
             </div>
