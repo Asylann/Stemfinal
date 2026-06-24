@@ -20,7 +20,7 @@ export default function CategoryGrid() {
       <div className="cat-grid">
         {categories.map((cat) => (
           <Link to={cat.path} key={cat.path} className="cat-grid-card">
-            <div className="cat-grid-img">
+            <div className={`cat-grid-img${cat.img.includes('RoqedAITOmainpage') ? ' cat-grid-img--roqed' : ''}`}>
               <img src={cat.img} alt={cat.title} />
             </div>
             <span className="cat-grid-label">{cat.title}</span>

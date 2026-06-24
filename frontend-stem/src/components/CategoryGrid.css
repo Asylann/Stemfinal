@@ -75,3 +75,19 @@
   .cat-grid-img { width: 48px; height: 48px; }
   .cat-grid-label { font-size: 11px; }
 }
+
+/* Roqed AI image — bigger & softly rounded */
+.cat-grid-img--roqed {
+  width: 130px;
+  height: 130px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #f0f0f0;
+}
+
+.cat-grid-img--roqed img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 18px;
+}
