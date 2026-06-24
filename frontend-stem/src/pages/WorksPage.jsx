@@ -4,10 +4,19 @@ import { useLang } from '../i18n/LanguageContext'
 import './WorksPage.css'
 
 const WORKS = [
-  { id: 1, video: '/videos/main_video.MP4' },
-  { id: 2, video: '/videos/second%20main.MP4' },
-  { id: 3, video: '/videos/second.MP4' },
-  { id: 4, video: '/videos/third.MP4' },
+  { id: 1, video: '/videos/work-01.mp4' },
+  { id: 2, video: '/videos/work-02.mp4' },
+  { id: 3, video: '/videos/work-03.mp4' },
+  { id: 4, video: '/videos/work-04.mp4' },
+  { id: 5, video: '/videos/work-05.mp4' },
+  { id: 6, video: '/videos/work-06.mp4' },
+  { id: 7, video: '/videos/work-07.mp4' },
+  { id: 8, video: '/videos/work-08.mp4' },
+  { id: 9, video: '/videos/work-09.mp4' },
+  { id: 10, video: '/videos/work-10.mp4' },
+  { id: 11, video: '/videos/work-11.mp4' },
+  { id: 12, video: '/videos/work-12.mp4' },
+  { id: 13, video: '/videos/work-13.mp4' },
 ]
 
 function LazyVideo({ src, className }) {
@@ -59,6 +68,9 @@ function LazyVideo({ src, className }) {
 export default function WorksPage() {
   const { t } = useLang()
 
+  const heroVideo = WORKS[0]
+  const gridVideos = WORKS.slice(1)
+
   return (
     <div className="works-page">
       <div className="works-hero">
@@ -83,23 +95,18 @@ export default function WorksPage() {
           <p>{t.works_section_desc}</p>
         </div>
 
+        <div className="works-featured">
+          <div className="work-card work-card--featured">
+            <LazyVideo src={heroVideo.video} className="work-video" />
+          </div>
+        </div>
+
         <div className="works-grid">
-          <div className="work-card work-card--large">
-            <LazyVideo src={WORKS[0].video} className="work-video" />
-          </div>
-
-          <div className="work-row">
-            <div className="work-card work-card--medium">
-              <LazyVideo src={WORKS[1].video} className="work-video" />
+          {gridVideos.map((work) => (
+            <div key={work.id} className="work-card">
+              <LazyVideo src={work.video} className="work-video" />
             </div>
-            <div className="work-card work-card--medium">
-              <LazyVideo src={WORKS[2].video} className="work-video" />
-            </div>
-          </div>
-
-          <div className="work-card work-card--large">
-            <LazyVideo src={WORKS[3].video} className="work-video" />
-          </div>
+          ))}
         </div>
 
         <div className="works-cta">
