@@ -290,12 +290,27 @@ export default function ProfilePage() {
                       <span className={`profile-order-card__status ${st.class}`}>{st.label}</span>
                     </div>
                     <div className="profile-order-card__body">
-                      <div className="profile-order-card__row">
-                        <span className="profile-order-card__label">
-                          <Icon.Package width="14" height="14" /> Товар
-                        </span>
-                        <span className="profile-order-card__value">{app.product_name || '—'}</span>
-                      </div>
+                      {app.products && app.products.length > 0 ? (
+                        <div className="profile-order-items">
+                          {app.products.map((item, idx) => (
+                            <div key={idx} className="profile-order-item">
+                              <div className="profile-order-item__info">
+                                <div className="profile-order-item__name">{item.name || '—'}</div>
+                                {item.article && <div className="profile-order-item__meta">Арт. {item.article}</div>}
+                                {item.color && <div className="profile-order-item__meta">Цвет: {item.color}</div>}
+                                <div className="profile-order-item__meta">Кол-во: {item.quantity || 1}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="profile-order-card__row">
+                          <span className="profile-order-card__label">
+                            <Icon.Package width="14" height="14" /> Товар
+                          </span>
+                          <span className="profile-order-card__value">{app.product_name || '—'}</span>
+                        </div>
+                      )}
                       <div className="profile-order-card__row">
                         <span className="profile-order-card__label">
                           <Icon.Calendar width="14" height="14" /> Дата

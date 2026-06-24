@@ -75,6 +75,7 @@ class Application(Base):
     product_name = Column(String, nullable=True)  
     article = Column(String, nullable=True)
     product_url = Column(String, nullable=True)
+    products_json = Column(Text, nullable=True)  # JSON array of full cart items
 
     
     status = Column(String, default="new")
