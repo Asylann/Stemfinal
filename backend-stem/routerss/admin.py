@@ -146,6 +146,7 @@ def _application_out(a: Application) -> dict:
         "manager_name": a.manager_name,
         "created_at": a.created_at,
         "updated_at": a.updated_at,
+        "products": json.loads(a.products_json) if a.products_json else None,
     }
 
 
@@ -162,6 +163,7 @@ def _user_out(u: User) -> dict:
                 "comment": a.comment,
                 "status": a.status,
                 "created_at": a.created_at,
+                "products": json.loads(a.products_json) if a.products_json else None,
             }
             for a in u.applications
         ]
