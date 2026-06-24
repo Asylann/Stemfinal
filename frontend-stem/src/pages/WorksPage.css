@@ -91,9 +91,9 @@
 
 /* ── BODY ─────────────────────────────────────────────────────────────────── */
 .works-body {
-  max-width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 56px 80px 80px;
+  padding: 56px 40px 80px;
 }
 
 .works-intro {
@@ -116,41 +116,38 @@
   line-height: 1.6;
 }
 
-/* ── VIDEO GRID ───────────────────────────────────────────────────────────── */
-.works-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 36px;
-  margin-bottom: 64px;
+/* ── FEATURED VIDEO ───────────────────────────────────────────────────────── */
+.works-featured {
+  margin-bottom: 36px;
 }
 
-.work-row {
-  display: flex;
-  gap: 36px;
+.work-card--featured {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+/* ── VIDEO GRID ───────────────────────────────────────────────────────────── */
+.works-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 64px;
 }
 
 /* ── VIDEO CARD ───────────────────────────────────────────────────────────── */
 .work-card {
   background: #fff;
-  border-radius: 20px;
+  border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-  transition: box-shadow 0.35s ease;
+  transition: box-shadow 0.35s ease, transform 0.35s ease;
   will-change: transform;
+  aspect-ratio: 16 / 9;
 }
 
 .work-card:hover {
   box-shadow: 0 16px 40px rgba(45,106,79,0.12);
-}
-
-.work-card--large {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-}
-
-.work-card--medium {
-  flex: 1;
-  aspect-ratio: 16 / 9;
+  transform: translateY(-4px);
 }
 
 .work-video {
@@ -158,7 +155,7 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  border-radius: 20px;
+  border-radius: 16px;
   pointer-events: none;
   background: #1a4731;
 }
@@ -205,19 +202,21 @@
 }
 
 /* ── RESPONSIVE ───────────────────────────────────────────────────────────── */
-@media (max-width: 1200px) {
-  .works-body { padding: 56px 60px 80px; }
+@media (max-width: 1024px) {
+  .works-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 900px) {
   .works-hero { padding: 70px 24px 60px; }
-  .works-body { padding: 40px 40px 60px; }
+  .works-body { padding: 40px 24px 60px; }
   .works-breadcrumb { padding: 10px 24px; }
-  .works-grid { gap: 24px; }
-  .work-row { gap: 24px; }
 }
 
-@media (max-width: 700px) {
-  .work-row { flex-direction: column; }
+@media (max-width: 600px) {
+  .works-grid {
+    grid-template-columns: 1fr;
+  }
   .works-cta { padding: 40px 24px; }
 }
