@@ -652,7 +652,7 @@ function ApplicationsTab() {
                 <th>Дата</th>
                 <th>Имя</th>
                 <th>Телефон</th>
-                <th>Товар</th>
+                <th>Товары</th>
                 <th>Комментарий</th>
                 <th>Статус</th>
                 <th>Bitrix</th>
@@ -671,7 +671,24 @@ function ApplicationsTab() {
                     </td>
                     <td style={{ fontWeight: 500 }}>{a.name}</td>
                     <td style={{ fontSize: 12 }}>{a.phone}</td>
-                    <td style={{ maxWidth: 160, fontSize: 13 }}>{a.product_name || '—'}</td>
+                    <td style={{ maxWidth: 200, fontSize: 13 }}>
+                      {a.products && a.products.length > 0 ? (
+                        <div className="admin-order-items">
+                          {a.products.map((item, idx) => (
+                            <div key={idx} className="admin-order-item">
+                              <div className="admin-order-item__name">{item.name || '—'}</div>
+                              <div className="admin-order-item__meta">
+                                {item.article && <span>Арт. {item.article}</span>}
+                                {item.color && <span>Цвет: {item.color}</span>}
+                                {item.quantity && <span>Кол-во: {item.quantity}</span>}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        a.product_name || '—'
+                      )}
+                    </td>
                     <td style={{ maxWidth: 160, fontSize: 12, color: '#666' }}>
                       {a.comment || '—'}
                     </td>
@@ -1393,7 +1410,7 @@ function UsersTab() {
                             </thead>
                             <tbody>
                               {u.applications.map((app) => (
-                                <tr key={app.id}>
+                              <tr key={app.id}>
                                   <td>{app.id}</td>
                                   <td style={{ fontSize: 12, color: '#888', whiteSpace: 'nowrap' }}>
                                     {app.created_at || '—'}
@@ -1402,8 +1419,23 @@ function UsersTab() {
                                   <td style={{ fontSize: 13, fontWeight: 600, color: '#2d6a4f' }}>
                                     {app.phone}
                                   </td>
-                                  <td style={{ maxWidth: 180, fontSize: 13 }}>
-                                    {app.product_name || '—'}
+                                  <td style={{ maxWidth: 200, fontSize: 13 }}>
+                                    {app.products && app.products.length > 0 ? (
+                                      <div className="admin-order-items">
+                                        {app.products.map((item, idx) => (
+                                          <div key={idx} className="admin-order-item">
+                                            <div className="admin-order-item__name">{item.name || '—'}</div>
+                                            <div className="admin-order-item__meta">
+                                              {item.article && <span>Арт. {item.article}</span>}
+                                              {item.color && <span>Цвет: {item.color}</span>}
+                                              {item.quantity && <span>Кол-во: {item.quantity}</span>}
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      app.product_name || '—'
+                                    )}
                                   </td>
                                   <td style={{ fontSize: 12, color: '#888' }}>
                                     {app.article || '—'}
