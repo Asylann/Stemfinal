@@ -45,7 +45,6 @@ services:
       sh -c "alembic upgrade head && python seed_db.py && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
     networks:
       - stem_network
-      - global_network
 
   # ─── React + Nginx Frontend ────────────────────────────────────────────────
   frontend:
@@ -62,7 +61,23 @@ services:
       - backend
     networks:
       - stem_network
-      - global_network
+
+  # ─── Nginx Proxy Manager ───────────────────────────────────────────────────
+  nginx-proxy:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx_proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"       # HTTP
+      - "443:443"     # HTTPS
+      - "81:81"       # Веб-интерфейс управления
+    volumes:
+      - ./nginx-proxy/data:/data
+      - ./nginx-proxy/letsencrypt:/etc/letsencrypt
+    depends_on:
+      - frontend
+    networks:
+      - stem_network
 
 # ─── Volumes ──────────────────────────────────────────────────────────────────
 volumes:
@@ -75,5 +90,3 @@ volumes:
 networks:
   stem_network:
     driver: bridge
-  global_network:
-    external: true
