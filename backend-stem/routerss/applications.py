@@ -1,5 +1,6 @@
 import os
 import re
+import json
 import uuid
 from datetime import datetime, timezone, timedelta
 from typing import Optional, List, Dict, Tuple
@@ -325,6 +326,7 @@ async def create_application(
         phone=app_data["phone"],
         comment=admin_comment,
         product_name=short_name,
+        products_json=json.dumps(products_list, ensure_ascii=False),
         status="new",
         user_id=user_id
     )
@@ -363,6 +365,7 @@ def get_my_applications(
             "bitrix_stage_name": a.bitrix_stage_name,
             "created_at": a.created_at,
             "updated_at": a.updated_at,
+            "products": json.loads(a.products_json) if a.products_json else None,
         }
         for a in apps
     ]
