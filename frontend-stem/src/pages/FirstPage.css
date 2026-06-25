@@ -610,6 +610,62 @@
   font-weight: 600;
 }
 
+/* ======= ПРИКАЗ №70 ======= */
+.order70-section {
+  padding: 48px 0;
+  background: #fff;
+}
+.order70-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 32px;
+  text-align: center;
+}
+.order70-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #2d6a4f, #40916c);
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 6px 20px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+}
+.order70-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: clamp(20px, 2.5vw, 30px);
+  color: #1a1a1a;
+  margin-bottom: 16px;
+}
+.order70-desc {
+  font-size: 15px;
+  color: #444;
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+.order70-note {
+  font-size: 14px;
+  color: #2d6a4f;
+  font-weight: 600;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+.order70-link {
+  display: inline-block;
+  color: #2d6a4f;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s;
+}
+.order70-link:hover {
+  color: #1e4d39;
+}
+
 @media (max-width: 900px) {
   .advantages-grid,
   .instr-preview-grid,
@@ -624,4 +680,5 @@
   .instructions-preview-section,
   .blog-preview-section { padding: 32px 0; }
   .section-container { padding: 0 16px; }
+  .order70-container { padding: 0 16px; }
 }
