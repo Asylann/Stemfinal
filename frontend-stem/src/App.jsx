@@ -32,6 +32,8 @@ import VisualizePage from './pages/VisualizePage'
 import AdminPage from './pages/AdminPage'
 import AdminLoginPage from './pages/AdminLoginPage'
 import AdminGuard from './components/AdminGuard'
+import PrivacyPage from './pages/PrivacyPage'
+import TermsPage from './pages/TermsPage'
 
 
 import RoqedPage from './pages/digital/RoqedPage'
@@ -115,6 +117,8 @@ export default function App() {
         <Route path="/digital/infostend" element={<InfoStendPage />} />
         <Route path="/digital/steambook" element={<SteamBookPage />} />
         <Route path="/visualize" element={<VisualizePage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
 
         {/* Новые разделы по ТЗ */}
         <Route path="/about" element={<AboutPage />} />

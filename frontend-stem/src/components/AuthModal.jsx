@@ -9,6 +9,8 @@ export default function AuthModal() {
   const [mode, setMode] = useState('login')
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
+  const [agreePrivacy, setAgreePrivacy] = useState(false)
+  const [agreeTerms, setAgreeTerms] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -34,6 +36,16 @@ export default function AuthModal() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    
+    if (mode === 'register' && !agreePrivacy) {
+      setError('Пожалуйста, примите политику конфиденциальности')
+      return
+    }
+    if (mode === 'register' && !agreeTerms) {
+      setError('Пожалуйста, примите пользовательское соглашение')
+      return
+    }
+    
     setLoading(true)
     try {
       if (mode === 'register') {
@@ -101,6 +113,41 @@ export default function AuthModal() {
           </div>
 
           {error && <div className="auth-box__error">{error}</div>}
+
+          {mode === 'register' && (
+            <div className="auth-box__checkbox">
+              <input
+                type="checkbox"
+                id="privacy-agree"
+                checked={agreePrivacy}
+                onChange={e => setAgreePrivacy(e.target.checked)}
+                required
+              />
+              <label htmlFor="privacy-agree">
+                Я принимаю{' '}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer">
+                  политику конфиденциальности
+                </a>
+              </label>
+            </div>
+          )}
+          {mode === 'register' && (
+            <div className="auth-box__checkbox">
+              <input
+                type="checkbox"
+                id="terms-agree"
+                checked={agreeTerms}
+                onChange={e => setAgreeTerms(e.target.checked)}
+                required
+              />
+              <label htmlFor="terms-agree">
+                Я принимаю{' '}
+                <a href="/terms" target="_blank" rel="noopener noreferrer">
+                  пользовательское соглашение
+                </a>
+              </label>
+            </div>
+          )}
 
           <button type="submit" className="auth-box__submit" disabled={loading}>
             {loading ? 'Загрузка...' : mode === 'login' ? 'Войти в аккаунт' : 'Создать аккаунт'}

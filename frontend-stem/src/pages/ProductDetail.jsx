@@ -37,6 +37,8 @@ export default function ProductDetail() {
   
   const [showModal, setShowModal] = useState(false)
   const [formData, setFormData] = useState({ name: '', phone: '', comment: '' })
+  const [agreePrivacy, setAgreePrivacy] = useState(false)
+  const [agreeTerms, setAgreeTerms] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
 
@@ -95,6 +97,16 @@ export default function ProductDetail() {
    
     if (!validatePhone(formData.phone)) {
       alert('Введите корректный номер телефона (11 цифр, например: +7 700 123 45 67)')
+      return
+    }
+    
+    if (!agreePrivacy) {
+      alert('Пожалуйста, примите политику конфиденциальности')
+      return
+    }
+    
+    if (!agreeTerms) {
+      alert('Пожалуйста, примите пользовательское соглашение')
       return
     }
     
@@ -303,6 +315,37 @@ export default function ProductDetail() {
                     rows="3"
                     maxLength={500}
                   />
+                </div>
+
+                <div className="form-checkbox">
+                  <input
+                    type="checkbox"
+                    id="privacy-agree-form"
+                    checked={agreePrivacy}
+                    onChange={e => setAgreePrivacy(e.target.checked)}
+                    required
+                  />
+                  <label htmlFor="privacy-agree-form">
+                    Я принимаю{' '}
+                    <a href="/privacy" target="_blank" rel="noopener noreferrer">
+                      политику конфиденциальности
+                    </a>
+                  </label>
+                </div>
+                <div className="form-checkbox">
+                  <input
+                    type="checkbox"
+                    id="terms-agree-form"
+                    checked={agreeTerms}
+                    onChange={e => setAgreeTerms(e.target.checked)}
+                    required
+                  />
+                  <label htmlFor="terms-agree-form">
+                    Я принимаю{' '}
+                    <a href="/terms" target="_blank" rel="noopener noreferrer">
+                      пользовательское соглашение
+                    </a>
+                  </label>
                 </div>
 
                 <button type="submit" className="btn-submit" disabled={submitting}>
