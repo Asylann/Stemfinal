@@ -406,6 +406,14 @@
   background: #229ED9;
   color: #fff;
 }
+.contacts-messenger--yt {
+  background: #FF0000;
+  color: #fff;
+}
+.contacts-messenger--ig {
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  color: #fff;
+}
 
 /* НИЖНЯЯ СЕКЦИЯ (форма + карта) */
 .contacts-bottom {
