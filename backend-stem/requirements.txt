@@ -21,3 +21,4 @@ alembic==1.13.1                 # Database migrations
 python-multipart==0.0.9         # Required for FastAPI file upload (UploadFile / Form)
 huggingface_hub>=0.16.4          # HuggingFace model management
 pillow==10.4.0                 # Image processing (PIL fork)
+redis==5.0.1                   # Caching layer

@@ -14,6 +14,7 @@ load_dotenv()
 from routerss import categories, orders, products, applications, visualize, auth, admin, uploads, blog, bitrix
 from database import init_db, SessionLocal
 from models import Product, Category
+from cache_utils import cache_get, cache_set
 
 UPLOADS_DIR = Path("/app/uploads")
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
@@ -325,7 +326,12 @@ app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 @app.get("/api/terms")
 def get_terms_of_service():
     """Пользовательское соглашение (Публичная оферта)"""
-    return {
+    # Try to get from cache
+    cached = cache_get("api:terms")
+    if cached:
+        return cached
+    
+    result = {
         "title": "Пользовательское соглашение (Публичная оферта)",
         "last_updated": "2026-06-25",
         "content": [
@@ -396,12 +402,22 @@ def get_terms_of_service():
             }
         ]
     }
+    
+    # Cache for 24 hours (static content)
+    cache_set("api:terms", result, ttl=86400)
+    
+    return result
 
 
 @app.get("/api/privacy")
 def get_privacy_policy():
     """Политика конфиденциальности"""
-    return {
+    # Try to get from cache
+    cached = cache_get("api:privacy")
+    if cached:
+        return cached
+    
+    result = {
         "title": "Политика в отношении обработки персональных данных",
         "last_updated": "2026-06-25",
         "content": [
@@ -688,6 +704,11 @@ def get_privacy_policy():
             }
         ]
     }
+    
+    # Cache for 24 hours (static content)
+    cache_set("api:privacy", result, ttl=86400)
+    
+    return result
 
 
 @app.get("/")
