@@ -1,5 +1,14 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 
+// Scroll to top on route change
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+  return null
+}
 
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
@@ -91,6 +100,7 @@ export default function App() {
 
   return (
     <>
+      <ScrollToTop />
       {!isAdminRoute && <Navbar />}
       {!isAdminRoute && <CartDrawer />}
       <AuthModal />

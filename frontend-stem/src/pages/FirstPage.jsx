@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
+import { Helmet } from 'react-helmet-async'
 import './FirstPage.css'
 import HeroSlider from '../components/HeroSlider'
 import CategoryGrid from '../components/CategoryGrid'
@@ -65,7 +66,38 @@ export default function FirstPage() {
   }, [location])
 
   return (
-    <div className="page">
+    <>
+      <Helmet>
+        <title>STEM Academia - Инновационное Образование и STEM Оборудование в Казахстане</title>
+        <meta name="description" content="STEM Academia - лидер в поставке STEM оборудования, интерактивных панелей и мебели для школ в Казахстане. Создаем будущее образования!" />
+        
+        {/* Schema.org Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "LocalBusiness",
+            "name": "STEM Academia",
+            "image": "https://stem-academia.kz/img/pagefirst/Vector (89).png",
+            "telephone": "+7 777 870 32 06",
+            "email": "info@stem-academia.kz",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "ул. Домалак ана, 26",
+              "addressLocality": "Астана",
+              "addressCountry": "KZ"
+            },
+            "url": "https://stem-academia.kz",
+            "priceRange": "$$",
+            "openingHours": "Mo-Fr 09:00-18:00",
+            "sameAs": [
+              "https://www.instagram.com/stem_academia",
+              "https://www.youtube.com/@stemacademia6974"
+            ]
+          })}
+        </script>
+      </Helmet>
+      
+      <div className="page">
       {/* Hero и категории */}
       <HeroSlider />
       <CategoryGrid />
@@ -208,5 +240,6 @@ export default function FirstPage() {
 
 
     </div>
+    </>
   )
 }
