@@ -52,9 +52,6 @@ export default function FirstPage() {
   const { t } = useLang()
   const packagesRef = useRef(null)
 
-  const scrollToPackages = () => {
-    packagesRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
   const location = useLocation()
 
   // Scroll to anchor if URL has a hash (e.g. /#packages)
@@ -101,7 +98,6 @@ export default function FirstPage() {
             </ul>
           </div>
           <img src="/img/pagefirst/Слой1.png" alt="Стул" className="package__img" />
-          <div className="package__price">90 000 ₸</div>
         </div>
 
         {/* COMFORT */}
@@ -114,7 +110,6 @@ export default function FirstPage() {
             </ul>
           </div>
           <img src="/img/pagefirst/plant.png" alt="Растение" className="package__img" />
-          <div className="package__price">130 000 ₸</div>
         </div>
 
         {/* PREMIUM */}
@@ -127,9 +122,21 @@ export default function FirstPage() {
             </ul>
           </div>
           <img src="/img/pagefirst/F5.png" alt="Кресло" className="package__img" />
-          <div className="package__price">180 000 ₸</div>
         </div>
       </main>
+
+      {/* Приказ №70 */}
+      <section className="order70-section">
+        <div className="order70-container">
+          <div className="order70-badge">Приказ №70 МОН РК</div>
+          <h2 className="order70-title">{t.order70_title}</h2>
+          <p className="order70-desc">{t.order70_desc}</p>
+          <p className="order70-note">{t.order70_note}</p>
+          <a href="https://adilet.zan.kz/rus/docs/V1600013272" target="_blank" rel="noopener noreferrer" className="order70-link">
+            {t.order70_link_text}
+          </a>
+        </div>
+      </section>
 
       {/* БЛОК ПРЕИМУЩЕСТВ */}
       <section className="advantages-section">
@@ -199,29 +206,7 @@ export default function FirstPage() {
         </div>
       </section>
 
-      {/* Dream секция */}
-      <section className="dream">
-        <img src="/img/pagefirst/key1.png" alt="" className="dream__key dream__key--tl" />
-        <img src="/img/pagefirst/key1.png" alt="" className="dream__key dream__key--tm" />
-        <img src="/img/pagefirst/key1.png" alt="" className="dream__key dream__key--bl" />
-        <img src="/img/pagefirst/key1.png" alt="" className="dream__key dream__key--br" />
 
-        <div className="dream__left">
-          <h2 className="dream__title">Инновационное решение для нашего будущего</h2>
-          <p className="dream__desc">{t.dream_desc}</p>
-          <button type="button" className="dream__btn" onClick={scrollToPackages}>{t.dream_btn}</button>
-        </div>
-
-        <div className="dream__right">
-          <img
-            src="/img/pagefirst/room.png"
-            alt={t.design_breadcrumb || 'Дизайн интерьера'}
-            className="dream__room dream__room--clickable"
-            onClick={scrollToPackages}
-            style={{ cursor: 'pointer' }}
-          />
-        </div>
-      </section>
     </div>
   )
 }
