@@ -66,7 +66,7 @@ export default function Footer() {
           <h4 className="footer-col__title">{t.nav_contacts}</h4>
           <ul className="footer-col__list footer-col__list--contacts">
             <li><Icon.MapPin width="14" height="14" style={{display:'inline',verticalAlign:'middle',marginRight:4}} /> {selectedCity.address}</li>
-            <li><Icon.Phone width="14" height="14" style={{display:'inline',verticalAlign:'middle',marginRight:4}} /> <a href="tel:+77778703206">+7 777 870 32 06</a></li>
+            <li><Icon.Phone width="14" height="14" style={{display:'inline',verticalAlign:'middle',marginRight:4}} /> <a href="tel:+77778703206">+7 777 697 14 23</a></li>
             <li><Icon.Mail width="14" height="14" style={{display:'inline',verticalAlign:'middle',marginRight:4}} /> <a href="mailto:info@stemacademia.kz">info@stemacademia.kz</a></li>
             <li><Icon.Clock width="14" height="14" style={{display:'inline',verticalAlign:'middle',marginRight:4}} /> {t.footer_schedule}</li>
           </ul>
