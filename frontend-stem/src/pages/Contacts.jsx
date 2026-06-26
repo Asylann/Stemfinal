@@ -89,7 +89,7 @@ export default function Contacts() {
             <h3 className="contacts-col__title">{t.contacts_messengers_title}</h3>
             <div className="contacts-messengers">
               <a
-                href="https://wa.me/77778703206"
+                href="https://wa.me/77776971423"
                 target="_blank"
                 rel="noreferrer"
                 className="contacts-messenger contacts-messenger--wa"
