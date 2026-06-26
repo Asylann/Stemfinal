@@ -39,10 +39,11 @@ else:
     engine = create_engine(
         DATABASE_URL,
         poolclass=QueuePool,
-        pool_size=5,
-        max_overflow=10,
+        pool_size=8,
+        max_overflow=12,
         pool_pre_ping=True,
-        pool_recycle=600,
+        pool_recycle=1800,
+        pool_timeout=30,
         connect_args={
             "connect_timeout": 10,
             "sslmode": ssl_mode,

@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
 from database import get_db
 from models import Product
+from cache_utils import cache_get, cache_set
 
 router = APIRouter()
 
@@ -110,6 +111,15 @@ def get_products(
     in_stock: bool = Query(None),
     db: Session = Depends(get_db),
 ):
+    # Build cache key based on query parameters
+    cache_key = f"products:{category}:{q}:{in_stock}"
+    
+    # Try to get from cache
+    cached = cache_get(cache_key)
+    if cached:
+        return cached
+    
+    # Query database
     query = db.query(Product).options(joinedload(Product.category))
     if category:
         query = query.filter(Product.category_slug == category)
@@ -117,11 +127,24 @@ def get_products(
         query = query.filter(Product.title.ilike(f"%{q}%"))
     if in_stock is not None:
         query = query.filter(Product.in_stock == in_stock)
-    return [_product_out(p) for p in query.all()]
+    
+    result = [_product_out(p) for p in query.all()]
+    
+    # Cache for 30 minutes
+    cache_set(cache_key, result, ttl=1800)
+    
+    return result
 
 
 @router.get("/{product_id}")
 def get_product(product_id: int, db: Session = Depends(get_db)):
+    # Try to get from cache
+    cache_key = f"product:{product_id}"
+    cached = cache_get(cache_key)
+    if cached:
+        return cached
+    
+    # Query database
     p = (
         db.query(Product)
         .options(joinedload(Product.category))
@@ -130,4 +153,10 @@ def get_product(product_id: int, db: Session = Depends(get_db)):
     )
     if not p:
         raise HTTPException(status_code=404, detail=f"Товар с ID {product_id} не найден")
-    return _product_out(p)
+    
+    result = _product_out(p)
+    
+    # Cache for 1 hour
+    cache_set(cache_key, result, ttl=3600)
+    
+    return result
