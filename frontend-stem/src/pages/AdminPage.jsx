@@ -134,6 +134,23 @@ function ProductModal({ product, categories, onClose, onSaved }) {
   const [uploading, setUploading] = useState(false)
   const [imgPreview, setImgPreview] = useState(product?.img || '')
 
+  // ── Color variants ────────────────────────────────────────────────────────
+  const parseColorsJson = (json) => {
+    if (!json) return []
+    try {
+      const parsed = JSON.parse(json)
+      if (Array.isArray(parsed)) return parsed.map(c => ({
+        name: c.name || '',
+        img: c.img || '',
+        hex: c.hex || '#cccccc',  // ensure picker always has a real starting value
+      }))
+    } catch { /* ignore */ }
+    return []
+  }
+  const [colors, setColors] = useState(() => parseColorsJson(product?.colors_json))
+  // Track which color index is uploading (null = none)
+  const [colorUploading, setColorUploading] = useState(null)
+
   const set = (field) => (e) => {
     setForm((prev) => ({
       ...prev,
@@ -179,6 +196,40 @@ function ProductModal({ product, categories, onClose, onSaved }) {
     }
   }
 
+  // Handle color variant image upload
+  async function handleColorImageFile(e, colorIndex) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Immediate local preview for that color slot
+    const localUrl = URL.createObjectURL(file)
+    setColors((prev) => {
+      const updated = [...prev]
+      updated[colorIndex] = { ...updated[colorIndex], img: localUrl, _uploading: true }
+      return updated
+    })
+
+    setColorUploading(colorIndex)
+    setError('')
+    try {
+      const result = await adminUploadImage(file)
+      setColors((prev) => {
+        const updated = [...prev]
+        updated[colorIndex] = { ...updated[colorIndex], img: result.url, _uploading: false }
+        return updated
+      })
+    } catch (err) {
+      setError('Ошибка загрузки фото цвета: ' + err.message)
+      setColors((prev) => {
+        const updated = [...prev]
+        updated[colorIndex] = { ...updated[colorIndex], img: '', _uploading: false }
+        return updated
+      })
+    } finally {
+      setColorUploading(null)
+    }
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     if (!form.title.trim()) {
@@ -189,12 +240,22 @@ function ProductModal({ product, categories, onClose, onSaved }) {
       setError('Подождите, фото ещё загружается...')
       return
     }
+    if (colorUploading !== null) {
+      setError('Подождите, фото цвета ещё загружается...')
+      return
+    }
     setSaving(true)
     setError('')
     try {
       // Serialize specs to JSON
       const validSpecs = specs.filter(s => s.label.trim() && s.value.trim())
       const specsJson = validSpecs.length > 0 ? JSON.stringify(validSpecs) : null
+
+      // Serialize colors to JSON (only rows that have at least a name OR an image)
+      const validColors = colors.filter(c => (c.name || '').trim() || (c.img || '').trim())
+      const colorsJson = validColors.length > 0
+        ? JSON.stringify(validColors.map(({ name, img, hex }) => ({ name: name || '', img: img || '', hex: hex || '#cccccc' })))
+        : null
 
       const payload = {
         ...form,
@@ -207,6 +268,7 @@ function ProductModal({ product, categories, onClose, onSaved }) {
         article: form.article || null,
         category_slug: form.category_slug || null,
         specs_json: specsJson,
+        colors_json: colorsJson,
       }
       if (isEdit) {
         await adminUpdateProduct(product.id, payload)
@@ -308,6 +370,92 @@ function ProductModal({ product, categories, onClose, onSaved }) {
           <div className="admin-form__field">
             <label>Размер</label>
             <input value={form.size} onChange={set('size')} placeholder="180x80x85 см" />
+          </div>
+
+          {/* Color variants */}
+          <div className="admin-form__field">
+            <label>Цвета товара</label>
+            <div className="admin-colors">
+              {colors.map((color, i) => (
+                <div key={i} className="admin-colors__row">
+                  {/* Thumbnail or placeholder */}
+                  {color.img ? (
+                    <img
+                      src={color.img}
+                      alt={color.name || `Цвет ${i + 1}`}
+                      className="admin-colors__thumb"
+                      onError={(e) => { e.target.style.display = 'none' }}
+                    />
+                  ) : (
+                    <div
+                      className="admin-colors__thumb-placeholder"
+                      style={{ background: color.hex || '#e0e0e0' }}
+                    />
+                  )}
+
+                  {/* RGB Color Picker */}
+                  <div className="admin-colors__picker-wrap">
+                    <input
+                      type="color"
+                      className="admin-colors__color-picker"
+                      value={color.hex || '#cccccc'}
+                      title="Выбрать цвет"
+                      onChange={(e) => {
+                        const updated = [...colors]
+                        updated[i] = { ...updated[i], hex: e.target.value }
+                        setColors(updated)
+                      }}
+                    />
+                    <span className="admin-colors__hex-label">{color.hex || '#cccccc'}</span>
+                  </div>
+
+                  {/* Name input */}
+                  <input
+                    className="admin-colors__name-input"
+                    placeholder="Название цвета (напр. Синий)"
+                    value={color.name || ''}
+                    onChange={(e) => {
+                      const updated = [...colors]
+                      updated[i] = { ...updated[i], name: e.target.value }
+                      setColors(updated)
+                    }}
+                  />
+
+                  {/* Upload button */}
+                  <label
+                    className="admin-colors__upload-label"
+                    htmlFor={`color-img-file-${i}`}
+                  >
+                    {colorUploading === i ? '...' : color.img ? '↺ Фото' : '📷 Фото'}
+                  </label>
+                  <input
+                    id={`color-img-file-${i}`}
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    style={{ display: 'none' }}
+                    onChange={(e) => handleColorImageFile(e, i)}
+                    disabled={colorUploading !== null}
+                  />
+
+                  {/* Delete row */}
+                  <button
+                    type="button"
+                    className="admin-colors__remove"
+                    onClick={() => setColors(colors.filter((_, idx) => idx !== i))}
+                    title="Удалить цвет"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                className="admin-colors__add"
+                onClick={() => setColors([...colors, { name: '', img: '', hex: '#cccccc' }])}
+              >
+                + Добавить цвет
+              </button>
+            </div>
           </div>
 
           <div className="admin-form__check-row">
