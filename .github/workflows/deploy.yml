@@ -2,7 +2,7 @@ name: Deploy to Production
 
 on:
   push:
-    branches: [ main, master]
+    branches: [ master ]
 
 jobs:
   deploy:
@@ -19,8 +19,21 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /var/www/stem
-            git stash
-            git pull
-            git stash pop || true
-            docker compose up -d --build --remove-orphans
+            
+            # 1. Скачиваем свежие коммиты в кэш git, ничего не меняя на диске сервера
+            git fetch origin master
+            
+            # 2. Вытаскиваем из гита ТОЛЬКО папки с кодом. 
+            # Твой рабочий docker-compose.yml и файлы базы на сервере никто не тронет.
+            git checkout origin/master -- backend-stem/
+            git checkout origin/master -- frontend-stem/
+            
+            # 3. Пересобираем фронтенд без кэша, чтобы пробить старые слои
+            docker compose build --no-cache frontend
+            docker compose build backend
+            
+            # 4. Обновляем контейнеры кода. База данных и редис продолжают работать без остановок.
+            docker compose up -d --no-deps --remove-orphans frontend backend
+            
+            # 5. Чистим мусорные слои образов
             docker image prune -f
