@@ -48,6 +48,7 @@ class ProductCreate(BaseModel):
     in_stock: bool = True
     category_slug: Optional[str] = None
     specs_json: Optional[str] = None
+    colors_json: Optional[str] = None
 
 
 class ProductUpdate(BaseModel):
@@ -62,6 +63,7 @@ class ProductUpdate(BaseModel):
     in_stock: Optional[bool] = None
     category_slug: Optional[str] = None
     specs_json: Optional[str] = None
+    colors_json: Optional[str] = None
 
 
 class CategoryCreate(BaseModel):
@@ -98,6 +100,7 @@ def _product_out(p: Product) -> dict:
         "in_stock": p.in_stock,
         "category_slug": p.category_slug,
         "specs_json": p.specs_json,
+        "colors_json": p.colors_json,
     }
 
 
