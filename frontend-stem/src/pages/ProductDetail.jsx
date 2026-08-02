@@ -34,6 +34,8 @@ export default function ProductDetail() {
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [activeImg, setActiveImg] = useState(null)   // null = use product.img
+  const [activeColorIdx, setActiveColorIdx] = useState(-1) // -1 = main/default
   
   const [showModal, setShowModal] = useState(false)
   const [formData, setFormData] = useState({ name: '', phone: '', comment: '' })
@@ -49,6 +51,8 @@ export default function ProductDetail() {
         setError(null)
         const response = await apiClient.get(`/api/products/${id}`)
         setProduct(response.data)
+        setActiveImg(null)        // reset to primary image on product change
+        setActiveColorIdx(-1)
       } catch (err) {
         if (err.response?.status === 404) {
           setError('Товар не найден')
@@ -149,6 +153,14 @@ export default function ProductDetail() {
 
   const categoryName = getCategoryName(product?.category)
 
+  // Color variants — public API returns a parsed array under `colors`
+  const colorVariants = Array.isArray(product?.colors)
+    ? product.colors.filter(c => c.img)
+    : []
+
+  // The image currently displayed in the main slot
+  const displayImg = activeImg || product?.img
+
   if (loading) {
     return (
       <div className="product-loading">
@@ -195,11 +207,71 @@ export default function ProductDetail() {
           <div className="product-gallery">
             <div className="product-main-image">
               <img
-                src={product.img}
+                src={displayImg}
                 alt={product.title}
                 className="main-image"
               />
             </div>
+
+            {/* Color swatches + thumbnail strip */}
+            {colorVariants.length > 0 && (
+              <>
+                {/* Thumbnail strip */}
+                <div className="product-thumbnails">
+                  {/* First thumb = main/default photo */}
+                  {product.img && (
+                    <img
+                      src={product.img}
+                      alt={product.title}
+                      className={`thumbnail${activeColorIdx === -1 || colorVariants.length === 0 ? ' active' : ''}`}
+                      onClick={() => { setActiveImg(null); setActiveColorIdx(-1) }}
+                    />
+                  )}
+                  {colorVariants.map((c, idx) => (
+                    <img
+                      key={idx}
+                      src={c.img}
+                      alt={c.name || `Цвет ${idx + 1}`}
+                      className={`thumbnail${activeColorIdx === idx ? ' active' : ''}`}
+                      onClick={() => { setActiveImg(c.img); setActiveColorIdx(idx) }}
+                    />
+                  ))}
+                </div>
+
+                {/* Color swatches */}
+                <div className="product-colors">
+                  <div className="color-swatches-row">
+                    {/* Default/main swatch */}
+                    {product.img && (
+                      <button
+                        className={`color-swatch${activeColorIdx === -1 ? ' active' : ''}`}
+                        style={{ backgroundColor: '#c8c8c8' }}
+                        title="Основной"
+                        onClick={() => { setActiveImg(null); setActiveColorIdx(-1) }}
+                      />
+                    )}
+                    {colorVariants.map((c, idx) => (
+                      <button
+                        key={idx}
+                        className={`color-swatch${activeColorIdx === idx ? ' active' : ''}`}
+                        style={{ backgroundColor: c.hex || '#c8c8c8' }}
+                        title={c.name || `Цвет ${idx + 1}`}
+                        onClick={() => { setActiveImg(c.img); setActiveColorIdx(idx) }}
+                      />
+                    ))}
+                  </div>
+                  {/* Show active color name */}
+                  <span className="color-label">
+                    Цвет:{' '}
+                    <strong>
+                      {activeColorIdx === -1
+                        ? 'Основной'
+                        : colorVariants[activeColorIdx]?.name || `Цвет ${activeColorIdx + 1}`}
+                    </strong>
+                  </span>
+                </div>
+              </>
+            )}
           </div>
 
           <div className="product-info">
